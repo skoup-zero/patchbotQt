@@ -1,0 +1,9 @@
+11
+7
+MMMMMMMMMMM
+M5  5  ..5M
+MM   .... M
+M  ...    M
+Mx .   ...M
+Mp   ....PM
+MMMMMMMMMMM
