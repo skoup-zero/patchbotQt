@@ -32,14 +32,20 @@ image image::load_tga_from_file( const std::filesystem::path &path )
 	if( !input.good() )	/* exc: errors in input stream */
 		throw std::runtime_error( "corrupted tga file" );
 
-	/* creates vector with iteratable unsigned chars */
-	std::vector<unsigned char> buffer( std::istreambuf_iterator<char>( input ), {} );
-
 	image_header header;
 
-	input.seekg( 0, input.beg );
 	input.read( reinterpret_cast<char *> ( &header ), 18 );
-	input.close();
+
+	/* correcting bytes for big endian systems */
+	if( !is_system_little_endian() )
+	{
+		swap_bytes( header.color_map_start );
+		swap_bytes( header.color_map_length );
+		swap_bytes( header.x_origin );
+		swap_bytes( header.y_origin );
+		swap_bytes( header.image_width );
+		swap_bytes( header.image_heigth );
+	}
 
 	if( static_cast<int>( header.id_length ) ) /* exc: header id included */
 		throw patchbot_exception( patchbot_enum_exception::image_format_exception );
@@ -68,14 +74,36 @@ image image::load_tga_from_file( const std::filesystem::path &path )
 	unsigned int img_size = static_cast<int>( header.image_heigth )
 		* static_cast<int>( header.image_width ) * 4;
 
-	/* deleting Header and Metadata */
-	buffer.erase( buffer.begin(), buffer.begin() + 18 );
-	buffer.erase( buffer.begin() + img_size, buffer.end() );
+	if( input_size + 18 <= img_size ) /* exc: file size is not big enough */
+		throw patchbot_exception( patchbot_enum_exception::image_format_exception );
 
-	( header.image_width, header.image_heigth, buffer );
+	std::vector<unsigned char> buffer;
+	buffer.resize( img_size );
+
+	for( int i = 0; i < img_size; i++ )
+	{
+		input.read( reinterpret_cast<char *>( &buffer[i] ), 1 );
+	}
 
 	return image( std::move( header ), std::move( buffer ) );
 }
+
+
+const bool image::is_system_little_endian()
+{
+	const unsigned int endian_test = 1;
+	const auto first_byte = reinterpret_cast<const unsigned char *> ( &endian_test );
+	return first_byte[0];
+}
+
+
+void image::swap_bytes( std::uint16_t &word )
+{
+	word = ( word >> 8 ) | ( word << 8 );
+}
+
+
+/// GETTER
 
 unsigned int image::pixel_index( unsigned int x, unsigned int y, unsigned int width, unsigned int heigth )
 {
@@ -85,14 +113,14 @@ unsigned int image::pixel_index( unsigned int x, unsigned int y, unsigned int wi
 	return ( width * 4 * y ) + ( x * 4 );
 }
 
-/// GETTER
 
-image_header image::header() const
+image_header image::header() const noexcept
 {
 	return header_;
 }
 
-std::vector<unsigned char> patchbot::image::pixels() const
+
+std::vector<unsigned char> patchbot::image::pixels() const noexcept
 {
 	return pixels_;
 }

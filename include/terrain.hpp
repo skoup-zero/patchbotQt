@@ -54,7 +54,7 @@ namespace patchbot
 		///	@return		a tile at given coordinates
 		const tile &at( unsigned int x, unsigned int y ) const;
 
-		unsigned int width() const;
-		unsigned int height() const;
+		unsigned int width() const noexcept;
+		unsigned int height() const noexcept;
 	};
 }

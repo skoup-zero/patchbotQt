@@ -6,7 +6,7 @@
 namespace patchbot
 {
 
-/* to match the struct size with tga header size */
+	/* to match the struct size with tga header size */
 #pragma pack(push, 1)
 
 	/// @struct header of image	
@@ -51,16 +51,33 @@ namespace patchbot
 		/// @return		instance of tga_loader
 		static image load_tga_from_file( const std::filesystem::path &path );
 
+		/// @brief		tests if system is little endian
+		///
+		///	@details	assigning 1 to an interger variable and checking the value
+		///				of the first bit stored in RAM. 
+		///				If 1 then the first bit is the least significant bit.
+		///				If 0 then the first bit is the most significant bit.
+		///
+		/// @return		1 (true) if system is little endian
+		static const bool is_system_little_endian();
+
+		/// @brief		swaps two bytes
+		///
+		/// @param		2 byte word
+		static void swap_bytes( std::uint16_t &word );
+
 		/// @brief		function to acces a specific pixel at given index
 		///
 		/// @param		x, y as coordiantes
 		/// @param		width, heigth as image_size
 		/// 
 		/// @return		index of pixel
+		/// 
+		/// @throws		std::out_of_range for invalid coordinates
 		static unsigned int pixel_index( unsigned int x, unsigned int y,
 			unsigned int width, unsigned int heigth );
 
-		image_header header() const;
-		std::vector<unsigned char> pixels() const;
+		image_header header() const noexcept;
+		std::vector<unsigned char> pixels() const noexcept;
 	};
 }

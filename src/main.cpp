@@ -62,14 +62,14 @@ void write_tga_to_file( const patchbot::image &tga )
 {
 	std::ofstream output( "Test.tga", std::ios::binary | std::ios::out );
 
-	auto header = tga.header();
-	auto pixels = tga.pixels();
+	const auto &header = tga.header();
+	const auto &pixels = tga.pixels();
 
-	output.write( reinterpret_cast<char *>( &header ), 18 );
+	output.write( reinterpret_cast<const char *>( &header ), 18 );
 
 	for( int i = 0; i < pixels.size(); i++ )
 	{
-		output.write( reinterpret_cast<char *> ( &pixels[i] ), sizeof( pixels[i] ) );
+		output.write( reinterpret_cast<const char *> ( &pixels[i] ), sizeof( pixels[i] ) );
 	}
 
 	output.close();
@@ -81,8 +81,11 @@ int main( int argc, char *argv[] )
 	QApplication a( argc, argv );
 	try
 	{
-		auto test = patchbot::image::load_tga_from_file(R"(C:\Zero_Work\patchbot\assets\tga\grafiken\roboter\patchbot.tga)" );
-		write_tga_to_file( test );
+		//auto map = patchbot::terrain::load_map_from_file(R"(C:\Zero_Work\patchbot\assets\txt\koloniekarten\everything.txt)" );
+		//write_map_to_file( map );
+
+		//auto test = patchbot::image::load_tga_from_file( R"(C:\Zero_Work\patchbot\assets\tga\grafiken\roboter\patchbot.tga)" );
+		//write_tga_to_file( test );
 
 	} catch( const std::exception &exc )
 	{
@@ -94,29 +97,31 @@ int main( int argc, char *argv[] )
 	return a.exec();
 }
 
-//int main( int argc, char **argv )
-//{
-//	if( argc != 2 )
-//	{
-//		std::cout << "please put a valid path for the map to load"
-//			<< R"(e.g.: F:\Work\Patchbot\extra\txt\koloniekarten\map.txt)" << std::endl;
-//
-//		return EXIT_FAILURE;
-//	}
-//	try
-//	{
-//		//patchbot::terrain map = patchbot::terrain::load_map_from_file( argv[1] );
-//		//write_map_to_file( map );
-//
-//		std::cout << argv[1] << std::endl;
-//		auto test = patchbot::image::load_tga_from_file( argv[1] );
-//		write_tga_to_file( test );
-//
-//	} catch( const std::exception &exc )
-//	{
-//		std::cout << "Error: " << exc.what() << std::endl;
-//		return EXIT_FAILURE;
-//	}
-//
-//	return EXIT_SUCCESS;
-//}
+/*
+MISTAKES TESTAT 2:
+-	[Fehlerarmut] Keine Überprüfung, ob genügend Pixeldaten vorhanden; Programm crasht bei zu wenigen Bytes in Datei
+-	[Datenstruktur] Umkopieren beim Löschen vermeiden
+
+CHANGES SINCE TESTAT 2:
+
+-	terrain:
+		getter: height, width now with noexcept.
+
+-	tga_loader:
+		program doesn´t crash anymore, checking if enough pixels are available
+		vector doesn´t copy the data into another vector, reads each char instead.
+
+		checks if system is little endian
+		swaps bytes if not
+
+		getter: header, pixels now with noexcept.
+
+-	main:
+		header and pixels are getting passed as references instead of copies.
+
+
+	left questions:
+		- tga loader doesen´t crash anymore but doensn´t catch invalid pixeldata from metadata either,
+			thus the output is a random pixelcolored image. how can i check if given stream contains pixel
+			data or meta data?
+*/

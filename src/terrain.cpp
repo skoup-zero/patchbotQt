@@ -113,15 +113,6 @@ terrain terrain::load_map_from_file( const std::filesystem::path &path )
 
 
 /// GETTER
-unsigned int terrain::width() const
-{
-	return width_;
-}
-
-unsigned int terrain::height() const
-{
-	return height_;
-}
 
 const tile &terrain::at( unsigned int index ) const
 {
@@ -139,4 +130,14 @@ const tile &terrain::at( unsigned int x, unsigned int y ) const
 		throw std::out_of_range{ "coordinates out of range" };
 	}
 	return tiles_.at( width_ * y + x );
+}
+
+unsigned int terrain::width() const noexcept
+{
+	return width_;
+}
+
+unsigned int terrain::height() const noexcept
+{
+	return height_;
 }
