@@ -77,8 +77,8 @@ void write_tga_to_file( const patchbot::image &tga )
 
 int main( int argc, char *argv[] )
 {
-
 	QApplication a( argc, argv );
+
 	try
 	{
 		//auto map = patchbot::terrain::load_map_from_file(R"(C:\Zero_Work\patchbot\assets\txt\koloniekarten\everything.txt)" );
@@ -92,8 +92,10 @@ int main( int argc, char *argv[] )
 		std::cout << "Error: " << exc.what() << std::endl;
 		return EXIT_FAILURE;
 	}
+
 	patchbot_gui w;
 	w.show();
+
 	return a.exec();
 }
 
