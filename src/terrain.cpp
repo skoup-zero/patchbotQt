@@ -125,7 +125,7 @@ const tile &terrain::at( unsigned int index ) const
 
 const tile &terrain::at( unsigned int x, unsigned int y ) const
 {
-	if( x >= width_ || y >= height_ )
+	if( x >= width_  || y >= height_ )
 	{
 		throw std::out_of_range{ "coordinates out of range" };
 	}

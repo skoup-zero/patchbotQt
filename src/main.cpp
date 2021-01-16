@@ -93,7 +93,7 @@ int main( int argc, char *argv[] )
 		return EXIT_FAILURE;
 	}
 
-	patchbot_gui w;
+	patchbot::patchbot_gui w;
 	w.show();
 
 	return a.exec();
@@ -101,7 +101,7 @@ int main( int argc, char *argv[] )
 
 /*
 MISTAKES TESTAT 2:
--	[Fehlerarmut] Keine Überprüfung, ob genügend Pixeldaten vorhanden; Programm crasht bei zu wenigen Bytes in Datei
+//-	[Fehlerarmut] Keine Überprüfung, ob genügend Pixeldaten vorhanden; Programm crasht bei zu wenigen Bytes in Datei
 -	[Datenstruktur] Umkopieren beim Löschen vermeiden
 
 CHANGES SINCE TESTAT 2:

@@ -102,6 +102,25 @@ void image::swap_bytes( std::uint16_t &word )
 	word = ( word >> 8 ) | ( word << 8 );
 }
 
+QPixmap patchbot::image::qpixmap_converter() const
+{
+	QImage q_img( header_.image_width, header_.image_heigth, QImage::Format_RGBA8888 );
+
+	for( int y = 0; y < q_img.height(); y++ )
+	{
+		for( int x = 0; x < q_img.width(); x++ )
+		{
+			q_img.setPixel( x, q_img.height() - 1 - y, qRgba(
+				pixels_[pixel_index( x, y, q_img.width(), q_img.height() ) + 2],	//R
+				pixels_[pixel_index( x, y, q_img.width(), q_img.height() ) + 1],	//G
+				pixels_[pixel_index( x, y, q_img.width(), q_img.height() )],		//B
+				pixels_[pixel_index( x, y, q_img.width(), q_img.height() ) + 3] )	//A
+			);
+		}
+	}
+
+	return QPixmap::fromImage( q_img );
+}
 
 /// GETTER
 
@@ -120,7 +139,97 @@ image_header image::header() const noexcept
 }
 
 
-std::vector<unsigned char> patchbot::image::pixels() const noexcept
+std::vector<unsigned char> image::pixels() const noexcept
 {
 	return pixels_;
+}
+
+
+/// @class assets
+
+patchbot::load_assets::load_assets()
+{
+	/* Load Map tga's */
+	terrain_img.insert( std::pair <tile_type, QPixmap>( tile_type::patchbot_start,
+		image::load_tga_from_file( R"(assets\tga\grafiken\umgebungen\boden_start_patchbot.tga)" )
+		.qpixmap_converter() ) );
+	terrain_img.insert( std::pair <tile_type, QPixmap>( tile_type::enemy_start,
+		image::load_tga_from_file( R"(assets\tga\grafiken\umgebungen\boden_start_gegner.tga)" )
+		.qpixmap_converter() ) );
+	terrain_img.insert( std::pair <tile_type, QPixmap>( tile_type::steel_plates,
+		image::load_tga_from_file( R"(assets\tga\grafiken\umgebungen\boden.tga)" )
+		.qpixmap_converter() ) );
+	terrain_img.insert( std::pair <tile_type, QPixmap>( tile_type::precipice,
+		image::load_tga_from_file( R"(assets\tga\grafiken\umgebungen\gefahr_abgrund.tga)" )
+		.qpixmap_converter() ) );
+	terrain_img.insert( std::pair <tile_type, QPixmap>( tile_type::water,
+		image::load_tga_from_file( R"(assets\tga\grafiken\umgebungen\gefahr_wasser.tga)" )
+		.qpixmap_converter() ) );
+	terrain_img.insert( std::pair <tile_type, QPixmap>( tile_type::server,
+		image::load_tga_from_file( R"(assets\tga\grafiken\umgebungen\hauptserver.tga)" )
+		.qpixmap_converter() ) );
+	terrain_img.insert( std::pair <tile_type, QPixmap>( tile_type::alien_weed,
+		image::load_tga_from_file( R"(assets\tga\grafiken\umgebungen\hindernis_aliengras.tga)" )
+		.qpixmap_converter() ) );
+	terrain_img.insert( std::pair <tile_type, QPixmap>( tile_type::gravel,
+		image::load_tga_from_file( R"(assets\tga\grafiken\umgebungen\hindernis_schotter.tga)" )
+		.qpixmap_converter() ) );
+	terrain_img.insert( std::pair <tile_type, QPixmap>( tile_type::secret_path,
+		image::load_tga_from_file( R"(assets\tga\grafiken\umgebungen\hindernis_geheimgang.tga)" )
+		.qpixmap_converter() ) );
+	terrain_img.insert( std::pair <tile_type, QPixmap>( tile_type::manual_door,
+		image::load_tga_from_file( R"(assets\tga\grafiken\umgebungen\tuer_manuell_geschlossen.tga)" )
+		.qpixmap_converter() ) );
+	terrain_img.insert( std::pair <tile_type, QPixmap>( tile_type::automatic_door,
+		image::load_tga_from_file( R"(assets\tga\grafiken\umgebungen\tuer_automatisch_geschlossen.tga)" )
+		.qpixmap_converter() ) );
+	terrain_img.insert( std::pair <tile_type, QPixmap>( tile_type::concrete_wall,
+		image::load_tga_from_file( R"(assets\tga\grafiken\umgebungen\wand_beton.tga)" )
+		.qpixmap_converter() ) );
+	terrain_img.insert( std::pair <tile_type, QPixmap>( tile_type::rock_wall,
+		image::load_tga_from_file( R"(assets\tga\grafiken\umgebungen\wand_fels.tga)" )
+		.qpixmap_converter() ) );
+
+	/* Load Robot tga's */
+	robot_img.insert( std::pair <robot_type, QPixmap>(robot_type::patchbot,
+		image::load_tga_from_file( R"(assets\tga\grafiken\roboter\patchbot.tga)" )
+		.qpixmap_converter() ) );
+	robot_img.insert( std::pair <robot_type, QPixmap>( robot_type::bugger,
+		image::load_tga_from_file( R"(assets\tga\grafiken\roboter\typ1_bugger.tga)" )
+		.qpixmap_converter() ) );
+	robot_img.insert( std::pair <robot_type, QPixmap>( robot_type::pusher,
+		image::load_tga_from_file( R"(assets\tga\grafiken\roboter\typ2_pusher.tga)" )
+		.qpixmap_converter() ) );
+	robot_img.insert( std::pair <robot_type, QPixmap>( robot_type::digger,
+		image::load_tga_from_file( R"(assets\tga\grafiken\roboter\typ3_digger.tga)" )
+		.qpixmap_converter() ) );
+	robot_img.insert( std::pair <robot_type, QPixmap>( robot_type::swimmer,
+		image::load_tga_from_file( R"(assets\tga\grafiken\roboter\typ4_swimmer.tga)" )
+		.qpixmap_converter() ) );
+	robot_img.insert( std::pair <robot_type, QPixmap>( robot_type::follower,
+		image::load_tga_from_file( R"(assets\tga\grafiken\roboter\typ5_follower.tga)" )
+		.qpixmap_converter() ) );
+	robot_img.insert( std::pair <robot_type, QPixmap>( robot_type::hunter,
+		image::load_tga_from_file( R"(assets\tga\grafiken\roboter\typ6_hunter.tga)" )
+		.qpixmap_converter() ) );
+	robot_img.insert( std::pair <robot_type, QPixmap>( robot_type::sniffer,
+		image::load_tga_from_file( R"(assets\tga\grafiken\roboter\typ7_sniffer.tga)" )
+		.qpixmap_converter() ) );
+	robot_img.insert( std::pair <robot_type, QPixmap>( robot_type::dead,
+		image::load_tga_from_file( R"(assets\tga\grafiken\roboter\dead.tga)" )
+		.qpixmap_converter() ) );
+
+	/* Load Arrow tga's */
+	arrow_img.insert( std::pair <arrows, QPixmap>( arrows::left,
+		image::load_tga_from_file( R"(assets\tga\grafiken\pfeile\pfeil_links.tga)" )
+		.qpixmap_converter() ) );
+	arrow_img.insert( std::pair <arrows, QPixmap>( arrows::up,
+		image::load_tga_from_file( R"(assets\tga\grafiken\pfeile\pfeil_oben.tga)" )
+		.qpixmap_converter() ) );
+	arrow_img.insert( std::pair <arrows, QPixmap>( arrows::right,
+		image::load_tga_from_file( R"(assets\tga\grafiken\pfeile\pfeil_rechts.tga)" )
+		.qpixmap_converter() ) );
+	arrow_img.insert( std::pair <arrows, QPixmap>( arrows::down,
+		image::load_tga_from_file( R"(assets\tga\grafiken\pfeile\pfeil_unten.tga)" )
+		.qpixmap_converter() ) );
 }

@@ -1,11 +1,15 @@
 #pragma once
 
+#include <qpixmap.h>
+
+#include <entity.hpp>
+#include <terrain.hpp>
 #include <fstream>
 #include <vector>
+#include <map>
 
 namespace patchbot
 {
-
 	/* to match the struct size with tga header size */
 #pragma pack(push, 1)
 
@@ -26,6 +30,7 @@ namespace patchbot
 		std::uint8_t	image_descriptor;
 	};
 #pragma pack(pop)
+
 
 	/// @class image with header and pixels representing tga file
 	class image
@@ -66,6 +71,11 @@ namespace patchbot
 		/// @param		2 byte word
 		static void swap_bytes( std::uint16_t &word );
 
+		/// @brief		converts image into pixmap
+		///
+		///	@return		converted pixmap
+		QPixmap qpixmap_converter() const;
+
 		/// @brief		function to acces a specific pixel at given index
 		///
 		/// @param		x, y as coordiantes
@@ -79,5 +89,25 @@ namespace patchbot
 
 		image_header header() const noexcept;
 		std::vector<unsigned char> pixels() const noexcept;
+	};
+
+
+	enum class arrows
+	{
+		left,
+		up,
+		right,
+		down
+	};
+
+
+	/// @class to preload tga files
+	class load_assets
+	{
+	public:
+		load_assets();
+		std::unordered_map<tile_type, QPixmap> terrain_img;
+		std::unordered_map<robot_type, QPixmap> robot_img;
+		std::unordered_map<arrows, QPixmap> arrow_img;
 	};
 }

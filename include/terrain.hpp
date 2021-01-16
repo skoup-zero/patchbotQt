@@ -56,5 +56,6 @@ namespace patchbot
 
 		unsigned int width() const noexcept;
 		unsigned int height() const noexcept;
+
 	};
 }

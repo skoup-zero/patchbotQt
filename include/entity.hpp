@@ -6,7 +6,6 @@
 
 namespace patchbot
 {
-
 	enum class robot_type
 	{
 		patchbot,
@@ -16,7 +15,8 @@ namespace patchbot
 		swimmer,
 		follower,
 		hunter,
-		sniffer
+		sniffer,
+		dead
 	};
 
 	/// map to assign symbols to enums
@@ -28,18 +28,25 @@ namespace patchbot
 		{ '4', robot_type::swimmer },
 		{ '5', robot_type::follower },
 		{ '6', robot_type::hunter },
-		{ '7', robot_type::sniffer }
+		{ '7', robot_type::sniffer },
+		{ 'X', robot_type::dead }
 	};
 
 	/// @class	robot represents a robot that interacts with the player
 	///			and the environment
 	class robot
 	{
+		bool alive_ = true;
+		unsigned int id_counter_ = 1;
 
 	public:
 		robot_type robot_type_;
+		unsigned int id_, x_, y_;
 
 		robot( robot_type type );
+
+		void kill_robot();
+		bool alive() const noexcept;
 	};
 
 	enum class tile_type
@@ -83,6 +90,6 @@ namespace patchbot
 		std::shared_ptr<robot> occupant_;
 
 		tile( tile_type type );
-		tile_type tile::type() const;
+		tile_type tile::type() const noexcept;
 	};
 }
