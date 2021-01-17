@@ -41,9 +41,9 @@ void model::render_map( QPixmap &pixmap, unsigned int label_x, unsigned int labe
 		last_x = terrain_.width() - 1, last_y = terrain_.height() - 1;
 
 	painter.begin( &pixmap );
-	for( int y = 0; y <= height / ( pixel_tga_height_ - 1 ) + 1 && y <= terrain_.height(); y++ )
+	for( int y = 0; y <= height / ( pixel_tga_height_ - 1 ) && y <= terrain_.height(); y++ )
 	{
-		for( int x = 0; x <= width / ( pixel_tga_width_ - 1 ) + 1 && x <= terrain_.width(); x++ )
+		for( int x = 0; x <= width / ( pixel_tga_width_ - 1 ) && x <= terrain_.width(); x++ )
 		{
 			try
 			{	/* Render Background */
@@ -71,7 +71,7 @@ void model::render_map( QPixmap &pixmap, unsigned int label_x, unsigned int labe
 				{
 					if( terrain_.at( last_x, last_y ).occupant_ )
 					{
-						r_type = terrain_.at( last_y, last_y ).occupant_->robot_type_;
+						r_type = terrain_.at( last_x, last_y ).occupant_->robot_type_;
 						terrain_.at( last_x, last_y ).occupant_->x_ = x;
 						terrain_.at( last_x, last_y ).occupant_->y_ = y;
 						robots_.push_back( terrain_.at( last_x, y ).occupant_ );
@@ -118,7 +118,8 @@ void model::render_map( QPixmap &pixmap, unsigned int label_x, unsigned int labe
 				}
 			} catch( const std::exception &exc )
 			{
-				std::cout << "Error: " << exc.what() << std::endl;
+				std::cout << "Error: " << exc.what() << "at: x/y: " <<
+					x << "/" << y << std::endl;
 				return;
 			}
 		}
@@ -172,10 +173,6 @@ patchbot_gui::patchbot_gui( QWidget *parent )
 	ui_.map_scroll_area->setMaximumSize(
 		model_.pixel_terrain_width(), model_.pixel_terrain_height() );
 
-	//model_.render_map( pixmap_, ui_.map_placeholder_label->width(),
-	//	ui_.map_placeholder_label->height(), 0, 0 );
-	//ui_.map_placeholder_label->setPixmap( pixmap_ );
-
 	/* same on all maps */
 	ui_.sequenz_line_edit->setReadOnly( true );
 	ui_.repeat_dropdown->addItems( { "1x", "2x", "3x", "4x", "5x", "6x", "7x", "8x", "9x", "10x" } );
@@ -185,19 +182,11 @@ patchbot_gui::patchbot_gui( QWidget *parent )
 
 void patchbot_gui::refresh_window()
 {
-	//unsigned int width = ( ui_.map_placeholder_label->width() < model_.pixel_terrain_width() )
-	//	? ui_.map_placeholder_label->width() : model_.pixel_terrain_width();
-	//unsigned int height = ( ui_.map_placeholder_label->height() < model_.pixel_terrain_height() )
-	//	? ui_.map_placeholder_label->height() : model_.pixel_terrain_height();
 	unsigned int width = ( ui_.map_scroll_area->width() < model_.pixel_terrain_width() )
 		? ui_.map_scroll_area->width() : model_.pixel_terrain_width();
 	unsigned int height = ( ui_.map_scroll_area->height() < model_.pixel_terrain_height() )
 		? ui_.map_scroll_area->height() : model_.pixel_terrain_height();
 
-	//pixmap_ = QPixmap(width, height);
-	//ui_.map_placeholder_label->resize( width, height );
-	//ui_.map_placeholder_label->setMaximumSize(
-	//	model_.pixel_terrain_width(), model_.pixel_terrain_height() );
 	pixmap_ = QPixmap( ui_.map_scroll_area->size() );
 	ui_.map_placeholder_label->resize( ui_.map_scroll_area->size() );
 	ui_.map_scroll_area->setMaximumSize(
@@ -210,15 +199,6 @@ void patchbot_gui::refresh_window()
 		ui_.map_scrollbar_h->value(), ui_.map_scrollbar_v->value() );
 
 	ui_.map_placeholder_label->setPixmap( pixmap_ );
-
-	/* DEBUG: !DELTE THIS! */
-	std::cout << "scroll_a: " << ui_.map_scroll_area->width() << "/" <<
-		ui_.map_scroll_area->height() << "scroll_a_w: " << ui_.map_scroll_area_widget->width()
-		<< "/" << ui_.map_scroll_area_widget->height() << " label" << ui_.map_placeholder_label->width()
-		<< "/" << ui_.map_placeholder_label->height() << "pixmap" << pixmap_.width() << "/" << pixmap_.height()
-		<< std::endl;
-	std::cout << ui_.map_scrollbar_h->maximum() << ui_.map_scrollbar_v->maximum() << std::endl;
-	/* DEBUG: !DELTE THIS! */
 }
 
 void patchbot_gui::resizeEvent( QResizeEvent *event )
@@ -319,7 +299,7 @@ void patchbot_gui::on_delete_button_clicked()
 void patchbot_gui::on_map_scrollbar_h_valueChanged( int change )
 {
 	model_.render_map( pixmap_,
-		ui_.map_placeholder_label->width(), ui_.map_placeholder_label->height(),
+		ui_.map_scroll_area->width(), ui_.map_scroll_area->height(),
 		ui_.map_scrollbar_h->value(), ui_.map_scrollbar_v->value() );
 
 	ui_.map_placeholder_label->setPixmap( pixmap_ );
@@ -328,7 +308,7 @@ void patchbot_gui::on_map_scrollbar_h_valueChanged( int change )
 void patchbot_gui::on_map_scrollbar_v_valueChanged( int change )
 {
 	model_.render_map( pixmap_,
-		ui_.map_placeholder_label->width(), ui_.map_placeholder_label->height(),
+		ui_.map_scroll_area->width(), ui_.map_scroll_area->height(),
 		ui_.map_scrollbar_h->value(), ui_.map_scrollbar_v->value() );
 
 	ui_.map_placeholder_label->setPixmap( pixmap_ );
