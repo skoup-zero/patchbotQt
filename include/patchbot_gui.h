@@ -59,6 +59,7 @@ namespace patchbot
 		model model_;	/* model for data */
 
 	public:
+
 		QPixmap pixmap_;
 
 		patchbot_gui( QWidget *parent = Q_NULLPTR );

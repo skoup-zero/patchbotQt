@@ -121,9 +121,4 @@ CHANGES SINCE TESTAT 2:
 -	main:
 		header and pixels are getting passed as references instead of copies.
 
-
-	left questions:
-		- tga loader doesen´t crash anymore but doensn´t catch invalid pixeldata from metadata either,
-			thus the output is a random pixelcolored image. how can i check if given stream contains pixel
-			data or meta data?
 */

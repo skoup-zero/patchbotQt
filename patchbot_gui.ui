@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>599</width>
-    <height>397</height>
+    <width>593</width>
+    <height>391</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>593</width>
+    <height>391</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>PATCHBOT v1.0</string>
@@ -45,19 +51,19 @@
        <item row="1" column="0">
         <layout class="QGridLayout" name="map_layout">
          <property name="leftMargin">
-          <number>3</number>
+          <number>1</number>
          </property>
          <property name="topMargin">
-          <number>3</number>
+          <number>1</number>
          </property>
          <property name="rightMargin">
-          <number>3</number>
+          <number>1</number>
          </property>
          <property name="bottomMargin">
-          <number>3</number>
+          <number>1</number>
          </property>
          <property name="spacing">
-          <number>3</number>
+          <number>1</number>
          </property>
          <item row="0" column="1">
           <widget class="QScrollBar" name="map_scrollbar_v">
@@ -119,8 +125,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>280</width>
-              <height>314</height>
+              <width>284</width>
+              <height>318</height>
              </rect>
             </property>
             <property name="sizePolicy">
@@ -131,16 +137,16 @@
             </property>
             <layout class="QGridLayout" name="map_scroll_area_widget_layout">
              <property name="leftMargin">
-              <number>0</number>
+              <number>1</number>
              </property>
              <property name="topMargin">
-              <number>0</number>
+              <number>1</number>
              </property>
              <property name="rightMargin">
-              <number>0</number>
+              <number>1</number>
              </property>
              <property name="bottomMargin">
-              <number>0</number>
+              <number>1</number>
              </property>
              <property name="horizontalSpacing">
               <number>6</number>
@@ -155,12 +161,12 @@
                </property>
                <property name="minimumSize">
                 <size>
-                 <width>0</width>
-                 <height>0</height>
+                 <width>282</width>
+                 <height>316</height>
                 </size>
                </property>
                <property name="styleSheet">
-                <string notr="true">background:lightgreen;</string>
+                <string notr="true"/>
                </property>
                <property name="text">
                 <string/>

@@ -66,7 +66,7 @@ void model::render_map( QPixmap &pixmap, unsigned int label_x, unsigned int labe
 				painter.drawPixmap( x * pixel_tga_width_ - space_x % 32,
 					y * pixel_tga_height_ - space_y % 32, assets_.terrain_img.at( t_type ) );
 
-				/* Render Robots and save them in vector */
+				/* Render Robots and save them in a vector */
 				if( x + padding_x >= terrain_.width() && y + padding_y >= terrain_.height() )
 				{
 					if( terrain_.at( last_x, last_y ).occupant_ )
@@ -74,7 +74,7 @@ void model::render_map( QPixmap &pixmap, unsigned int label_x, unsigned int labe
 						r_type = terrain_.at( last_x, last_y ).occupant_->robot_type_;
 						terrain_.at( last_x, last_y ).occupant_->x_ = x;
 						terrain_.at( last_x, last_y ).occupant_->y_ = y;
-						robots_.push_back( terrain_.at( last_x, y ).occupant_ );
+						robots_.push_back( terrain_.at( last_x, last_y ).occupant_ );
 
 						painter.drawPixmap( x * pixel_tga_width_ - space_x % 32,
 							y * pixel_tga_height_ - space_y % 32, assets_.robot_img.at( r_type ) );
@@ -118,8 +118,7 @@ void model::render_map( QPixmap &pixmap, unsigned int label_x, unsigned int labe
 				}
 			} catch( const std::exception &exc )
 			{
-				std::cout << "Error: " << exc.what() << "at: x/y: " <<
-					x << "/" << y << std::endl;
+				std::cout << "Error: " << exc.what() << std::endl;
 				return;
 			}
 		}
@@ -168,8 +167,10 @@ patchbot_gui::patchbot_gui( QWidget *parent )
 
 	ui_.map_label->setText( "Aktuelle Kolonie: everything" );
 
-	pixmap_ = QPixmap( ui_.map_scroll_area->size() );
-	ui_.map_placeholder_label->resize( ui_.map_scroll_area->size() );
+	pixmap_ = QPixmap( ui_.map_placeholder_label->size() );
+	ui_.map_placeholder_label->setMaximumSize(
+		model_.pixel_terrain_width(), model_.pixel_terrain_height() );
+
 	ui_.map_scroll_area->setMaximumSize(
 		model_.pixel_terrain_width(), model_.pixel_terrain_height() );
 
@@ -187,17 +188,16 @@ void patchbot_gui::refresh_window()
 	unsigned int height = ( ui_.map_scroll_area->height() < model_.pixel_terrain_height() )
 		? ui_.map_scroll_area->height() : model_.pixel_terrain_height();
 
-	pixmap_ = QPixmap( ui_.map_scroll_area->size() );
-	ui_.map_placeholder_label->resize( ui_.map_scroll_area->size() );
-	ui_.map_scroll_area->setMaximumSize(
-		model_.pixel_terrain_width(), model_.pixel_terrain_height() );
+	ui_.map_placeholder_label->setFixedWidth( width );
+	ui_.map_placeholder_label->setFixedHeight( height );
+
+	pixmap_ = pixmap_.scaled( ui_.map_placeholder_label->size(), Qt::IgnoreAspectRatio );
 
 	ui_.map_scrollbar_h->setMaximum( model_.pixel_terrain_width() - width );
 	ui_.map_scrollbar_v->setMaximum( model_.pixel_terrain_height() - height );
 
 	model_.render_map( pixmap_, width, height,
 		ui_.map_scrollbar_h->value(), ui_.map_scrollbar_v->value() );
-
 	ui_.map_placeholder_label->setPixmap( pixmap_ );
 }
 
