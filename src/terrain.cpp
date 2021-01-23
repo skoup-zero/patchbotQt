@@ -53,7 +53,7 @@ terrain terrain::load_map_from_file( const std::filesystem::path &path )
 		throw;
 	}
 
-	unsigned int pb_start = 0, pb_goals = 0, counter = 0;
+	unsigned int pb_start = 0, pb_goals = 0, counter_height = 0, counter_width = 0;
 
 	std::vector<tile> tiles;
 	tiles.reserve( width * height );
@@ -75,6 +75,8 @@ terrain terrain::load_map_from_file( const std::filesystem::path &path )
 				{
 					auto temp = tile( tile_type::patchbot_start );
 					temp.occupant_ = std::make_shared<robot>( r_it->second );
+					temp.occupant_->x_ = counter_width;
+					temp.occupant_->y_ = counter_height;
 					tiles.push_back( temp );
 					pb_start++;
 
@@ -82,6 +84,8 @@ terrain terrain::load_map_from_file( const std::filesystem::path &path )
 				{
 					auto temp = tile( tile_type::enemy_start );
 					temp.occupant_ = std::make_shared<robot>( r_it->second );
+					temp.occupant_->x_ = counter_width;
+					temp.occupant_->y_ = counter_height;
 					tiles.push_back( temp );
 				}
 			} else if( !( t_it == tile_map.end() ) ) /* creating tile */
@@ -96,10 +100,11 @@ terrain terrain::load_map_from_file( const std::filesystem::path &path )
 			{ /* exc: invalid char */
 				throw patchbot_exception{ patchbot_enum_exception::map_format_exception };
 			}
+			counter_width++;
 		}
-		counter++;
+		counter_height++;
 	}
-	if( counter != height ) /* exc: height of map is incorrect */
+	if( counter_height != height ) /* exc: height of map is incorrect */
 		throw patchbot_exception{ patchbot_enum_exception::map_format_exception };
 
 	if( pb_goals < 1 ) /* exc: no server found */

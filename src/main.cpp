@@ -1,5 +1,6 @@
 #include <patchbot_gui.h>
 #include <QtWidgets/QApplication>
+#include <QMessageBox>
 
 #include <entity.hpp>
 #include <terrain.hpp>
@@ -87,38 +88,36 @@ int main( int argc, char *argv[] )
 		//auto test = patchbot::image::load_tga_from_file( R"(C:\Zero_Work\patchbot\assets\tga\grafiken\roboter\patchbot.tga)" );
 		//write_tga_to_file( test );
 
+		patchbot::patchbot_gui w;
+		w.show();
+
+		return a.exec();
+
 	} catch( const std::exception &exc )
 	{
 		std::cout << "Error: " << exc.what() << std::endl;
 		return EXIT_FAILURE;
 	}
-
-	patchbot::patchbot_gui w;
-	w.show();
-
-	return a.exec();
 }
 
 /*
-MISTAKES TESTAT 2:
-//-	[Fehlerarmut] Keine Überprüfung, ob genügend Pixeldaten vorhanden; Programm crasht bei zu wenigen Bytes in Datei
--	[Datenstruktur] Umkopieren beim Löschen vermeiden
 
-CHANGES SINCE TESTAT 2:
+Testat 3 + 4
+[Ausnahmebehandlung] Ausnahmen, die das Programmende erfordern, in der main fangen -> done
+[Schlichtheit] redundanter Code beim Laden der Grafiken,
+				effizienterer Code für Konvertierung nach Qimage -> done
 
--	terrain:
-		getter: height, width now with noexcept.
+[Datenstrukturen] zu rendernden Ausschnitt bestimmen, Anstelle jedes Mal auf Ende der Karte zu prüfen
 
--	tga_loader:
-		program doesn´t crash anymore, checking if enough pixels are available
-		vector doesn´t copy the data into another vector, reads each char instead.
+TODOS:
+-relativer Pfad
+-stürtzt ab wenn tga nicht findet 
+- 
 
-		checks if system is little endian
-		swaps bytes if not
-
-		getter: header, pixels now with noexcept.
-
--	main:
-		header and pixels are getting passed as references instead of copies.
-
+VERBESSERUNG TESTAT 4:
+- rendering jetz halb so kurz und ca 2000 mal unkomplizierter.
+- qpixmap converter vertauscht nach dem lesen der daten die R mit B und spiegelt es vertikal anstatt
+	jeden pixel einzeln zu lesen.
+- Ausnahmen, die das Programmende erfordern werden in der Main abgefangen und alle anderen per QDialog 
+	dem User mitgeteilt.
 */

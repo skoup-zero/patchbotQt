@@ -100,6 +100,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\controls.cpp" />
     <ClCompile Include="src\terrain.cpp" />
     <ClCompile Include="src\tga_loader.cpp" />
     <QtRcc Include="patchbot_gui.qrc" />
@@ -111,6 +112,7 @@
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\controls.hpp" />
     <ClInclude Include="include\entity.hpp" />
     <ClInclude Include="include\exceptions.hpp" />
     <ClInclude Include="include\terrain.hpp" />

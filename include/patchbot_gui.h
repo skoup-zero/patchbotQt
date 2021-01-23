@@ -10,6 +10,7 @@
 #include <fstream>
 #include <iostream>
 #include <filesystem>
+#include <string>
 
 namespace patchbot
 {
@@ -21,6 +22,7 @@ namespace patchbot
 		unsigned int pixel_tga_height_;
 		unsigned int pixel_terrain_width_;
 		unsigned int pixel_terrain_height_;
+		bool game_is_on_ = false;
 
 	public:
 
@@ -36,8 +38,8 @@ namespace patchbot
 		///				according to map (terrain_)
 		/// 
 		/// @param		pixmap to draw on
-		/// @param		label_x, label_y - size of Label
-		/// @param		space_x, space_y - scroll values
+		/// @param		screen_width, screen_height - size of view
+		/// @param		scroll_value_x, scroll_value_y - scroll values
 		void render_map( QPixmap &pixmap, unsigned int label_x, unsigned int label_y,
 			unsigned int space_x, unsigned int space_y );
 
@@ -45,6 +47,8 @@ namespace patchbot
 		int pixel_tga_height() const noexcept;
 		int pixel_terrain_width() const noexcept;
 		int pixel_terrain_height() const noexcept;
+
+		void set_game_is_on(bool status);
 	};
 
 
@@ -85,6 +89,7 @@ namespace patchbot
 		void on_arrow_down_button_clicked();
 		void on_arrow_left_button_clicked();
 		void on_arrow_right_button_clicked();
+		void on_center_button_clicked();
 		void on_delete_button_clicked();
 
 		/// @brief scrollbars 

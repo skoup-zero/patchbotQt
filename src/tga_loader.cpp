@@ -104,22 +104,10 @@ void image::swap_bytes( std::uint16_t &word )
 
 QPixmap patchbot::image::qpixmap_converter() const
 {
-	QImage q_img( header_.image_width, header_.image_heigth, QImage::Format_RGBA8888 );
+	QImage q_img( (uchar *) pixels_.data(), header_.image_width, header_.image_heigth,
+		QImage::Format_RGBA8888 );
 
-	for( int y = 0; y < q_img.height(); y++ )
-	{
-		for( int x = 0; x < q_img.width(); x++ )
-		{
-			q_img.setPixel( x, q_img.height() - 1 - y, qRgba(
-				pixels_[pixel_index( x, y, q_img.width(), q_img.height() ) + 2],	//R
-				pixels_[pixel_index( x, y, q_img.width(), q_img.height() ) + 1],	//G
-				pixels_[pixel_index( x, y, q_img.width(), q_img.height() )],		//B
-				pixels_[pixel_index( x, y, q_img.width(), q_img.height() ) + 3] )	//A
-			);
-		}
-	}
-
-	return QPixmap::fromImage( q_img );
+	return QPixmap::fromImage( q_img.rgbSwapped().mirrored( false, true ) );
 }
 
 /// GETTER

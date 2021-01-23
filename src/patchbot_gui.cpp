@@ -24,107 +24,61 @@ model::model( terrain &&ter )
 	pixel_terrain_height_ = terrain_.height() * pixel_tga_height_;
 }
 
-void model::render_map( QPixmap &pixmap, unsigned int label_x, unsigned int label_y,
-	unsigned int space_x, unsigned int space_y )
+void model::render_map( QPixmap &pixmap, unsigned int screen_width, unsigned int screen_height,
+	unsigned int scroll_value_x, unsigned int scroll_value_y )
 {
 	/* render entire map if it fits in Label */
-	unsigned int width = ( pixel_terrain_width_ < label_x )
-		? pixel_terrain_width_ : label_x;
-	unsigned int height = ( pixel_terrain_height_ < label_y )
-		? pixel_terrain_height_ : label_y;
+	unsigned int width = ( pixel_terrain_width_ < screen_width )
+		? pixel_terrain_width_ : screen_width;
+	unsigned int height = ( pixel_terrain_height_ < screen_height )
+		? pixel_terrain_height_ : screen_height;
+
+	int left_border = std::floor( scroll_value_x / pixel_tga_width_ );
+	int top_border = std::floor( scroll_value_y / pixel_tga_height_ );
+
+	int right_border = std::ceil( ( width + scroll_value_x ) / pixel_tga_width_ ) + 1;
+	int bottom_border = std::ceil( ( height + scroll_value_y ) / pixel_tga_height_ ) + 1;
 
 	QPainter painter;
-	tile_type t_type;
-	robot_type r_type;
-
-	unsigned int padding_x = space_x / pixel_tga_width_, padding_y = space_y / pixel_tga_height_,
-		last_x = terrain_.width() - 1, last_y = terrain_.height() - 1;
-
 	painter.begin( &pixmap );
-	for( int y = 0; y <= height / ( pixel_tga_height_ - 1 ) && y <= terrain_.height(); y++ )
+
+	for( int y = top_border; y <= bottom_border && y < terrain_.height(); y++ )
 	{
-		for( int x = 0; x <= width / ( pixel_tga_width_ - 1 ) && x <= terrain_.width(); x++ )
+		for( int x = left_border; x <= right_border && x < terrain_.width(); x++ )
 		{
-			try
-			{	/* Render Background */
-				if( x + padding_x >= terrain_.width() && y + padding_y >= terrain_.height() )
-				{
-					t_type = terrain_.at( last_x, last_y ).type();
+			/* draw Background */
+			const auto &tile = terrain_.at( x, y );
+			const auto &img = assets_.terrain_img.at( tile.type() );
 
-				} else if( x + padding_x >= terrain_.width() )
-				{
-					t_type = terrain_.at( last_x, y + padding_y ).type();
+			painter.drawPixmap( ( x - left_border ) * pixel_tga_width_ - scroll_value_x % 32,
+				( y - top_border ) * pixel_tga_height_ - scroll_value_y % 32, img );
 
-				} else if( y + padding_y >= terrain_.height() )
-				{
-					t_type = terrain_.at( x + padding_x, last_y ).type();
-
-				} else
-				{
-					t_type = terrain_.at( x + padding_x, y + padding_y ).type();
-				}
-				painter.drawPixmap( x * pixel_tga_width_ - space_x % 32,
-					y * pixel_tga_height_ - space_y % 32, assets_.terrain_img.at( t_type ) );
-
-				/* Render Robots and save them in a vector */
-				if( x + padding_x >= terrain_.width() && y + padding_y >= terrain_.height() )
-				{
-					if( terrain_.at( last_x, last_y ).occupant_ )
-					{
-						r_type = terrain_.at( last_x, last_y ).occupant_->robot_type_;
-						terrain_.at( last_x, last_y ).occupant_->x_ = x;
-						terrain_.at( last_x, last_y ).occupant_->y_ = y;
-						robots_.push_back( terrain_.at( last_x, last_y ).occupant_ );
-
-						painter.drawPixmap( x * pixel_tga_width_ - space_x % 32,
-							y * pixel_tga_height_ - space_y % 32, assets_.robot_img.at( r_type ) );
-					}
-				} else if( x + padding_x >= terrain_.width() )
-				{
-					if( terrain_.at( last_x, y + padding_y ).occupant_ )
-					{
-						r_type = terrain_.at( last_x, y + padding_y ).occupant_->robot_type_;
-						terrain_.at( last_x, y + padding_y ).occupant_->x_ = x;
-						terrain_.at( last_x, y + padding_y ).occupant_->y_ = y;
-						robots_.push_back( terrain_.at( last_x, y + padding_y ).occupant_ );
-
-						painter.drawPixmap( x * pixel_tga_width_ - space_x % 32,
-							y * pixel_tga_height_ - space_y % 32, assets_.robot_img.at( r_type ) );
-					}
-				} else if( y + padding_y >= terrain_.height() )
-				{
-					if( terrain_.at( x + padding_x, last_y ).occupant_ )
-					{
-						r_type = terrain_.at( x + padding_x, last_y ).occupant_->robot_type_;
-						terrain_.at( x + padding_x, last_y ).occupant_->x_ = x;
-						terrain_.at( x + padding_x, last_y ).occupant_->y_ = y;
-						robots_.push_back( terrain_.at( x + padding_x, last_y ).occupant_ );
-
-						painter.drawPixmap( x * pixel_tga_width_ - space_x % 32,
-							y * pixel_tga_height_ - space_y % 32, assets_.robot_img.at( r_type ) );
-					}
-				} else
-				{
-					if( terrain_.at( x + padding_x, y + padding_y ).occupant_ )
-					{
-						r_type = terrain_.at( x + padding_x, y + padding_y ).occupant_->robot_type_;
-						terrain_.at( x + padding_x, y + padding_y ).occupant_->x_ = x;
-						terrain_.at( x + padding_x, y + padding_y ).occupant_->y_ = y;
-						robots_.push_back( terrain_.at( x + padding_x, y + padding_y ).occupant_ );
-
-						painter.drawPixmap( x * pixel_tga_width_ - space_x % 32,
-							y * pixel_tga_height_ - space_y % 32, assets_.robot_img.at( r_type ) );
-					}
-				}
-			} catch( const std::exception &exc )
+			/* draw Robots */
+			if( tile.occupant_ )
 			{
-				std::cout << "Error: " << exc.what() << std::endl;
-				return;
+				const auto &robot = tile.occupant_;
+				const auto &img = assets_.robot_img.at( robot->robot_type_ );
+
+				if( robot->robot_type_ == robot_type::patchbot )
+				{
+					if( game_is_on_ )
+					{
+						painter.drawPixmap( ( x - left_border ) * pixel_tga_width_ - scroll_value_x % 32,
+							( y - top_border ) * pixel_tga_height_ - scroll_value_y % 32, img );
+						robots_.push_back( robot );
+					}
+				} else
+				{
+					painter.drawPixmap( ( x - left_border ) * pixel_tga_width_ - scroll_value_x % 32,
+						( y - top_border ) * pixel_tga_height_ - scroll_value_y % 32, img );
+					robots_.push_back( robot );
+				}
 			}
 		}
 	}
 	painter.end();
 }
+
 
 
 // GETTER
@@ -143,41 +97,40 @@ int model::pixel_terrain_width() const noexcept
 	return pixel_terrain_width_;
 
 }
+
 int model::pixel_terrain_height() const noexcept
 {
 	return pixel_terrain_height_;
+}
+
+void model::set_game_is_on( bool status )
+{
+	game_is_on_ = status;
 }
 
 
 /*********************************~ PRESENTER ~***********************************/
 patchbot_gui::patchbot_gui( QWidget *parent )
 	: QMainWindow( parent )
+	, model_()
 {
-	model model_;
-	try
-	{
-		model_ = model();
-	} catch( const std::exception &exc )
-	{
-		std::cout << "Error: " << exc.what() << std::endl;
-		return;
-	}
-
 	ui_.setupUi( this );
 
+	/* Display */
+	ui_.map_scroll_area->resize( 324, 321 );
+	ui_.map_placeholder_label->resize( 324, 321 );
+	pixmap_ = QPixmap( 324, 321 );
 	ui_.map_label->setText( "Aktuelle Kolonie: everything" );
 
-	pixmap_ = QPixmap( ui_.map_placeholder_label->size() );
-	ui_.map_placeholder_label->setMaximumSize(
-		model_.pixel_terrain_width(), model_.pixel_terrain_height() );
-
-	ui_.map_scroll_area->setMaximumSize(
-		model_.pixel_terrain_width(), model_.pixel_terrain_height() );
-
-	/* same on all maps */
+	/* program buttons */
 	ui_.sequenz_line_edit->setReadOnly( true );
-	ui_.repeat_dropdown->addItems( { "1x", "2x", "3x", "4x", "5x", "6x", "7x", "8x", "9x", "10x" } );
-	ui_.center_button->setEnabled( false );
+	ui_.repeat_dropdown->addItems( { "1x", "2x", "3x", "4x", "5x", "6x", "7x", "8x",
+		"9x", "bis Hindernis" } );
+
+	/* control buttons */
+	ui_.mission_step_button->setEnabled( false );
+	ui_.mission_cancel_button->setEnabled( false );
+	ui_.mission_auto_button->setEnabled( false );
 }
 
 
@@ -188,9 +141,7 @@ void patchbot_gui::refresh_window()
 	unsigned int height = ( ui_.map_scroll_area->height() < model_.pixel_terrain_height() )
 		? ui_.map_scroll_area->height() : model_.pixel_terrain_height();
 
-	ui_.map_placeholder_label->setFixedWidth( width );
-	ui_.map_placeholder_label->setFixedHeight( height );
-
+	ui_.map_placeholder_label->resize( width, height );
 	pixmap_ = pixmap_.scaled( ui_.map_placeholder_label->size(), Qt::IgnoreAspectRatio );
 
 	ui_.map_scrollbar_h->setMaximum( model_.pixel_terrain_width() - width );
@@ -220,21 +171,24 @@ void patchbot_gui::on_change_colonie_button_clicked()
 	if( !change_map_path.isNull() )
 	{
 		QFileInfo path( change_map_path );
-		ui_.map_label->setText( "Aktuelle Kolonie: " + path.baseName() );
-		ui_.map_scrollbar_h->setValue( 0 );
-		ui_.map_scrollbar_v->setValue( 0 );
-
 		std::filesystem::path casted_path = change_map_path.toUtf8().constData();
 
 		try
 		{
 			auto temp = ( terrain::load_map_from_file( casted_path ) );
 			model_ = model( std::move( temp ) );
+
 		} catch( std::exception &exc )
 		{
 			std::cout << "Error: " << exc.what() << std::endl;
+			QMessageBox::information( this, "selected File is Broken!", "Please select another File" );
 			return;
 		}
+		ui_.map_label->setText( "Aktuelle Kolonie: " + path.baseName() );
+		ui_.map_scrollbar_h->setValue( 0 );
+		ui_.map_scrollbar_v->setValue( 0 );
+		pixmap_ = QPixmap( ui_.map_placeholder_label->size() );
+
 		refresh_window();
 	}
 }
@@ -243,25 +197,44 @@ void patchbot_gui::on_change_colonie_button_clicked()
 /* MISSION BUTTONS */
 void patchbot_gui::on_mission_start_button_clicked()
 {
-	QMessageBox::about( this, "START_BUTTON", "start button is clicked" );
+	ui_.arrow_up_button->setEnabled( false );
+	ui_.arrow_down_button->setEnabled( false );
+	ui_.arrow_left_button->setEnabled( false );
+	ui_.arrow_right_button->setEnabled( false );
+	ui_.center_button->setEnabled( false );
+	ui_.sequenz_line_edit->setEnabled( false );
+	ui_.sequenz_scrollbar_h->setEnabled( false );
+	ui_.change_colonie_button->setEnabled( false );
+	ui_.mission_start_button->setEnabled( false );
+	ui_.delete_button->setEnabled( false );
+	ui_.repeat_dropdown->setEnabled( false );
+
+	ui_.mission_step_button->setEnabled( true );
+	ui_.mission_cancel_button->setEnabled( true );
+	ui_.mission_auto_button->setEnabled( true );
+
+	model_.set_game_is_on( true );
+	refresh_window();
 }
 
-void patchbot_gui::on_mission_cancel_button_clicked()
+void patchbot_gui::on_mission_cancel_button_clicked() //TODO
 {
 	QMessageBox::about( this, "CANCEL_BUTTON", "cancel button is clicked" );
 }
 
-void patchbot_gui::on_mission_step_button_clicked()
+void patchbot_gui::on_mission_step_button_clicked() //TODO
 {
-	QMessageBox::about( this, "STEP_BUTTON", "step button is clicked" );
+	auto full_command_q = ui_.sequenz_line_edit->text().remove( 0, 2 );
+	std::string one_command = full_command_q.toUtf8().constData();
+	ui_.sequenz_line_edit->setText( full_command_q );
 }
 
-void patchbot_gui::on_mission_auto_button_clicked()
+void patchbot_gui::on_mission_auto_button_clicked() //TODO
 {
 	QMessageBox::about( this, "AUTO_BUTTON", "auto button is clicked" );
 }
 
-void patchbot_gui::on_mission_stop_button_clicked()
+void patchbot_gui::on_mission_stop_button_clicked() //TODO
 {
 	QMessageBox::about( this, "STOP_BUTTON", "stop button is clicked" );
 }
@@ -271,27 +244,85 @@ void patchbot_gui::on_mission_stop_button_clicked()
 
 void patchbot_gui::on_arrow_up_button_clicked()
 {
-	QMessageBox::about( this, "UP_BUTTON", "up-arrow button is clicked" );
+	auto frequency = ui_.repeat_dropdown->currentIndex() + 1;
+
+	if( frequency == 10 )
+	{
+		ui_.sequenz_line_edit->insert( "OX" );
+	} else
+	{
+		ui_.sequenz_line_edit->insert( "O" );
+		ui_.sequenz_line_edit->insert( QString::number( frequency ) );
+	}
 }
 
 void patchbot_gui::on_arrow_down_button_clicked()
 {
-	QMessageBox::about( this, "DOWN_BUTTON", "down-arrow button is clicked" );
+	auto frequency = ui_.repeat_dropdown->currentIndex() + 1;
+
+	if( frequency == 10 )
+	{
+		ui_.sequenz_line_edit->insert( "UX" );
+	} else
+	{
+		ui_.sequenz_line_edit->insert( "U" );
+		ui_.sequenz_line_edit->insert( QString::number( frequency ) );
+	}
 }
 
 void patchbot_gui::on_arrow_left_button_clicked()
 {
-	QMessageBox::about( this, "LEFT_BUTTON", "left-arrow button is clicked" );
+	auto frequency = ui_.repeat_dropdown->currentIndex() + 1;
+
+	if( frequency == 10 )
+	{
+		ui_.sequenz_line_edit->insert( "LX" );
+	} else
+	{
+		ui_.sequenz_line_edit->insert( "L" );
+		ui_.sequenz_line_edit->insert( QString::number( frequency ) );
+	}
 }
 
 void patchbot_gui::on_arrow_right_button_clicked()
 {
-	QMessageBox::about( this, "RIGHT_BUTTON", "right-arrow button is clicked" );
+	auto frequency = ui_.repeat_dropdown->currentIndex() + 1;
+
+	if( frequency == 10 )
+	{
+		ui_.sequenz_line_edit->insert( "RX" );
+	} else
+	{
+		ui_.sequenz_line_edit->insert( "R" );
+		ui_.sequenz_line_edit->insert( QString::number( frequency ) );
+	}
+}
+
+void patchbot_gui::on_center_button_clicked()
+{
+	auto frequency = ui_.repeat_dropdown->currentIndex() + 1;
+
+	if( frequency == 10 )
+	{
+		ui_.sequenz_line_edit->insert( "WX" );
+	} else
+	{
+		ui_.sequenz_line_edit->insert( "W" );
+		ui_.sequenz_line_edit->insert( QString::number( frequency ) );
+	}
 }
 
 void patchbot_gui::on_delete_button_clicked()
 {
-	QMessageBox::about( this, "DELETE_BUTTON", "delete button is clicked" );
+	auto text = ui_.sequenz_line_edit->displayText();
+	if( text.size() == 0 )
+	{
+		QMessageBox::information( this, "Delete error",
+			"no command to delete" );
+		return;
+	}
+	text.chop( 2 );
+	ui_.sequenz_line_edit->setText( text );
 }
 
 
@@ -299,8 +330,8 @@ void patchbot_gui::on_delete_button_clicked()
 void patchbot_gui::on_map_scrollbar_h_valueChanged( int change )
 {
 	model_.render_map( pixmap_,
-		ui_.map_scroll_area->width(), ui_.map_scroll_area->height(),
-		ui_.map_scrollbar_h->value(), ui_.map_scrollbar_v->value() );
+		ui_.map_placeholder_label->width(), ui_.map_placeholder_label->height(),
+		change, ui_.map_scrollbar_v->value() );
 
 	ui_.map_placeholder_label->setPixmap( pixmap_ );
 }
@@ -308,8 +339,8 @@ void patchbot_gui::on_map_scrollbar_h_valueChanged( int change )
 void patchbot_gui::on_map_scrollbar_v_valueChanged( int change )
 {
 	model_.render_map( pixmap_,
-		ui_.map_scroll_area->width(), ui_.map_scroll_area->height(),
-		ui_.map_scrollbar_h->value(), ui_.map_scrollbar_v->value() );
+		ui_.map_placeholder_label->width(), ui_.map_placeholder_label->height(),
+		ui_.map_scrollbar_h->value(), change );
 
 	ui_.map_placeholder_label->setPixmap( pixmap_ );
 }
