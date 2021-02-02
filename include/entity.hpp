@@ -94,7 +94,7 @@ namespace patchbot
 	/// @class	tile represents a tile from a map which might have an occupant 
 	class tile
 	{
-		std::uint8_t timer_ = 0;
+		std::uint8_t timer = 0;
 		tile_type tile_type_;
 
 	public:
@@ -105,8 +105,8 @@ namespace patchbot
 		void door_set_timer();
 		void door_decrement_timer();
 
-		tile_type tile::type() const noexcept;
-		bool const door_is_open() const;
-		bool const door_is_automatic() const;
+		tile_type type() const noexcept;
+		bool door_is_open() const;
+		bool door_is_automatic() const;
 	};
 }

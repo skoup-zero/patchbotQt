@@ -1,8 +1,6 @@
 #include <patchbot_gui.h>
-#include <qmessagebox.h>
 
 using namespace patchbot;
-
 
 patchbot_gui::patchbot_gui( QWidget *parent )
 	: QMainWindow( parent )

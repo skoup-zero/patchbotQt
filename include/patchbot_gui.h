@@ -1,10 +1,11 @@
 #pragma once
 
 #include <QtWidgets/QMainWindow>
-#include <qpainter.h>
 #include <ui_patchbot_gui.h>
-#include <qfiledialog.h>
-#include <qtimer.h>
+#include <QPainter>
+#include <QFileDialog>
+#include <QTimer>
+#include <QMessageBox>
 
 #include <model.hpp>
 #include <terrain.hpp>

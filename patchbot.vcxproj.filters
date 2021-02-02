@@ -78,9 +78,6 @@
     <ClInclude Include="include\model.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\level_renderer.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\patchbot_gui.h">

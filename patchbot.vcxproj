@@ -116,7 +116,6 @@
     <ClInclude Include="include\controls.hpp" />
     <ClInclude Include="include\entity.hpp" />
     <ClInclude Include="include\exceptions.hpp" />
-    <ClInclude Include="include\level_renderer.hpp" />
     <ClInclude Include="include\model.hpp" />
     <ClInclude Include="include\terrain.hpp" />
     <ClInclude Include="include\tga_loader.hpp" />

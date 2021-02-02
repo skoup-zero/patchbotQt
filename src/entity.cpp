@@ -66,7 +66,7 @@ tile_type tile::type() const noexcept
 	return tile_type_;
 }
 
-bool const tile::door_is_open() const
+bool tile::door_is_open() const
 {
 	if( !door_ )
 		throw std::invalid_argument( " Tile is not a door " );
@@ -74,7 +74,7 @@ bool const tile::door_is_open() const
 	return ( timer_ <= 0 ) ? false : true;
 }
 
-bool const tile::door_is_automatic() const
+bool tile::door_is_automatic() const
 {
 	if( !door_ )
 		throw std::invalid_argument( " Tile is not a door " );

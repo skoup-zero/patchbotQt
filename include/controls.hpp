@@ -3,9 +3,8 @@
 #include <entity.hpp>
 #include <terrain.hpp>
 
-#include <qstring.h>
-#include <qchar.h>
-#include <qdebug.h>
+#include <QString>
+#include <QChar>
 
 #include <memory>
 #include <string>
