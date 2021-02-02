@@ -82,12 +82,6 @@ int main( int argc, char *argv[] )
 
 	try
 	{
-		//auto map = patchbot::terrain::load_map_from_file(R"(C:\Zero_Work\patchbot\assets\txt\koloniekarten\everything.txt)" );
-		//write_map_to_file( map );
-
-		//auto test = patchbot::image::load_tga_from_file( R"(C:\Zero_Work\patchbot\assets\tga\grafiken\roboter\patchbot.tga)" );
-		//write_tga_to_file( test );
-
 		patchbot::patchbot_gui w;
 		w.show();
 
@@ -101,18 +95,28 @@ int main( int argc, char *argv[] )
 }
 
 /*
+format if else elseif etc (lesbarkeit)
+bis wand und dann ein einfach schritt führt zu einem extra schritt ( BUG ) 
+wenn man auf einer tür wartet zählt es nicht als zeitschritt
+sobald ein roboter auf der tür ist, soll die tür nicht schließen ( TODO )
+änder robots[0] zu eigener patchbot variable! (lesbarkeit)
+rename tile type and robot type member to only type! (lesbarkeit)
+game_status in model erweitern und alle methoden dort verlagern (structur)
+
+zuletzt testen ob das Programm auch auf anderen PC´s läuft, also relative pfade verwenden ( TODO )
 
 Testat 3 + 4
 [Ausnahmebehandlung] Ausnahmen, die das Programmende erfordern, in der main fangen -> done
 [Schlichtheit] redundanter Code beim Laden der Grafiken,
 				effizienterer Code für Konvertierung nach Qimage -> done
 
-[Datenstrukturen] zu rendernden Ausschnitt bestimmen, Anstelle jedes Mal auf Ende der Karte zu prüfen
+[Datenstrukturen] zu rendernden Ausschnitt bestimmen,
+	Anstelle jedes Mal auf Ende der Karte zu prüfen -> done1
 
-TODOS:
--relativer Pfad
--stürtzt ab wenn tga nicht findet 
-- 
+MAYBE CHANGE:
+Robots are also concidered as walls, which means if patchbot goes until wall he will stop by an enemy bot
++ no deadlock if pb and robot are cornered and game can end
+- not acutally a wall
 
 VERBESSERUNG TESTAT 4:
 - rendering jetz halb so kurz und ca 2000 mal unkomplizierter.
@@ -120,4 +124,5 @@ VERBESSERUNG TESTAT 4:
 	jeden pixel einzeln zu lesen.
 - Ausnahmen, die das Programmende erfordern werden in der Main abgefangen und alle anderen per QDialog 
 	dem User mitgeteilt.
+- model in eine extra klasse ausgewandert -> übersichtlicher
 */

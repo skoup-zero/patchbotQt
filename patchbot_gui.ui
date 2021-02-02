@@ -225,6 +225,9 @@
        <string/>
       </property>
       <layout class="QGridLayout" name="controls_group_layout">
+       <property name="sizeConstraint">
+        <enum>QLayout::SetFixedSize</enum>
+       </property>
        <item row="0" column="0">
         <layout class="QHBoxLayout" name="change_colonie_layout">
          <item>

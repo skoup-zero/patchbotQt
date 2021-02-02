@@ -1,5 +1,7 @@
 #pragma once
 
+#include <controls.hpp>
+
 #include <vector>
 #include <memory>
 #include <map>
@@ -37,7 +39,9 @@ namespace patchbot
 	class robot
 	{
 		bool alive_ = true;
+		bool obstructed_ = false;
 		unsigned int id_counter_ = 1;
+		std::uint8_t grave_timer_ = 0;
 
 	public:
 		robot_type robot_type_;
@@ -45,8 +49,12 @@ namespace patchbot
 
 		robot( robot_type type );
 
+
 		void kill_robot();
+		void update_obstructed();
+
 		bool alive() const noexcept;
+		bool obstructed() const noexcept;
 	};
 
 	enum class tile_type
@@ -61,7 +69,9 @@ namespace patchbot
 		gravel,
 		secret_path,
 		manual_door,
+		manual_door_open,
 		automatic_door,
+		automatic_door_open,
 		concrete_wall,
 		rock_wall
 	};
@@ -84,12 +94,19 @@ namespace patchbot
 	/// @class	tile represents a tile from a map which might have an occupant 
 	class tile
 	{
+		std::uint8_t timer_ = 0;
 		tile_type tile_type_;
 
 	public:
+		bool door_;
 		std::shared_ptr<robot> occupant_;
 
-		tile( tile_type type );
+		tile( tile_type type, const bool door = false );
+		void door_set_timer();
+		void door_decrement_timer();
+
 		tile_type tile::type() const noexcept;
+		bool const door_is_open() const;
+		bool const door_is_automatic() const;
 	};
 }

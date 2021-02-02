@@ -4,6 +4,7 @@
 
 #include <entity.hpp>
 #include <terrain.hpp>
+#include <controls.hpp>
 #include <fstream>
 #include <vector>
 #include <map>
@@ -91,16 +92,6 @@ namespace patchbot
 		std::vector<unsigned char> pixels() const noexcept;
 	};
 
-
-	enum class arrows
-	{
-		left,
-		up,
-		right,
-		down
-	};
-
-
 	/// @class to preload tga files
 	class load_assets
 	{
@@ -108,6 +99,6 @@ namespace patchbot
 		load_assets();
 		std::unordered_map<tile_type, QPixmap> terrain_img;
 		std::unordered_map<robot_type, QPixmap> robot_img;
-		std::unordered_map<arrows, QPixmap> arrow_img;
+		std::unordered_map<direction, QPixmap> arrow_img;
 	};
 }

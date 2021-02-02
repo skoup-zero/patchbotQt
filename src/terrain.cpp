@@ -10,9 +10,10 @@
 
 using namespace patchbot;
 
-terrain::terrain( std::vector<tile> &&tiles, unsigned int width,
-	unsigned int height )
-	:tiles_{ tiles }
+terrain::terrain( std::vector<tile> &&tiles, std::vector<std::shared_ptr<robot>> &&robots,
+	unsigned int width, unsigned int height )
+	: tiles_{ tiles }
+	, robots_{ robots }
 	, width_{ width }
 	, height_{ height }
 {}
@@ -56,6 +57,9 @@ terrain terrain::load_map_from_file( const std::filesystem::path &path )
 	unsigned int pb_start = 0, pb_goals = 0, counter_height = 0, counter_width = 0;
 
 	std::vector<tile> tiles;
+	std::vector<std::shared_ptr<robot>> robots;
+
+	robots.push_back( nullptr ); // reserving first index for patchbot
 	tiles.reserve( width * height );
 
 	/* reads each char of each line and creates Objects asigned to that symbol */
@@ -78,6 +82,7 @@ terrain terrain::load_map_from_file( const std::filesystem::path &path )
 					temp.occupant_->x_ = counter_width;
 					temp.occupant_->y_ = counter_height;
 					tiles.push_back( temp );
+					robots[0] = temp.occupant_;
 					pb_start++;
 
 				} else
@@ -87,14 +92,23 @@ terrain terrain::load_map_from_file( const std::filesystem::path &path )
 					temp.occupant_->x_ = counter_width;
 					temp.occupant_->y_ = counter_height;
 					tiles.push_back( temp );
+					robots.push_back( temp.occupant_ );
 				}
 			} else if( !( t_it == tile_map.end() ) ) /* creating tile */
 			{
 				if( t_it->first == 'P' )
 					pb_goals++;
 
-				auto temp = tile( t_it->second );
-				tiles.push_back( temp );
+				if( t_it->first == 'd' || t_it->first == 'D' )
+				{
+					auto temp = tile( t_it->second, true );
+					tiles.push_back( temp );
+				}
+				else
+				{
+					auto temp = tile( t_it->second );
+					tiles.push_back( temp );
+				}
 
 			} else
 			{ /* exc: invalid char */
@@ -102,6 +116,7 @@ terrain terrain::load_map_from_file( const std::filesystem::path &path )
 			}
 			counter_width++;
 		}
+		counter_width = 0;
 		counter_height++;
 	}
 	if( counter_height != height ) /* exc: height of map is incorrect */
@@ -113,7 +128,7 @@ terrain terrain::load_map_from_file( const std::filesystem::path &path )
 	if( pb_start != 1 ) /* exc: less or more then one patchbot */
 		throw patchbot_exception{ patchbot_enum_exception::map_format_exception };
 
-	return terrain( std::move( tiles ), width, height );
+	return terrain( std::move( tiles ), std::move( robots ), width, height );
 }
 
 
@@ -128,9 +143,9 @@ const tile &terrain::at( unsigned int index ) const
 	return tiles_.at( index );
 }
 
-const tile &terrain::at( unsigned int x, unsigned int y ) const
+tile &terrain::at( unsigned int x, unsigned int y )
 {
-	if( x >= width_  || y >= height_ )
+	if( x >= width_ || y >= height_ )
 	{
 		throw std::out_of_range{ "coordinates out of range" };
 	}

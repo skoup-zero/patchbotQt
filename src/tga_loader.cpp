@@ -9,7 +9,7 @@ using namespace patchbot;
 
 image::image( image_header &&header, std::vector<unsigned char> &&pixels )
 	:header_{ header }
-	, pixels_{ pixels }
+	,pixels_{ pixels }
 {}
 
 image image::load_tga_from_file( const std::filesystem::path &path )
@@ -168,8 +168,14 @@ patchbot::load_assets::load_assets()
 	terrain_img.insert( std::pair <tile_type, QPixmap>( tile_type::manual_door,
 		image::load_tga_from_file( R"(assets\tga\grafiken\umgebungen\tuer_manuell_geschlossen.tga)" )
 		.qpixmap_converter() ) );
+	terrain_img.insert( std::pair <tile_type, QPixmap>( tile_type::manual_door_open,
+		image::load_tga_from_file( R"(assets\tga\grafiken\umgebungen\tuer_manuell_offen.tga)" )
+		.qpixmap_converter() ) );
 	terrain_img.insert( std::pair <tile_type, QPixmap>( tile_type::automatic_door,
 		image::load_tga_from_file( R"(assets\tga\grafiken\umgebungen\tuer_automatisch_geschlossen.tga)" )
+		.qpixmap_converter() ) );
+	terrain_img.insert( std::pair <tile_type, QPixmap>( tile_type::automatic_door_open,
+		image::load_tga_from_file( R"(assets\tga\grafiken\umgebungen\tuer_manuell_offen.tga)" )
 		.qpixmap_converter() ) );
 	terrain_img.insert( std::pair <tile_type, QPixmap>( tile_type::concrete_wall,
 		image::load_tga_from_file( R"(assets\tga\grafiken\umgebungen\wand_beton.tga)" )
@@ -208,16 +214,16 @@ patchbot::load_assets::load_assets()
 		.qpixmap_converter() ) );
 
 	/* Load Arrow tga's */
-	arrow_img.insert( std::pair <arrows, QPixmap>( arrows::left,
+	arrow_img.insert( std::pair <direction, QPixmap>( direction::left,
 		image::load_tga_from_file( R"(assets\tga\grafiken\pfeile\pfeil_links.tga)" )
 		.qpixmap_converter() ) );
-	arrow_img.insert( std::pair <arrows, QPixmap>( arrows::up,
+	arrow_img.insert( std::pair <direction, QPixmap>( direction::up,
 		image::load_tga_from_file( R"(assets\tga\grafiken\pfeile\pfeil_oben.tga)" )
 		.qpixmap_converter() ) );
-	arrow_img.insert( std::pair <arrows, QPixmap>( arrows::right,
+	arrow_img.insert( std::pair <direction, QPixmap>( direction::right,
 		image::load_tga_from_file( R"(assets\tga\grafiken\pfeile\pfeil_rechts.tga)" )
 		.qpixmap_converter() ) );
-	arrow_img.insert( std::pair <arrows, QPixmap>( arrows::down,
+	arrow_img.insert( std::pair <direction, QPixmap>( direction::down,
 		image::load_tga_from_file( R"(assets\tga\grafiken\pfeile\pfeil_unten.tga)" )
 		.qpixmap_converter() ) );
 }

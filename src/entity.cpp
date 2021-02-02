@@ -4,7 +4,7 @@
 
 using namespace patchbot;
 
-/// CLASS ROBOT
+/////////////////////////* CLASS ROBOT */////////////////////////
 robot::robot( robot_type type )
 	:robot_type_{ type }
 {
@@ -15,19 +15,69 @@ void robot::kill_robot()
 {
 	alive_ = false;
 }
+
+void robot::update_obstructed()
+{
+	obstructed_ = ( obstructed_ ) ? false : true;
+}
+
 /// GETTER
 bool robot::alive() const noexcept
 {
 	return alive_;
 }
 
-/// CLASS TILE
-tile::tile( tile_type type )
+bool robot::obstructed() const noexcept
+{
+	return obstructed_;
+}
+
+
+/////////////////////////* CLASS TILE */////////////////////////
+tile::tile( tile_type type, const bool door )
 	: tile_type_{ type }
+	, door_{ door }
 {}
+
+void tile::door_set_timer()
+{
+	if( !door_ )
+		throw std::invalid_argument( " Tile is not a door " );
+
+	if( !door_is_open() )
+		timer_ = 10;
+}
+
+void patchbot::tile::door_decrement_timer()
+{
+	if( !door_ )
+		throw std::invalid_argument( " Tile is not a door " );
+
+	if( timer_ == 1 && occupant_ )
+		return;
+
+	if( timer_ > 0 )
+		timer_--;
+}
 
 /// GETTER
 tile_type tile::type() const noexcept
 {
 	return tile_type_;
+}
+
+bool const tile::door_is_open() const
+{
+	if( !door_ )
+		throw std::invalid_argument( " Tile is not a door " );
+
+	return ( timer_ <= 0 ) ? false : true;
+}
+
+bool const tile::door_is_automatic() const
+{
+	if( !door_ )
+		throw std::invalid_argument( " Tile is not a door " );
+
+	return ( tile_type_ == tile_type::automatic_door ) ? true : false;
 }

@@ -9,6 +9,7 @@
 
 namespace patchbot
 {
+
 	/// @class with width, height and tiles representing map
 	class terrain
 	{
@@ -16,10 +17,12 @@ namespace patchbot
 		unsigned int height_;
 		std::vector<tile> tiles_;
 
-		terrain( std::vector<tile> &&tiles, unsigned int width,
-			unsigned int height );
+		terrain( std::vector<tile> &&tiles, std::vector<std::shared_ptr<robot>> &&robots_,
+			unsigned int width, unsigned int height );
 
 	public:
+
+		std::vector<std::shared_ptr<robot>> robots_;
 
 		///	@brief		reads the symbols from a txt file .
 		///
@@ -52,10 +55,9 @@ namespace patchbot
 		///	@throws		std::out_of_range if coordinates is out of range
 		/// 
 		///	@return		a tile at given coordinates
-		const tile &at( unsigned int x, unsigned int y ) const;
+		tile &at( unsigned int x, unsigned int y );
 
 		unsigned int width() const noexcept;
 		unsigned int height() const noexcept;
-
 	};
 }
