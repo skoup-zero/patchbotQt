@@ -1,13 +1,7 @@
 #pragma once
 
-#include <qpixmap.h>
-
-#include <entity.hpp>
-#include <terrain.hpp>
 #include <controls.hpp>
-#include <fstream>
-#include <vector>
-#include <map>
+#include <QPixmap>
 
 namespace patchbot
 {
@@ -43,48 +37,37 @@ namespace patchbot
 
 	public:
 
-		/// @brief		reads data from a tga file.
-		///
-		/// @details	reads header first and saves it in struct, image information
+		/// @brief		Reads data from a tga file.
+		/// @details	Reads header first and saves it in struct, image information
 		///				are saved in a vector BGRA which represents a pixel.
-		/// 
 		/// @param		path to file.
-		/// 
-		/// @throws		std::invalid_argument if file isn´t found
-		/// @throws		std::runtime_error if file couldn´t be opened
-		/// @throws		patchbot_exception if header is not valid
-		/// 
-		/// @return		instance of tga_loader
+		/// @throws		invalid_argument if file isn´t found.
+		/// @throws		runtime_error if file couldn´t be opened.
+		/// @throws		patchbot_exception if header is not valid.
+		/// @return		instance of tga_loader.
 		static image load_tga_from_file( const std::filesystem::path &path );
 
-		/// @brief		tests if system is little endian
-		///
-		///	@details	assigning 1 to an interger variable and checking the value
+		/// @brief		Tests if system is little endian.
+		///	@details	Assigning 1 to an interger variable and checking the value
 		///				of the first bit stored in RAM. 
 		///				If 1 then the first bit is the least significant bit.
 		///				If 0 then the first bit is the most significant bit.
-		///
-		/// @return		1 (true) if system is little endian
+		/// @return		1 (true) if system is little endian.
 		static const bool is_system_little_endian();
 
-		/// @brief		swaps two bytes
-		///
-		/// @param		2 byte word
+		/// @brief		Swaps two bytes.
+		/// @param		2 byte word.
 		static void swap_bytes( std::uint16_t &word );
 
-		/// @brief		converts image into pixmap
-		///
-		///	@return		converted pixmap
+		/// @brief		Converts image into pixmap.
+		///	@return		Converted pixmap.
 		QPixmap qpixmap_converter() const;
 
-		/// @brief		function to acces a specific pixel at given index
-		///
-		/// @param		x, y as coordiantes
-		/// @param		width, heigth as image_size
-		/// 
-		/// @return		index of pixel
-		/// 
-		/// @throws		std::out_of_range for invalid coordinates
+		/// @brief		Function to acces a specific pixel at given index.
+		/// @param		x, y as coordiantes.
+		/// @param		width, heigth as image_size.
+		/// @return		index of pixel.
+		/// @throws		out_of_range for invalid coordinates.
 		static unsigned int pixel_index( unsigned int x, unsigned int y,
 			unsigned int width, unsigned int heigth );
 

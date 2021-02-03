@@ -1,19 +1,12 @@
-#include <entity.hpp>
 #include <terrain.hpp>
-#include <exceptions.hpp>
-
-#include <fstream>
-#include <string>
-#include <stdexcept>
-#include <map>
-#include <cctype>
 
 using namespace patchbot;
 
 terrain::terrain( std::vector<tile> &&tiles, std::vector<std::shared_ptr<robot>> &&robots,
-	unsigned int width, unsigned int height )
+	std::shared_ptr<robot> patchbot, unsigned int width, unsigned int height )
 	: tiles_{ tiles }
 	, robots_{ robots }
+	, patchbot_{ patchbot }
 	, width_{ width }
 	, height_{ height }
 {}
@@ -37,7 +30,6 @@ terrain terrain::load_map_from_file( const std::filesystem::path &path )
 		{
 			throw patchbot_exception{ patchbot_enum_exception::map_format_exception };
 		}
-
 		width = stoi( current_line );
 		std::getline( init_map, current_line );
 
@@ -46,10 +38,9 @@ terrain terrain::load_map_from_file( const std::filesystem::path &path )
 		{
 			throw patchbot_exception{ patchbot_enum_exception::map_format_exception };
 		}
-
 		height = stoi( current_line );
-
-	} catch( const std::exception &exc )
+	}
+	catch( const std::exception &exc )
 	{
 		throw;
 	}
@@ -58,8 +49,8 @@ terrain terrain::load_map_from_file( const std::filesystem::path &path )
 
 	std::vector<tile> tiles;
 	std::vector<std::shared_ptr<robot>> robots;
+	std::shared_ptr<robot> patchbot;
 
-	robots.push_back( nullptr ); // reserving first index for patchbot
 	tiles.reserve( width * height );
 
 	/* reads each char of each line and creates Objects asigned to that symbol */
@@ -82,10 +73,10 @@ terrain terrain::load_map_from_file( const std::filesystem::path &path )
 					temp.occupant_->x_ = counter_width;
 					temp.occupant_->y_ = counter_height;
 					tiles.push_back( temp );
-					robots[0] = temp.occupant_;
+					patchbot = temp.occupant_;
 					pb_start++;
-
-				} else
+				}
+				else
 				{
 					auto temp = tile( tile_type::enemy_start );
 					temp.occupant_ = std::make_shared<robot>( r_it->second );
@@ -94,7 +85,8 @@ terrain terrain::load_map_from_file( const std::filesystem::path &path )
 					tiles.push_back( temp );
 					robots.push_back( temp.occupant_ );
 				}
-			} else if( !( t_it == tile_map.end() ) ) /* creating tile */
+			}
+			else if( !( t_it == tile_map.end() ) ) /* creating tile */
 			{
 				if( t_it->first == 'P' )
 					pb_goals++;
@@ -109,8 +101,8 @@ terrain terrain::load_map_from_file( const std::filesystem::path &path )
 					auto temp = tile( t_it->second );
 					tiles.push_back( temp );
 				}
-
-			} else
+			}
+			else
 			{ /* exc: invalid char */
 				throw patchbot_exception{ patchbot_enum_exception::map_format_exception };
 			}
@@ -128,7 +120,7 @@ terrain terrain::load_map_from_file( const std::filesystem::path &path )
 	if( pb_start != 1 ) /* exc: less or more then one patchbot */
 		throw patchbot_exception{ patchbot_enum_exception::map_format_exception };
 
-	return terrain( std::move( tiles ), std::move( robots ), width, height );
+	return terrain( std::move( tiles ), std::move( robots ), std::move( patchbot ), width, height );
 }
 
 

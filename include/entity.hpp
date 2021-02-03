@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <vector>
 #include <memory>
 #include <map>
@@ -38,19 +39,21 @@ namespace patchbot
 	{
 		bool alive_ = true;
 		bool obstructed_ = false;
-		unsigned int id_counter_ = 1;
 		std::uint8_t grave_timer_ = 0;
 
 	public:
 		robot_type r_type_;
-		unsigned int id_, x_, y_;
+		unsigned int x_, y_;
 
 		robot( robot_type type );
 
-
-		void kill_robot();
+		/// @brief		Swtiches obstructed_ to opposite bool
 		void update_obstructed();
 
+		/// @brief		Sets alive to false.
+		void kill_robot();
+
+		/// Getter 
 		bool alive() const noexcept;
 		bool obstructed() const noexcept;
 	};
@@ -96,12 +99,16 @@ namespace patchbot
 		tile_type t_type_;
 
 	public:
+		/* true if tile is door */
 		const bool door_;
 		std::shared_ptr<robot> occupant_;
 
 		tile( tile_type type, const bool door = false );
-		void door_set_timer();
+
 		void door_decrement_timer();
+
+		/// @brief		Sets timer of door to 10.
+		void door_set_timer();
 
 		tile_type type() const noexcept;
 		bool door_is_open() const;

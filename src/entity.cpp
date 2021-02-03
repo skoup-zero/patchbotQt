@@ -1,14 +1,15 @@
 #include <entity.hpp>
-#include <map>
-#include <iostream>
 
 using namespace patchbot;
 
 /////////////////////////* CLASS ROBOT */////////////////////////
 robot::robot( robot_type type )
 	:r_type_{ type }
+{}
+
+void robot::update_obstructed()
 {
-	id_ = ( type == robot_type::patchbot ) ? 0 : id_counter_++;
+	obstructed_ = ( obstructed_ ) ? false : true;
 }
 
 void robot::kill_robot()
@@ -16,10 +17,6 @@ void robot::kill_robot()
 	alive_ = false;
 }
 
-void robot::update_obstructed()
-{
-	obstructed_ = ( obstructed_ ) ? false : true;
-}
 
 /// GETTER
 bool robot::alive() const noexcept
@@ -33,11 +30,25 @@ bool robot::obstructed() const noexcept
 }
 
 
+
 /////////////////////////* CLASS TILE */////////////////////////
 tile::tile( tile_type type, const bool door )
 	: t_type_{ type }
 	, door_{ door }
 {}
+
+void tile::door_decrement_timer()
+{
+	if( !door_ )
+		throw std::invalid_argument( " Tile is not a door " );
+
+	/* don't close the door if a robot is on it */
+	if( timer_ == 1 && occupant_ )
+		return;
+
+	if( timer_ > 0 )
+		timer_--;
+}
 
 void tile::door_set_timer()
 {
@@ -48,17 +59,6 @@ void tile::door_set_timer()
 		timer_ = 10;
 }
 
-void patchbot::tile::door_decrement_timer()
-{
-	if( !door_ )
-		throw std::invalid_argument( " Tile is not a door " );
-
-	if( timer_ == 1 && occupant_ )
-		return;
-
-	if( timer_ > 0 )
-		timer_--;
-}
 
 /// GETTER
 tile_type tile::type() const noexcept

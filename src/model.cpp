@@ -58,7 +58,8 @@ void model::render_map( QPixmap &pixmap, unsigned int screen_width, unsigned int
 
 				painter.drawPixmap( ( x - left_border ) * pixel_tga_width_ - scroll_value_x % 32,
 					( y - top_border ) * pixel_tga_height_ - scroll_value_y % 32, open_door_img );
-			} else
+			}
+			else
 				painter.drawPixmap( ( x - left_border ) * pixel_tga_width_ - scroll_value_x % 32,
 					( y - top_border ) * pixel_tga_height_ - scroll_value_y % 32, img );
 
@@ -75,12 +76,14 @@ void model::render_map( QPixmap &pixmap, unsigned int screen_width, unsigned int
 						painter.drawPixmap( ( x - left_border ) * pixel_tga_width_ - scroll_value_x % 32,
 							( y - top_border ) * pixel_tga_height_ - scroll_value_y % 32, img );
 					}
-				} else
+				}
+				else
 				{
 					painter.drawPixmap( ( x - left_border ) * pixel_tga_width_ - scroll_value_x % 32,
 						( y - top_border ) * pixel_tga_height_ - scroll_value_y % 32, img );
 				}
-			} else if( tile.occupant_ && !tile.occupant_->alive() )
+			}
+			else if( tile.occupant_ && !tile.occupant_->alive() )
 			{
 				painter.drawPixmap( ( x - left_border ) * pixel_tga_width_ - scroll_value_x % 32,
 					( y - top_border ) * pixel_tga_height_ - scroll_value_y % 32,
@@ -90,9 +93,9 @@ void model::render_map( QPixmap &pixmap, unsigned int screen_width, unsigned int
 	painter.end();
 }
 
-bool const model::check_win()
+bool model::check_win()
 {
-	const auto &tile = terrain_.at( terrain_.robots_[0]->x_, terrain_.robots_[0]->y_ );
+	const auto &tile = terrain_.at( terrain_.patchbot_->x_, terrain_.patchbot_->y_ );
 	if( tile.type() == tile_type::server )
 		return true;
 	else
@@ -100,7 +103,14 @@ bool const model::check_win()
 }
 
 
-// GETTER
+/// SETTER
+void model::set_game_is_on( bool status )
+{
+	game_is_on_ = status;
+}
+
+
+/// GETTER
 int model::pixel_tga_width() const noexcept
 {
 	return pixel_tga_width_;
@@ -120,9 +130,4 @@ int model::pixel_terrain_width() const noexcept
 int model::pixel_terrain_height() const noexcept
 {
 	return pixel_terrain_height_;
-}
-
-void model::set_game_is_on( bool status )
-{
-	game_is_on_ = status;
 }

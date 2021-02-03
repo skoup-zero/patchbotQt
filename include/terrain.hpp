@@ -1,10 +1,11 @@
 #pragma once
 
-#include<entity.hpp>
+#include <entity.hpp>
+#include <exceptions.hpp>
 
 #include <filesystem>
-#include <vector>
-#include <memory>
+#include <fstream>
+#include <stdexcept>
 #include <string>
 
 namespace patchbot
@@ -18,10 +19,10 @@ namespace patchbot
 		std::vector<tile> tiles_;
 
 		terrain( std::vector<tile> &&tiles, std::vector<std::shared_ptr<robot>> &&robots_,
-			unsigned int width, unsigned int height );
+			std::shared_ptr<robot> patchbot, unsigned int width, unsigned int height );
 
 	public:
-
+		std::shared_ptr<robot> patchbot_;
 		std::vector<std::shared_ptr<robot>> robots_;
 
 		///	@brief		reads the symbols from a txt file .

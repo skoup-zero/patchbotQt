@@ -1,15 +1,8 @@
 #include <patchbot_gui.h>
 #include <QtWidgets/QApplication>
-#include <QMessageBox>
 
-#include <entity.hpp>
 #include <terrain.hpp>
 #include <tga_loader.hpp>
-
-#include <stdexcept>
-#include <iostream>
-#include <vector>
-#include <fstream>
 
 /// @brief	takes a terrain and writes it into a txt file
 ///
@@ -43,7 +36,8 @@ void write_map_to_file( const patchbot::terrain &map )
 				if( iter->second == temp->r_type_ )
 					output_file << iter->first;
 			}
-		} else
+		}
+		else
 		{
 			for( auto iter = patchbot::tile_map.begin();
 				iter != patchbot::tile_map.end(); ++iter )
@@ -69,9 +63,7 @@ void write_tga_to_file( const patchbot::image &tga )
 	output.write( reinterpret_cast<const char *>( &header ), 18 );
 
 	for( int i = 0; i < pixels.size(); i++ )
-	{
 		output.write( reinterpret_cast<const char *> ( &pixels[i] ), sizeof( pixels[i] ) );
-	}
 
 	output.close();
 }
@@ -79,15 +71,14 @@ void write_tga_to_file( const patchbot::image &tga )
 int main( int argc, char *argv[] )
 {
 	QApplication a( argc, argv );
-
 	try
 	{
 		patchbot::patchbot_gui w;
 		w.show();
 
 		return a.exec();
-
-	} catch( const std::exception &exc )
+	}
+	catch( const std::exception &exc )
 	{
 		std::cout << "Error: " << exc.what() << std::endl;
 		return EXIT_FAILURE;
@@ -95,10 +86,8 @@ int main( int argc, char *argv[] )
 }
 
 /*
-änder robots[0] zu eigener patchbot variable! (lesbarkeit)
-rename tile type and robot type member to only type! (lesbarkeit)
-game_status in model erweitern und alle methoden dort verlagern (structur)
-
+little bug where windows is not streched enoguh
+win condition doesnt work
 zuletzt testen ob das Programm auch auf anderen PC´s läuft, also relative pfade verwenden ( TODO )
 
 Testat 3 + 4
@@ -114,7 +103,7 @@ VERBESSERUNG TESTAT 4:
 - rendering jetz halb so kurz und ca 2000 mal unkomplizierter.
 - qpixmap converter vertauscht nach dem lesen der daten die R mit B und spiegelt es vertikal anstatt
 	jeden pixel einzeln zu lesen.
-- Ausnahmen, die das Programmende erfordern werden in der Main abgefangen und alle anderen per QDialog 
+- Ausnahmen, die das Programmende erfordern werden in der Main abgefangen und alle anderen per QDialog
 	dem User mitgeteilt.
 - model in eine extra klasse ausgewandert -> übersichtlicher
 */

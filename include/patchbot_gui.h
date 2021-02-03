@@ -8,27 +8,20 @@
 #include <QMessageBox>
 
 #include <model.hpp>
-#include <terrain.hpp>
 #include <tga_loader.hpp>
-#include <controls.hpp>
-
-#include <fstream>
-#include <iostream>
-#include <filesystem>
-#include <string>
 
 namespace patchbot
 {
-	/// @class patchbot_gui as GUI with MVP design pattern
+	/// @class patchbot_gui as GUI with MVP design pattern.
 	class patchbot_gui: public QMainWindow
 	{
 		Q_OBJECT
 
 	private:
 
-		Ui::patchbot_guiClass ui_; /* ui as view */
-		model model_;	/* model for data */
-		controls controls_; /* controls for interaction */
+		Ui::patchbot_guiClass ui_;
+		model model_;
+		controls controls_;
 		QTimer timer_;
 		QPixmap pixmap_;
 		QString last_instruction_ = ""; /* saving instruction from last game */
@@ -37,26 +30,38 @@ namespace patchbot
 
 		patchbot_gui( QWidget *parent = Q_NULLPTR );
 
-		/// @brief adjust size of Map and Sequence line
+		/// @brief	Adjust size of Map components.
 		void refresh_window();
+
+		/// @brief	Calls refresh_windows() everytime window resizes.
 		void resizeEvent( QResizeEvent *event );
 
-		/// @brief (de-)activate all instruction buttons
-		void activate_instruction_buttons( bool activate );
+		/// @brief	(de-)activate all program buttons.
+		void activate_prgram_buttons( bool activate );
 
 	public slots:
 
-		/// @brief change map
+		/// @brief	Change map and reset game.
 		void on_change_colonie_button_clicked();
 
-		/// @brief mission button 
+
+		/// @brief	Starts the game.
 		void on_mission_start_button_clicked();
+
+		/// @brief	Cancels current game and restores map values.
 		void on_mission_cancel_button_clicked();
+
+		/// @brief	Makes one time step.
 		void on_mission_step_button_clicked();
+
+		/// @brief	Makes one time step every second.
 		void on_mission_auto_button_clicked();
+
+		/// @brief	Stops automatic mode and returns to manuel mode.
 		void on_mission_stop_button_clicked();
 
-		/// @brief programm button
+
+		/// @brief	Program buttons to add or delete commands for patchbot.
 		void on_arrow_up_button_clicked();
 		void on_arrow_down_button_clicked();
 		void on_arrow_left_button_clicked();
@@ -64,9 +69,12 @@ namespace patchbot
 		void on_center_button_clicked();
 		void on_delete_button_clicked();
 
-		/// @brief scrollbars 
+
+		/// @brief	Scrollbars for map.
 		void on_map_scrollbar_h_valueChanged( int change );
 		void on_map_scrollbar_v_valueChanged( int change );
+
+		/// @brief	Scrollbars for sequenz line.
 		void on_sequenz_scrollbar_h_valueChanged( int change );
 	};
 }

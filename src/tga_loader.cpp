@@ -1,15 +1,10 @@
 #include <tga_loader.hpp>
-#include <exceptions.hpp>
-
-#include <filesystem>
-#include <stdexcept>
-#include <vector>
 
 using namespace patchbot;
 
 image::image( image_header &&header, std::vector<unsigned char> &&pixels )
 	:header_{ header }
-	,pixels_{ pixels }
+	, pixels_{ pixels }
 {}
 
 image image::load_tga_from_file( const std::filesystem::path &path )
@@ -81,13 +76,10 @@ image image::load_tga_from_file( const std::filesystem::path &path )
 	buffer.resize( img_size );
 
 	for( int i = 0; i < img_size; i++ )
-	{
 		input.read( reinterpret_cast<char *>( &buffer[i] ), 1 );
-	}
-
+	
 	return image( std::move( header ), std::move( buffer ) );
 }
-
 
 const bool image::is_system_little_endian()
 {
@@ -96,13 +88,12 @@ const bool image::is_system_little_endian()
 	return first_byte[0];
 }
 
-
 void image::swap_bytes( std::uint16_t &word )
 {
 	word = ( word >> 8 ) | ( word << 8 );
 }
 
-QPixmap patchbot::image::qpixmap_converter() const
+QPixmap image::qpixmap_converter() const
 {
 	QImage q_img( (uchar *) pixels_.data(), header_.image_width, header_.image_heigth,
 		QImage::Format_RGBA8888 );
@@ -120,18 +111,15 @@ unsigned int image::pixel_index( unsigned int x, unsigned int y, unsigned int wi
 	return ( width * 4 * y ) + ( x * 4 );
 }
 
-
 image_header image::header() const noexcept
 {
 	return header_;
 }
 
-
 std::vector<unsigned char> image::pixels() const noexcept
 {
 	return pixels_;
 }
-
 
 /// @class assets
 
@@ -185,7 +173,7 @@ patchbot::load_assets::load_assets()
 		.qpixmap_converter() ) );
 
 	/* Load Robot tga's */
-	robot_img.insert( std::pair <robot_type, QPixmap>(robot_type::patchbot,
+	robot_img.insert( std::pair <robot_type, QPixmap>( robot_type::patchbot,
 		image::load_tga_from_file( R"(assets\tga\grafiken\roboter\patchbot.tga)" )
 		.qpixmap_converter() ) );
 	robot_img.insert( std::pair <robot_type, QPixmap>( robot_type::bugger,
