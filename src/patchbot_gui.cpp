@@ -107,6 +107,7 @@ void patchbot_gui::on_change_colonie_button_clicked()
 		ui_.map_scrollbar_v->setValue( 0 );
 		pixmap_ = QPixmap( ui_.map_placeholder_label->size() );
 
+		last_instruction_ = "";
 		on_mission_cancel_button_clicked();
 		refresh_window();
 	}
@@ -128,6 +129,7 @@ void patchbot_gui::on_mission_start_button_clicked()
 
 	model_.set_game_is_on( true );
 	controls_ = controls( ui_.sequenz_line_edit->text(), &model_.terrain_ );
+	last_instruction_ = ui_.sequenz_line_edit->text();
 
 	refresh_window();
 }
@@ -151,6 +153,9 @@ void patchbot_gui::on_mission_cancel_button_clicked()
 	auto temp = ( terrain::load_map_from_file( model_.current_path_ ) );
 	model_ = model( std::move( temp ), model_.current_path_ );
 
+	/* insert command from last game */
+	ui_.sequenz_line_edit->setText( last_instruction_ );
+
 	refresh_window();
 }
 
@@ -162,16 +167,7 @@ void patchbot_gui::on_mission_step_button_clicked()
 	{
 		QMessageBox::about( this, "!!! WIN !!!", "you found the server" );
 		on_mission_cancel_button_clicked();
-
-	} else if( !model_.terrain_.robots_[0]->alive() ) /* move loose to end*/
-	{
-		QMessageBox::about( this, "!!! LOSE !!!", "patchbot died" );
-		on_mission_cancel_button_clicked();
-
-	} else if( full_command.size() <= 0 )
-	{
-		QMessageBox::about( this, "!!! LOSE !!!", "you didn't found the server" );
-		on_mission_cancel_button_clicked();
+		return;
 
 	} else
 	{
@@ -189,9 +185,21 @@ void patchbot_gui::on_mission_step_button_clicked()
 			}
 		}
 	}
-
 	ui_.sequenz_line_edit->setText( full_command );
 	refresh_window();
+
+	if( !model_.terrain_.robots_[0]->alive() )
+	{
+		QMessageBox::about( this, "!!! LOSE !!!", "patchbot died" );
+		on_mission_cancel_button_clicked();
+		return;
+
+	} else if( full_command.size() <= 0 )
+	{
+		QMessageBox::about( this, "!!! LOSE !!!", "you didn't found the server" );
+		on_mission_cancel_button_clicked();
+		return;
+	}
 }
 
 void patchbot_gui::on_mission_auto_button_clicked()

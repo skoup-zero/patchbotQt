@@ -1,7 +1,5 @@
 #pragma once
 
-#include <controls.hpp>
-
 #include <vector>
 #include <memory>
 #include <map>
@@ -44,7 +42,7 @@ namespace patchbot
 		std::uint8_t grave_timer_ = 0;
 
 	public:
-		robot_type robot_type_;
+		robot_type r_type_;
 		unsigned int id_, x_, y_;
 
 		robot( robot_type type );
@@ -94,11 +92,11 @@ namespace patchbot
 	/// @class	tile represents a tile from a map which might have an occupant 
 	class tile
 	{
-		std::uint8_t timer = 0;
-		tile_type tile_type_;
+		std::uint8_t timer_ = 0;
+		tile_type t_type_;
 
 	public:
-		bool door_;
+		const bool door_;
 		std::shared_ptr<robot> occupant_;
 
 		tile( tile_type type, const bool door = false );

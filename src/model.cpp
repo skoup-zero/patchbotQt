@@ -66,9 +66,9 @@ void model::render_map( QPixmap &pixmap, unsigned int screen_width, unsigned int
 			if( tile.occupant_ && tile.occupant_->alive() )
 			{
 				const auto &robot = tile.occupant_;
-				const auto &img = assets_.robot_img.at( robot->robot_type_ );
+				const auto &img = assets_.robot_img.at( robot->r_type_ );
 
-				if( robot->robot_type_ == robot_type::patchbot )
+				if( robot->r_type_ == robot_type::patchbot )
 				{
 					if( game_is_on_ )
 					{

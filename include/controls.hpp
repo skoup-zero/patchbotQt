@@ -36,19 +36,19 @@ namespace patchbot
 		controls( terrain *terrain );
 		controls( QString &instructions, terrain *terrain );
 
-		static direction direction_to_enum( const char dir );
+		static direction direction_to_enum( char dir );
 
 		void update_world();
 		void update_patchbot();
 		void update_instruction();
-		//void one_step_patchbot();
-		void move_robot( unsigned int x, unsigned int y, const direction &d );
-		bool dangerous_tile( unsigned int x, unsigned int y ); /* done */
-		bool obstacle( unsigned int x, unsigned int y ); /* done */
-		bool wall( unsigned int x, unsigned int y, robot_type r_type ); /* done */
-		bool wall_next_tile( unsigned int x, unsigned int y, direction d); /* done */
 
-		void update_doors(); /* done? */
+		void move_robot( unsigned int x, unsigned int y, const direction &d );
+		bool dangerous_tile( unsigned int x, unsigned int y );
+		bool obstacle( unsigned int x, unsigned int y );
+		bool wall( unsigned int x, unsigned int y, robot_type r_type );
+		bool wall_next_tile( unsigned int x, unsigned int y, const direction &d);
+
+		void update_doors();
 
 		bool until_wall() const noexcept;
 	};

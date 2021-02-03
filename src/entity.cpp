@@ -6,7 +6,7 @@ using namespace patchbot;
 
 /////////////////////////* CLASS ROBOT */////////////////////////
 robot::robot( robot_type type )
-	:robot_type_{ type }
+	:r_type_{ type }
 {
 	id_ = ( type == robot_type::patchbot ) ? 0 : id_counter_++;
 }
@@ -35,7 +35,7 @@ bool robot::obstructed() const noexcept
 
 /////////////////////////* CLASS TILE */////////////////////////
 tile::tile( tile_type type, const bool door )
-	: tile_type_{ type }
+	: t_type_{ type }
 	, door_{ door }
 {}
 
@@ -63,7 +63,7 @@ void patchbot::tile::door_decrement_timer()
 /// GETTER
 tile_type tile::type() const noexcept
 {
-	return tile_type_;
+	return t_type_;
 }
 
 bool tile::door_is_open() const
@@ -79,5 +79,5 @@ bool tile::door_is_automatic() const
 	if( !door_ )
 		throw std::invalid_argument( " Tile is not a door " );
 
-	return ( tile_type_ == tile_type::automatic_door ) ? true : false;
+	return ( t_type_ == tile_type::automatic_door ) ? true : false;
 }

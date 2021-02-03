@@ -40,7 +40,7 @@ void write_map_to_file( const patchbot::terrain &map )
 			for( auto iter = patchbot::robot_map.begin();
 				iter != patchbot::robot_map.end(); ++iter )
 			{
-				if( iter->second == temp->robot_type_ )
+				if( iter->second == temp->r_type_ )
 					output_file << iter->first;
 			}
 		} else
@@ -95,10 +95,6 @@ int main( int argc, char *argv[] )
 }
 
 /*
-format if else elseif etc (lesbarkeit)
-bis wand und dann ein einfach schritt führt zu einem extra schritt ( BUG ) 
-wenn man auf einer tür wartet zählt es nicht als zeitschritt
-sobald ein roboter auf der tür ist, soll die tür nicht schließen ( TODO )
 änder robots[0] zu eigener patchbot variable! (lesbarkeit)
 rename tile type and robot type member to only type! (lesbarkeit)
 game_status in model erweitern und alle methoden dort verlagern (structur)
@@ -113,10 +109,6 @@ Testat 3 + 4
 [Datenstrukturen] zu rendernden Ausschnitt bestimmen,
 	Anstelle jedes Mal auf Ende der Karte zu prüfen -> done1
 
-MAYBE CHANGE:
-Robots are also concidered as walls, which means if patchbot goes until wall he will stop by an enemy bot
-+ no deadlock if pb and robot are cornered and game can end
-- not acutally a wall
 
 VERBESSERUNG TESTAT 4:
 - rendering jetz halb so kurz und ca 2000 mal unkomplizierter.

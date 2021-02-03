@@ -39,7 +39,7 @@ void controls::update_world()
 {
 	update_patchbot();
 	//update enemies();
-	//update doors();
+	update_doors();
 }
 
 void controls::update_patchbot()
@@ -47,21 +47,20 @@ void controls::update_patchbot()
 	if( !frequency_.size() )
 		throw std::out_of_range( "ERROR: empty stack" );
 
-	auto &patchbot = terrain_->robots_[0];
-	auto x = terrain_->robots_[0]->x_, y = terrain_->robots_[0]->y_;
-
-	if( dangerous_tile( x, y ) )
-	{
-		patchbot->kill_robot();
-		return;
-
-	} else if( obstacle( x, y ) || wall_next_tile( x, y, direction_.top() ) )
+	if( obstacle( terrain_->robots_[0]->x_, terrain_->robots_[0]->y_ ) ||
+		wall_next_tile( terrain_->robots_[0]->x_, terrain_->robots_[0]->y_, direction_.top() ) )
 	{
 		update_instruction();
 		return;
 
 	} else
-		move_robot( x, y, direction_.top() );
+		move_robot( terrain_->robots_[0]->x_, terrain_->robots_[0]->y_, direction_.top() );
+
+	if( dangerous_tile( terrain_->robots_[0]->x_, terrain_->robots_[0]->y_ ) )
+	{
+		terrain_->robots_[0]->kill_robot();
+		return;
+	}
 
 	update_instruction();
 }
@@ -80,82 +79,31 @@ void controls::update_instruction()
 		until_wall_ = false;
 		frequency_.pop();
 		direction_.pop();
-	} else
+	} else if( frequency_.top() != 0 )
 		frequency_.top()--;
 }
 
-//void controls::one_step_patchbot()
-//{
-//	if( !frequency_.size() )
-//		throw std::out_of_range( "ERROR: empty stack" );
-//
-//	if( obstacle( terrain_->robots_[0]->x_, terrain_->robots_[0]->y_ ) && !wait_ )
-//	{
-//		wait_ = true;
-//		return;
-//	} else
-//		wait_ = false;
-//
-//	if( frequency_.top() == 0 )
-//	{
-//		until_wall_ = true;
-//
-//		if( wall_next_tile( terrain_->robots_[0]->x_, terrain_->robots_[0]->y_, direction_.top() )
-//			&& until_wall_ )
-//		{
-//			until_wall_ = false;
-//			frequency_.pop();
-//			direction_.pop();
-//
-//			if( !direction_.empty() )
-//				move_robot( terrain_->robots_[0]->x_, terrain_->robots_[0]->y_, 0, direction_.top() );
-//		} else
-//		{
-//			move_robot( terrain_->robots_[0]->x_, terrain_->robots_[0]->y_, 0, direction_.top() );
-//		}
-//	} else
-//	{
-//		move_robot( terrain_->robots_[0]->x_, terrain_->robots_[0]->y_, 0, direction_.top() );
-//
-//		if( frequency_.top() <= 1 )
-//		{
-//			frequency_.pop();
-//			direction_.pop();
-//		}
-//		if( !frequency_.empty() )
-//			( frequency_.top() == 0 ) ?
-//			until_wall_ = true : frequency_.top()--;
-//	}
-//
-//	for( auto &door : doors_ )
-//	{
-//		door->door_decrement_timer();
-//	}
-//
-//	doors_.erase( std::remove_if( doors_.begin(), doors_.end(),
-//		[]( auto &tile ) { return !tile->door_is_open(); } ), doors_.end() );
-//}
 
 void controls::move_robot( unsigned int x, unsigned int y, const direction &d )
 {
-	auto &robot = terrain_->at( x, y ).occupant_;
+
 	switch( d )
 	{
 		case direction::up:
 			terrain_->at( x, y - 1 ).occupant_.swap( terrain_->at( x, y ).occupant_ );
-			robot->y_ = y - 1; break;
+			terrain_->robots_[0]->y_--; break;
 
 		case direction::down:
 			terrain_->at( x, y + 1 ).occupant_.swap( terrain_->at( x, y ).occupant_ );
-			robot->y_ = y + 1; break;
+			terrain_->robots_[0]->y_++; break;
 
 		case direction::left:
 			terrain_->at( x - 1, y ).occupant_.swap( terrain_->at( x, y ).occupant_ );
-			robot->x_ = x - 1; break;
+			terrain_->robots_[0]->x_--; break;
 
 		case direction::right:
 			terrain_->at( x + 1, y ).occupant_.swap( terrain_->at( x, y ).occupant_ );
-			robot->x_ = x + 1; break;
+			terrain_->robots_[0]->x_++; break;
 
 		case direction::wait: break;
 		default: throw std::invalid_argument( "ERROR: reading Robot direction" );
@@ -170,7 +118,7 @@ bool controls::dangerous_tile( unsigned int x, unsigned int y )
 	{
 		tile.occupant_->kill_robot();
 		return true;
-	} else if( tile.type() == tile_type::water && tile.occupant_->robot_type_ != robot_type::swimmer )
+	} else if( tile.type() == tile_type::water && tile.occupant_->r_type_ != robot_type::swimmer )
 	{
 		tile.occupant_->kill_robot();
 		return true;
@@ -181,7 +129,7 @@ bool controls::dangerous_tile( unsigned int x, unsigned int y )
 bool controls::obstacle( unsigned int x, unsigned int y )
 {
 	auto &tile = terrain_->at( x, y );
-	auto const &robot = tile.occupant_;
+	auto &robot = tile.occupant_;
 
 	/* obstructed robots can move again */
 	if( robot->obstructed() )
@@ -190,8 +138,8 @@ bool controls::obstacle( unsigned int x, unsigned int y )
 		return false;
 	}
 
-	auto const has_wheels = ( robot->robot_type_ == robot_type::follower ||
-		robot->robot_type_ == robot_type::hunter || robot->robot_type_ == robot_type::sniffer ) ?
+	auto const has_wheels = ( robot->r_type_ == robot_type::follower ||
+		robot->r_type_ == robot_type::hunter || robot->r_type_ == robot_type::sniffer ) ?
 		false : true;
 
 	auto const is_closed_door = ( terrain_->at( x, y ).door_ && !tile.door_is_open() ) ?
@@ -213,7 +161,7 @@ bool controls::obstacle( unsigned int x, unsigned int y )
 
 	/* closed manual door as obstacle for patchbot */
 	else if( is_closed_door && !tile.door_is_automatic() &&
-		robot->robot_type_ == robot_type::patchbot )
+		robot->r_type_ == robot_type::patchbot )
 	{
 		robot->update_obstructed();
 		tile.door_set_timer();
@@ -223,7 +171,7 @@ bool controls::obstacle( unsigned int x, unsigned int y )
 
 	/* closed automatic door as obstacle for enemy robots */
 	else if( is_closed_door && tile.door_is_automatic() &&
-		robot->robot_type_ != robot_type::patchbot )
+		robot->r_type_ != robot_type::patchbot )
 	{
 		robot->update_obstructed();
 		tile.door_set_timer();
@@ -267,7 +215,7 @@ bool controls::wall( unsigned int x, unsigned int y, robot_type r_type )
 		if( tile.occupant_ && ( r_type == robot_type::patchbot || r_type == robot_type::bugger ) )
 			return true;
 		/* follower, hunter, sniffer interpret other enemies as walls */
-		else if( tile.occupant_->robot_type_ != robot_type::patchbot &&
+		else if( tile.occupant_->r_type_ != robot_type::patchbot &&
 			( r_type == robot_type::follower || r_type == robot_type::hunter
 				|| r_type == robot_type::sniffer ) )
 			return true;
@@ -276,24 +224,27 @@ bool controls::wall( unsigned int x, unsigned int y, robot_type r_type )
 	return false;
 }
 
-bool controls::wall_next_tile( unsigned int x, unsigned int y, direction d )
+bool controls::wall_next_tile( unsigned int x, unsigned int y, const direction &d )
 {
+	if( !terrain_->at( x, y ).occupant_ )
+		throw std::invalid_argument( "ERROR: no robot to move" );
+
 	switch( d )
 	{
 		case direction::up:
-			return ( wall( x, y - 1, terrain_->at( x, y ).occupant_->robot_type_ ) ) ?
+			return ( wall( x, y - 1, terrain_->at( x, y ).occupant_->r_type_ ) ) ?
 				true : false; break;
 
 		case direction::down:
-			return ( wall( x, y + 1, terrain_->at( x, y ).occupant_->robot_type_ ) ) ?
+			return ( wall( x, y + 1, terrain_->at( x, y ).occupant_->r_type_ ) ) ?
 				true : false; break;
 
 		case direction::left:
-			return ( wall( x - 1, y, terrain_->at( x, y ).occupant_->robot_type_ ) ) ?
+			return ( wall( x - 1, y, terrain_->at( x, y ).occupant_->r_type_ ) ) ?
 				true : false; break;
 
 		case direction::right:
-			return ( wall( x + 1, y, terrain_->at( x, y ).occupant_->robot_type_ ) ) ?
+			return ( wall( x + 1, y, terrain_->at( x, y ).occupant_->r_type_ ) ) ?
 				true : false; break;
 
 		case direction::wait: return false; break;
@@ -304,13 +255,13 @@ bool controls::wall_next_tile( unsigned int x, unsigned int y, direction d )
 
 void controls::update_doors()
 {
-	for( auto &door : doors_ )
-		door->door_decrement_timer();
+	for( int i = 0; i < doors_.size(); i++ )
+	{
+		doors_[i]->door_decrement_timer();
 
-	/* remove all closed doors */
-	//doors_.erase( std::remove_if( doors_.begin(), doors_.end(),
-	//	[]( auto &tile ) { return !tile->door_is_open(); } ),
-	//	doors_.end() );
+		if( !doors_[i]->door_is_open() )
+			doors_.erase( doors_.begin() + i );
+	}
 }
 
 bool controls::until_wall() const noexcept

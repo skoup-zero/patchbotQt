@@ -26,16 +26,15 @@ namespace patchbot
 
 	private:
 
-		Ui::patchbot_guiClass ui_; /* view */
+		Ui::patchbot_guiClass ui_; /* ui as view */
 		model model_;	/* model for data */
-		controls controls_;
+		controls controls_; /* controls for interaction */
 		QTimer timer_;
-
-
-
 		QPixmap pixmap_;
+		QString last_instruction_ = ""; /* saving instruction from last game */
 
 	public:
+
 		patchbot_gui( QWidget *parent = Q_NULLPTR );
 
 		/// @brief adjust size of Map and Sequence line
