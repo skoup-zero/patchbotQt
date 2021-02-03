@@ -86,9 +86,6 @@ int main( int argc, char *argv[] )
 }
 
 /*
-little bug where windows is not streched enoguh
-win condition doesnt work
-zuletzt testen ob das Programm auch auf anderen PC´s läuft, also relative pfade verwenden ( TODO )
 
 Testat 3 + 4
 [Ausnahmebehandlung] Ausnahmen, die das Programmende erfordern, in der main fangen -> done

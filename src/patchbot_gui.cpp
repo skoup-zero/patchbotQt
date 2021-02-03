@@ -76,7 +76,7 @@ void patchbot_gui::on_change_colonie_button_clicked()
 	QString change_map_path = QFileDialog::getOpenFileName(
 		this,
 		"Please Select a Map",
-		R"(x64/Debug/koloniekarten)",
+		R"(assets\txt\koloniekarten)",
 		"txt files (*.txt)" );
 
 	if( !change_map_path.isNull() )
@@ -168,7 +168,7 @@ void patchbot_gui::on_mission_step_button_clicked()
 		on_mission_cancel_button_clicked();
 		return;
 	}
-	else if( !model_.terrain_.robots_[0]->alive() )
+	else if( !model_.terrain_.patchbot_->alive() )
 	{
 		QMessageBox::about( this, "!!! LOSE !!!", "patchbot died" );
 		on_mission_cancel_button_clicked();
