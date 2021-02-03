@@ -26,17 +26,17 @@ namespace patchbot
 		model();
 		model( terrain &&ter, std::filesystem::path current_path );
 
-		/// @brief		Renders visible part of map.
-		/// @details	Loads preloaded TGA images and draws it to a pixmap
+		///	@brief		Renders visible part of map.
+		///	@details	Loads preloaded TGA images and draws it to a pixmap
 		///				according to map (terrain_).
-		/// @param		pixmap to draw on.
-		/// @param		screen_width, screen_height - size of view.
-		/// @param		scroll_value_x, scroll_value_y - scroll values.
+		///	@param		pixmap to draw on.
+		///	@param		screen_width, screen_height - size of view.
+		///	@param		scroll_value_x, scroll_value_y - scroll values.
 		void render_map( QPixmap &pixmap, unsigned int label_x, unsigned int label_y,
 			unsigned int space_x, unsigned int space_y );
 
-		/// @brief		Check if player won the game.
-		/// @return		true if patchbot is on server.
+		///	@brief		Check if player won the game.
+		///	@return		true if patchbot is on server.
 		bool check_win();
 
 		/// SETTER
