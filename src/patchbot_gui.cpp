@@ -48,6 +48,10 @@ void patchbot_gui::refresh_window()
 	model_.render_map( pixmap_, width, height,
 		ui_.map_scrollbar_h->value(), ui_.map_scrollbar_v->value() );
 	ui_.map_placeholder_label->setPixmap( pixmap_ );
+
+	/* (OPTIONAL) Jumps Cursor to beginning */
+	ui_.sequenz_line_edit->setCursorPosition( 0 );
+	ui_.sequenz_scrollbar_h->setValue( 0 );
 }
 
 void patchbot_gui::resizeEvent( QResizeEvent *event )
@@ -65,7 +69,9 @@ void patchbot_gui::activate_prgram_buttons( bool activate )
 	ui_.sequenz_line_edit->setEnabled( activate );
 	ui_.delete_button->setEnabled( activate );
 	ui_.repeat_dropdown->setEnabled( activate );
-	ui_.sequenz_scrollbar_h->setEnabled( activate );
+
+	/* (OPTIONAL) Uncomment this if User is NOT allowed to scroll during gameplay */
+	//ui_.sequenz_scrollbar_h->setEnabled( activate );
 }
 
 /////////////////////////////////////// PUBLIC SLOTS ///////////////////////////////////////
