@@ -190,7 +190,8 @@ void patchbot_gui::on_mission_step_button_clicked()
 	{
 		controls_.update_world();
 
-		if( !controls_.until_wall() ) /* skip if until wall is active */
+		/* Skip instruction edit if until wall is active or patchbot is obstructed */
+		if( !controls_.until_wall() && !model_.terrain_.patchbot_->obstructed() ) 
 		{
 			if( full_command.at( 1 ).digitValue() <= 1 || full_command.at( 1 ) == 'X' )
 				full_command.remove( 0, 2 );

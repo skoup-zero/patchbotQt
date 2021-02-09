@@ -47,9 +47,12 @@ void controls::update_patchbot()
 	if( !frequency_.size() )
 		throw std::out_of_range( "ERROR: empty stack" );
 
-	/* Patchbot doesn't move at first contact with an obstacle and if the next tile is a wall */
-	if( obstacle( terrain_->patchbot_->x_, terrain_->patchbot_->y_ ) ||
-		wall_next_tile( terrain_->patchbot_->x_, terrain_->patchbot_->y_, direction_.top() ) )
+	/* Patchbot waits at first contact with an obstacle */
+	if( obstacle( terrain_->patchbot_->x_, terrain_->patchbot_->y_ ) )
+		return;
+
+	/* Patchbot doesn't move if the next tile is a wall */
+	else if( wall_next_tile( terrain_->patchbot_->x_, terrain_->patchbot_->y_, direction_.top() ) )
 	{
 		update_instruction();
 		return;
