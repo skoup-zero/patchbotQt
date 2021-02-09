@@ -36,8 +36,11 @@ namespace patchbot
 		/// @brief	Calls refresh_windows() everytime window resizes.
 		void resizeEvent( QResizeEvent *event );
 
-		/// @brief	(de-)activate all program buttons.
+		/// @brief	(De-)Activates all program buttons.
 		void activate_prgram_buttons( bool activate );
+
+		///	@brief	Adjusts sequence scrollbar for long instructions.
+		void adjust_sequence_scrollbar();
 
 	public slots:
 
@@ -74,7 +77,7 @@ namespace patchbot
 		void on_map_scrollbar_h_valueChanged( int change );
 		void on_map_scrollbar_v_valueChanged( int change );
 
-		/// @brief	Scrollbars for sequenz line.
+		/// @brief	Scrollbars for sequence line.
 		void on_sequenz_scrollbar_h_valueChanged( int change );
 	};
 }

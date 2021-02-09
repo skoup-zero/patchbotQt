@@ -49,7 +49,9 @@ void patchbot_gui::refresh_window()
 		ui_.map_scrollbar_h->value(), ui_.map_scrollbar_v->value() );
 	ui_.map_placeholder_label->setPixmap( pixmap_ );
 
-	/* (OPTIONAL) Jumps Cursor to beginning */
+	adjust_sequence_scrollbar();
+
+	/* (OPTIONAL) Jumps Cursor to beginning so user can always see current command*/
 	ui_.sequenz_line_edit->setCursorPosition( 0 );
 	ui_.sequenz_scrollbar_h->setValue( 0 );
 }
@@ -72,6 +74,19 @@ void patchbot_gui::activate_prgram_buttons( bool activate )
 
 	/* (OPTIONAL) Uncomment this if User is NOT allowed to scroll during gameplay */
 	//ui_.sequenz_scrollbar_h->setEnabled( activate );
+}
+
+void patchbot_gui::adjust_sequence_scrollbar()
+{
+	ui_.sequenz_line_edit->end( false );
+	if( ui_.sequenz_line_edit->text().size() > 18 )
+	{
+		ui_.sequenz_line_edit->end( false );
+		ui_.sequenz_scrollbar_h->setRange( 0, ui_.sequenz_line_edit->cursorPosition() / 2 );
+		ui_.sequenz_scrollbar_h->setValue( ui_.sequenz_scrollbar_h->maximum() );
+	}
+	else
+		ui_.sequenz_scrollbar_h->setMaximum( 0 );
 }
 
 /////////////////////////////////////// PUBLIC SLOTS ///////////////////////////////////////
@@ -243,12 +258,7 @@ void patchbot_gui::on_arrow_up_button_clicked()
 		ui_.sequenz_line_edit->insert( QString::number( frequency ) );
 	}
 
-	if( ui_.sequenz_line_edit->text().size() > 18 )
-	{
-		ui_.sequenz_line_edit->end( false );
-		ui_.sequenz_scrollbar_h->setRange( 0, ui_.sequenz_line_edit->cursorPosition() / 2 );
-		ui_.sequenz_scrollbar_h->setValue( ui_.sequenz_scrollbar_h->maximum() );
-	}
+	adjust_sequence_scrollbar();
 }
 
 void patchbot_gui::on_arrow_down_button_clicked()
@@ -264,12 +274,7 @@ void patchbot_gui::on_arrow_down_button_clicked()
 		ui_.sequenz_line_edit->insert( QString::number( frequency ) );
 	}
 
-	if( ui_.sequenz_line_edit->text().size() > 18 )
-	{
-		ui_.sequenz_line_edit->end( false );
-		ui_.sequenz_scrollbar_h->setRange( 0, ui_.sequenz_line_edit->cursorPosition() / 2 );
-		ui_.sequenz_scrollbar_h->setValue( ui_.sequenz_scrollbar_h->maximum() );
-	}
+	adjust_sequence_scrollbar();
 }
 
 void patchbot_gui::on_arrow_left_button_clicked()
@@ -285,12 +290,7 @@ void patchbot_gui::on_arrow_left_button_clicked()
 		ui_.sequenz_line_edit->insert( QString::number( frequency ) );
 	}
 
-	if( ui_.sequenz_line_edit->text().size() > 18 )
-	{
-		ui_.sequenz_line_edit->end( false );
-		ui_.sequenz_scrollbar_h->setRange( 0, ui_.sequenz_line_edit->cursorPosition() / 2 );
-		ui_.sequenz_scrollbar_h->setValue( ui_.sequenz_scrollbar_h->maximum() );
-	}
+	adjust_sequence_scrollbar();
 }
 
 void patchbot_gui::on_arrow_right_button_clicked()
@@ -306,12 +306,7 @@ void patchbot_gui::on_arrow_right_button_clicked()
 		ui_.sequenz_line_edit->insert( QString::number( frequency ) );
 	}
 
-	if( ui_.sequenz_line_edit->text().size() > 18 )
-	{
-		ui_.sequenz_line_edit->end( false );
-		ui_.sequenz_scrollbar_h->setRange( 0, ui_.sequenz_line_edit->cursorPosition() / 2 );
-		ui_.sequenz_scrollbar_h->setValue( ui_.sequenz_scrollbar_h->maximum() );
-	}
+	adjust_sequence_scrollbar();
 }
 
 void patchbot_gui::on_center_button_clicked()
@@ -327,12 +322,7 @@ void patchbot_gui::on_center_button_clicked()
 		ui_.sequenz_line_edit->insert( QString::number( frequency ) );
 	}
 
-	if( ui_.sequenz_line_edit->text().size() > 18 )
-	{
-		ui_.sequenz_line_edit->end( false );
-		ui_.sequenz_scrollbar_h->setRange( 0, ui_.sequenz_line_edit->cursorPosition() / 2 );
-		ui_.sequenz_scrollbar_h->setValue( ui_.sequenz_scrollbar_h->maximum() );
-	}
+	adjust_sequence_scrollbar();
 }
 
 void patchbot_gui::on_delete_button_clicked()
@@ -348,14 +338,7 @@ void patchbot_gui::on_delete_button_clicked()
 	text.chop( 2 );
 	ui_.sequenz_line_edit->setText( text );
 
-	if( ui_.sequenz_line_edit->text().size() > 18 )
-	{
-		ui_.sequenz_line_edit->end( false );
-		ui_.sequenz_scrollbar_h->setRange( 0, ui_.sequenz_line_edit->cursorPosition() / 2 );
-		ui_.sequenz_scrollbar_h->setValue( ui_.sequenz_scrollbar_h->maximum() );
-	}
-	else
-		ui_.sequenz_scrollbar_h->setMaximum( 0 );
+	adjust_sequence_scrollbar();
 }
 
 
