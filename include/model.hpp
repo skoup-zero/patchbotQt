@@ -32,8 +32,8 @@ namespace patchbot
 		///	@param		pixmap to draw on.
 		///	@param		screen_width, screen_height - size of view.
 		///	@param		scroll_value_x, scroll_value_y - scroll values.
-		void render_map( QPixmap &pixmap, unsigned int label_x, unsigned int label_y,
-			unsigned int space_x, unsigned int space_y );
+		void render_map( QPixmap &pixmap, unsigned int screen_width, unsigned int screen_height,
+			unsigned int scroll_value_x, unsigned int scroll_value_y );
 
 		///	@brief		Check if player won the game.
 		///	@return		true if patchbot is on server.

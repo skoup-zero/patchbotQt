@@ -5,7 +5,7 @@ using namespace patchbot;
 patchbot_gui::patchbot_gui( QWidget *parent )
 	: QMainWindow( parent )
 	, model_()
-	, controls_( &model_.terrain_ )
+	, controls_( model_.terrain_ )
 	, timer_( QTimer() )
 {
 	ui_.setupUi( this );
@@ -34,9 +34,9 @@ patchbot_gui::patchbot_gui( QWidget *parent )
 void patchbot_gui::refresh_window()
 {
 	/* size is entire map if it fits in label */
-	unsigned int width = ( ui_.map_scroll_area->width() < model_.pixel_terrain_width() )
+	const auto width = ( ui_.map_scroll_area->width() < model_.pixel_terrain_width() )
 		? ui_.map_scroll_area->width() : model_.pixel_terrain_width();
-	unsigned int height = ( ui_.map_scroll_area->height() < model_.pixel_terrain_height() )
+	const auto height = ( ui_.map_scroll_area->height() < model_.pixel_terrain_height() )
 		? ui_.map_scroll_area->height() : model_.pixel_terrain_height();
 
 	ui_.map_placeholder_label->resize( width, height );
@@ -61,7 +61,7 @@ void patchbot_gui::resizeEvent( QResizeEvent *event )
 	refresh_window();
 }
 
-void patchbot_gui::activate_prgram_buttons( bool activate )
+void patchbot_gui::activate_program_buttons( const bool activate ) const
 {
 	ui_.arrow_up_button->setEnabled( activate );
 	ui_.arrow_down_button->setEnabled( activate );
@@ -94,7 +94,7 @@ void patchbot_gui::adjust_sequence_scrollbar()
 /* CHANGE MAP  */
 void patchbot_gui::on_change_colonie_button_clicked()
 {
-	QString change_map_path = QFileDialog::getOpenFileName(
+	const QString change_map_path = QFileDialog::getOpenFileName(
 		this,
 		"Please Select a Map",
 		R"(assets\txt\koloniekarten)",
@@ -123,7 +123,6 @@ void patchbot_gui::on_change_colonie_button_clicked()
 		ui_.repeat_dropdown->setCurrentIndex( 0 );
 		pixmap_ = QPixmap( ui_.map_placeholder_label->size() );
 
-		last_instruction_ = "";
 		on_mission_cancel_button_clicked();
 		refresh_window();
 	}
@@ -136,7 +135,7 @@ void patchbot_gui::on_change_colonie_button_clicked()
 
 void patchbot_gui::on_mission_start_button_clicked()
 {
-	activate_prgram_buttons( false );
+	activate_program_buttons( false );
 	ui_.change_colonie_button->setEnabled( false );
 
 	ui_.mission_stop_button->setEnabled( false );
@@ -147,16 +146,12 @@ void patchbot_gui::on_mission_start_button_clicked()
 
 	model_.set_game_is_on( true );
 
-	/* saving instructions and passing to controls class */
-	last_instruction_ = ui_.sequenz_line_edit->text();
-	controls_ = controls( ui_.sequenz_line_edit->text(), &model_.terrain_ );
-
 	refresh_window();
 }
 
 void patchbot_gui::on_mission_cancel_button_clicked()
 {
-	activate_prgram_buttons( true );
+	activate_program_buttons( true );
 	ui_.change_colonie_button->setEnabled( true );
 
 	ui_.mission_step_button->setEnabled( false );
@@ -172,10 +167,8 @@ void patchbot_gui::on_mission_cancel_button_clicked()
 	/* reload map when canceled */
 	auto temp = ( terrain::load_map_from_file( model_.current_path_ ) );
 	model_ = model( std::move( temp ), model_.current_path_ );
-
-	/* insert instructions from last game */
-	ui_.sequenz_line_edit->setText( last_instruction_ );
-
+	controls_ = controls( model_.terrain_ );
+	
 	refresh_window();
 }
 
@@ -206,7 +199,7 @@ void patchbot_gui::on_mission_step_button_clicked()
 		controls_.update_world();
 
 		/* Skip instruction edit if until wall is active or patchbot is obstructed */
-		if( !controls_.until_wall() && !model_.terrain_.patchbot_->obstructed() ) 
+		if( !controls_.until_wall() && !model_.terrain_.patchbot_->obstructed() )
 		{
 			if( full_command.at( 1 ).digitValue() <= 1 || full_command.at( 1 ) == 'X' )
 				full_command.remove( 0, 2 );
@@ -251,11 +244,15 @@ void patchbot_gui::on_arrow_up_button_clicked()
 	ui_.sequenz_line_edit->end( false );
 
 	if( frequency == 10 )
+	{
 		ui_.sequenz_line_edit->insert( "OX" );
+		controls_.add_instruction( direction::up, 0 );
+	}
 	else
 	{
 		ui_.sequenz_line_edit->insert( "O" );
 		ui_.sequenz_line_edit->insert( QString::number( frequency ) );
+		controls_.add_instruction( direction::up, frequency );
 	}
 
 	adjust_sequence_scrollbar();
@@ -267,11 +264,15 @@ void patchbot_gui::on_arrow_down_button_clicked()
 	ui_.sequenz_line_edit->end( false );
 
 	if( frequency == 10 )
+	{
 		ui_.sequenz_line_edit->insert( "UX" );
+		controls_.add_instruction( direction::down, 0 );
+	}
 	else
 	{
 		ui_.sequenz_line_edit->insert( "U" );
 		ui_.sequenz_line_edit->insert( QString::number( frequency ) );
+		controls_.add_instruction( direction::down, frequency );
 	}
 
 	adjust_sequence_scrollbar();
@@ -283,11 +284,15 @@ void patchbot_gui::on_arrow_left_button_clicked()
 	ui_.sequenz_line_edit->end( false );
 
 	if( frequency == 10 )
+	{
 		ui_.sequenz_line_edit->insert( "LX" );
+		controls_.add_instruction( direction::left, 0 );
+	}
 	else
 	{
 		ui_.sequenz_line_edit->insert( "L" );
 		ui_.sequenz_line_edit->insert( QString::number( frequency ) );
+		controls_.add_instruction( direction::left, frequency );
 	}
 
 	adjust_sequence_scrollbar();
@@ -299,11 +304,15 @@ void patchbot_gui::on_arrow_right_button_clicked()
 	ui_.sequenz_line_edit->end( false );
 
 	if( frequency == 10 )
+	{
 		ui_.sequenz_line_edit->insert( "RX" );
+		controls_.add_instruction( direction::right, 0 );
+	}
 	else
 	{
 		ui_.sequenz_line_edit->insert( "R" );
 		ui_.sequenz_line_edit->insert( QString::number( frequency ) );
+		controls_.add_instruction( direction::right, frequency );
 	}
 
 	adjust_sequence_scrollbar();
@@ -312,17 +321,20 @@ void patchbot_gui::on_arrow_right_button_clicked()
 void patchbot_gui::on_center_button_clicked()
 {
 	auto frequency = ui_.repeat_dropdown->currentIndex() + 1;
-	ui_.sequenz_line_edit->end( false );
 
 	if( frequency == 10 )
-		QMessageBox::information( this, "Are you sure?", "Patchbot would never move" );
-	else
 	{
-		ui_.sequenz_line_edit->insert( "W" );
-		ui_.sequenz_line_edit->insert( QString::number( frequency ) );
+		QMessageBox::information( this, "Are you sure?", "Patchbot would never move" );
+		return;
 	}
 
+	ui_.sequenz_line_edit->end( false );
+	ui_.sequenz_line_edit->insert( "W" );
+	ui_.sequenz_line_edit->insert( QString::number( frequency ) );
+
 	adjust_sequence_scrollbar();
+
+	controls_.add_instruction( direction::wait, frequency );
 }
 
 void patchbot_gui::on_delete_button_clicked()
@@ -337,8 +349,9 @@ void patchbot_gui::on_delete_button_clicked()
 	}
 	text.chop( 2 );
 	ui_.sequenz_line_edit->setText( text );
-
 	adjust_sequence_scrollbar();
+
+	controls_.remove_instruction();
 }
 
 

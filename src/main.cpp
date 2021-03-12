@@ -87,20 +87,28 @@ int main( int argc, char *argv[] )
 
 /*
 
-Testat 3 + 4
-[Ausnahmebehandlung] Ausnahmen, die das Programmende erfordern, in der main fangen -> done
-[Schlichtheit] redundanter Code beim Laden der Grafiken,
-				effizienterer Code für Konvertierung nach Qimage -> done
+Testat 5
+[Funktionalität] Warten vor der Tür ->done
+[Schlichtheit] interne Befehls-Repräsentation ->done
+[Schlichtheit] inline if else, um bool Variable zu schreiben -> done
+[const] bei Methoden -> done
+[Referenzen] Verweise nach Möglichkeit als Referenz speichern -> done
 
-[Datenstrukturen] zu rendernden Ausschnitt bestimmen,
-	Anstelle jedes Mal auf Ende der Karte zu prüfen -> done1
+
+VERBESSERUNG:
+- roboter warten vor der tür
+
+- interne befehlsrepräsentation: extra konstruktor gelöscht und befehle werden
+	nun im controller seperat vom Qstring gebaut
+
+- anfängerfehler behoben ( if/else für bool variable )
+
+- controls::move_robot -> const
+- controls::dangerous_tile -> const
+- controls::wall -> const, parameter -> const
+- controls::wall_next_tile -> const, parameter -> const
 
 
-VERBESSERUNG TESTAT 4:
-- rendering jetz halb so kurz und ca 2000 mal unkomplizierter.
-- qpixmap converter vertauscht nach dem lesen der daten die R mit B und spiegelt es vertikal anstatt
-	jeden pixel einzeln zu lesen.
-- Ausnahmen, die das Programmende erfordern werden in der Main abgefangen und alle anderen per QDialog
-	dem User mitgeteilt.
-- model in eine extra klasse ausgewandert -> übersichtlicher
+- verweis auf terrain jetzt als referenz statt pointer
+
 */

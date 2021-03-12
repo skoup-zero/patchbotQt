@@ -25,25 +25,25 @@ model::model( terrain &&ter, std::filesystem::path current_path )
 }
 
 void model::render_map( QPixmap &pixmap, unsigned int screen_width, unsigned int screen_height,
-	unsigned int scroll_value_x, unsigned int scroll_value_y )
+	const unsigned int scroll_value_x, const unsigned int scroll_value_y )
 {
 	/* render entire map if it fits in Label */
-	unsigned int width = ( pixel_terrain_width_ < screen_width )
+	auto width = ( pixel_terrain_width_ < screen_width )
 		? pixel_terrain_width_ : screen_width;
-	unsigned int height = ( pixel_terrain_height_ < screen_height )
+	auto height = ( pixel_terrain_height_ < screen_height )
 		? pixel_terrain_height_ : screen_height;
 
-	int left_border = std::floor( scroll_value_x / pixel_tga_width_ );
-	int top_border = std::floor( scroll_value_y / pixel_tga_height_ );
+	const int left_border = std::floor( scroll_value_x / pixel_tga_width_ );
+	const int top_border = std::floor( scroll_value_y / pixel_tga_height_ );
 
-	int right_border = std::ceil( ( width + scroll_value_x ) / pixel_tga_width_ ) + 1;
-	int bottom_border = std::ceil( ( height + scroll_value_y ) / pixel_tga_height_ ) + 1;
+	const int right_border = std::ceil( ( width + scroll_value_x ) / pixel_tga_width_ ) + 1;
+	const int bottom_border = std::ceil( ( height + scroll_value_y ) / pixel_tga_height_ ) + 1;
 
 	QPainter painter;
 	painter.begin( &pixmap );
 
-	for( int y = top_border; y <= bottom_border && y < terrain_.height(); y++ )
-		for( int x = left_border; x <= right_border && x < terrain_.width(); x++ )
+	for( auto y = top_border; y <= bottom_border && y < terrain_.height(); y++ )
+		for( auto x = left_border; x <= right_border && x < terrain_.width(); x++ )
 		{
 			/* draw Background */
 			const auto &tile = terrain_.at( x, y );
@@ -98,13 +98,13 @@ bool model::check_win()
 	const auto &tile = terrain_.at( terrain_.patchbot_->x_, terrain_.patchbot_->y_ );
 	if( tile.type() == tile_type::server )
 		return true;
-	else
-		return false;
+
+	return false;
 }
 
 
 /// SETTER
-void model::set_game_is_on( bool status )
+void model::set_game_is_on( const bool status )
 {
 	game_is_on_ = status;
 }

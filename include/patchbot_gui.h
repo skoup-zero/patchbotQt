@@ -24,7 +24,6 @@ namespace patchbot
 		controls controls_;
 		QTimer timer_;
 		QPixmap pixmap_;
-		QString last_instruction_ = ""; /* saving instruction from last game */
 
 	public:
 
@@ -37,7 +36,7 @@ namespace patchbot
 		void resizeEvent( QResizeEvent *event );
 
 		/// @brief	(De-)Activates all program buttons.
-		void activate_prgram_buttons( bool activate );
+		void activate_program_buttons( bool activate ) const;
 
 		///	@brief	Adjusts sequence scrollbar for long instructions.
 		void adjust_sequence_scrollbar();

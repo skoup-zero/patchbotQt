@@ -71,7 +71,7 @@ bool tile::door_is_open() const
 	if( !door_ )
 		throw std::invalid_argument( " Tile is not a door " );
 
-	return ( timer_ <= 0 ) ? false : true;
+	return  timer_ > 0;
 }
 
 bool tile::door_is_automatic() const
@@ -79,5 +79,5 @@ bool tile::door_is_automatic() const
 	if( !door_ )
 		throw std::invalid_argument( " Tile is not a door " );
 
-	return ( t_type_ == tile_type::automatic_door ) ? true : false;
+	return  t_type_ == tile_type::automatic_door;
 }
