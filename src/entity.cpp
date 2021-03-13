@@ -83,17 +83,16 @@ bool tile::door_is_automatic() const
 }
 
 int tile::node_cost() const
-{ /* !NOTE: after enemies moved enemy start is accessible */
-	if( t_type_ == tile_type::alien_weed || t_type_ == tile_type::steel_plates )
-		return 1;
+{ 
+	if( occupant_ )
+		return 0;
 
-	if( t_type_ == tile_type::gravel )
+	if( t_type_ == tile_type::gravel || door_ && !door_is_open() )
 		return 2;
-
-	/* review this */
-	if( door_ )
-		if( !door_is_open() )
-			return 2;
+	
+	if( t_type_ == tile_type::patchbot_start || t_type_ == tile_type::enemy_start ||
+		t_type_ == tile_type::steel_plates || t_type_ == tile_type::alien_weed || door_)
+		return 1;
 
 	return 0;
 }

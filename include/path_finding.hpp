@@ -15,12 +15,6 @@ namespace patchbot
 	class dijkstra
 	{
 	public:
-		static void calculate_path(terrain &terrain);
+		static void calculate_paths( terrain &terrain );
 	};
 }
-
-//struct compare_nodes
-//{
-//	bool operator()( std::tuple<unsigned int, unsigned int, unsigned int> const &t1,
-//		std::tuple<unsigned int, unsigned int, unsigned int> const &t2 ) const;
-//};
