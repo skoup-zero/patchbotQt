@@ -292,3 +292,18 @@ bool controls::until_wall() const noexcept
 {
 	return until_wall_;
 }
+
+int controls::tile_cost(unsigned const int x, unsigned const int y) const
+{
+	if( dangerous_tile( x, y ) || wall( x, y, robot_type::follower ) )
+		return 0;
+	
+	if( terrain_.at( x, y ).type() == tile_type::alien_weed )
+		return 2;
+
+	if( terrain_.at( x, y ).door_ )
+		if( !terrain_.at( x, y ).door_is_open() )
+			return 2;
+
+	return 1;
+}

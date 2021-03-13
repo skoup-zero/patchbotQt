@@ -89,6 +89,19 @@ void model::render_map( QPixmap &pixmap, unsigned int screen_width, unsigned int
 					( y - top_border ) * pixel_tga_height_ - scroll_value_y % 32,
 					assets_.robot_img.at( robot_type::dead ) );
 			}
+
+			/* draw Arrows */
+			if( arrows_is_on )
+			{
+				if( tile.predecessor_ != direction::undefined )
+				{
+					const auto arrow = tile.predecessor_;
+					
+					painter.drawPixmap( ( x - left_border ) * pixel_tga_width_ - scroll_value_x % 32,
+						( y - top_border ) * pixel_tga_height_ - scroll_value_y % 32,
+						assets_.arrow_img.at( arrow ) );
+				}
+			}
 		}
 	painter.end();
 }

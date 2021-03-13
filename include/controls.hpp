@@ -4,14 +4,6 @@
 
 namespace patchbot
 {
-	enum class direction
-	{
-		left,
-		up,
-		right,
-		down,
-		wait
-	};
 	
 	/// @class updates all objects that can change in map.
 	class controls
@@ -83,5 +75,7 @@ namespace patchbot
 
 		/// GETTER 
 		bool until_wall() const noexcept;
+
+		int tile_cost(unsigned int x, unsigned int y) const;
 	};
 }

@@ -81,3 +81,19 @@ bool tile::door_is_automatic() const
 
 	return  t_type_ == tile_type::automatic_door;
 }
+
+int tile::node_cost() const
+{ /* !NOTE: after enemies moved enemy start is accessible */
+	if( t_type_ == tile_type::alien_weed || t_type_ == tile_type::steel_plates )
+		return 1;
+
+	if( t_type_ == tile_type::gravel )
+		return 2;
+
+	/* review this */
+	if( door_ )
+		if( !door_is_open() )
+			return 2;
+
+	return 0;
+}

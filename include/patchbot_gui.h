@@ -8,7 +8,7 @@
 #include <QMessageBox>
 
 #include <model.hpp>
-#include <tga_loader.hpp>
+#include <path_finding.hpp>
 
 namespace patchbot
 {

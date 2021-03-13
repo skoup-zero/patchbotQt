@@ -7,6 +7,16 @@
 
 namespace patchbot
 {
+	enum class direction
+	{
+		left,
+		up,
+		right,
+		down,
+		wait,
+		undefined
+	};
+	
 	enum class robot_type
 	{
 		patchbot,
@@ -103,15 +113,23 @@ namespace patchbot
 		const bool door_;
 		std::shared_ptr<robot> occupant_;
 
+		
+		/* path to patchbot */
+		direction predecessor_ = direction::undefined;
+		/* cost of node (maximum by default) */
+		unsigned int path_cost_ = std::numeric_limits<decltype( path_cost_ )>::max();
+
 		tile( tile_type type, const bool door = false );
 
+		
 		void door_decrement_timer();
-
 		/// @brief		Sets timer of door to 10.
 		void door_set_timer();
 
 		tile_type type() const noexcept;
 		bool door_is_open() const;
 		bool door_is_automatic() const;
+
+		int node_cost() const;
 	};
 }

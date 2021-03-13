@@ -212,6 +212,8 @@ void patchbot_gui::on_mission_step_button_clicked()
 		}
 	}
 	ui_.sequenz_line_edit->setText( full_command );
+
+	dijkstra::calculate_path( model_.terrain_ );
 	refresh_window();
 }
 

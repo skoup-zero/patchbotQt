@@ -102,6 +102,7 @@
   <ItemGroup>
     <ClCompile Include="src\controls.cpp" />
     <ClCompile Include="src\model.cpp" />
+    <ClCompile Include="src\path_finding.cpp" />
     <ClCompile Include="src\terrain.cpp" />
     <ClCompile Include="src\tga_loader.cpp" />
     <QtRcc Include="patchbot_gui.qrc" />
@@ -117,6 +118,7 @@
     <ClInclude Include="include\entity.hpp" />
     <ClInclude Include="include\exceptions.hpp" />
     <ClInclude Include="include\model.hpp" />
+    <ClInclude Include="include\path_finding.hpp" />
     <ClInclude Include="include\terrain.hpp" />
     <ClInclude Include="include\tga_loader.hpp" />
   </ItemGroup>

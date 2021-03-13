@@ -15,6 +15,7 @@ namespace patchbot
 		unsigned int pixel_terrain_width_;
 		unsigned int pixel_terrain_height_;
 		bool game_is_on_ = false;
+		bool arrows_is_on = true;
 
 	public:
 
