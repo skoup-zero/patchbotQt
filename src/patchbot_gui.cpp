@@ -76,7 +76,7 @@ void patchbot_gui::activate_program_buttons( const bool activate ) const
 	//ui_.sequenz_scrollbar_h->setEnabled( activate );
 }
 
-void patchbot_gui::adjust_sequence_scrollbar()
+void patchbot_gui::adjust_sequence_scrollbar() const
 {
 	ui_.sequenz_line_edit->end( false );
 	if( ui_.sequenz_line_edit->text().size() > 18 )
@@ -102,12 +102,12 @@ void patchbot_gui::on_change_colonie_button_clicked()
 
 	if( !change_map_path.isNull() )
 	{
-		QFileInfo path( change_map_path );
+		const QFileInfo path( change_map_path );
 		std::filesystem::path casted_path = change_map_path.toUtf8().constData();
 		try
 		{
 			auto &temp = ( terrain::load_map_from_file( casted_path ) );
-			model_ = model( std::move( temp ), casted_path );
+			model_ = model( std::move( temp ), casted_path);
 		}
 		catch( std::exception &exc )
 		{
@@ -176,7 +176,7 @@ void patchbot_gui::on_mission_step_button_clicked()
 {
 	auto full_command = ui_.sequenz_line_edit->text();
 
-	if( model_.check_win() )
+	if( controls_.check_win() )
 	{
 		QMessageBox::about( this, "!!! WIN !!!", "you found the server" );
 		on_mission_cancel_button_clicked();
@@ -206,14 +206,14 @@ void patchbot_gui::on_mission_step_button_clicked()
 
 			else
 			{
-				auto frequency = full_command.at( 1 ).digitValue() - 1;
+				const auto frequency = full_command.at( 1 ).digitValue() - 1;
 				full_command.replace( 1, 1, QString::fromStdString( std::to_string( frequency ) ) );
 			}
 		}
 	}
+	model_.load_dijkstra_path();
+	
 	ui_.sequenz_line_edit->setText( full_command );
-
-	dijkstra::calculate_paths( model_.terrain_ );
 	refresh_window();
 }
 
@@ -242,7 +242,7 @@ void patchbot_gui::on_mission_stop_button_clicked()
 
 void patchbot_gui::on_arrow_up_button_clicked()
 {
-	auto frequency = ui_.repeat_dropdown->currentIndex() + 1;
+	const auto frequency = ui_.repeat_dropdown->currentIndex() + 1;
 	ui_.sequenz_line_edit->end( false );
 
 	if( frequency == 10 )
@@ -262,7 +262,7 @@ void patchbot_gui::on_arrow_up_button_clicked()
 
 void patchbot_gui::on_arrow_down_button_clicked()
 {
-	auto frequency = ui_.repeat_dropdown->currentIndex() + 1;
+	const auto frequency = ui_.repeat_dropdown->currentIndex() + 1;
 	ui_.sequenz_line_edit->end( false );
 
 	if( frequency == 10 )
@@ -282,7 +282,7 @@ void patchbot_gui::on_arrow_down_button_clicked()
 
 void patchbot_gui::on_arrow_left_button_clicked()
 {
-	auto frequency = ui_.repeat_dropdown->currentIndex() + 1;
+	const auto frequency = ui_.repeat_dropdown->currentIndex() + 1;
 	ui_.sequenz_line_edit->end( false );
 
 	if( frequency == 10 )
@@ -302,7 +302,7 @@ void patchbot_gui::on_arrow_left_button_clicked()
 
 void patchbot_gui::on_arrow_right_button_clicked()
 {
-	auto frequency = ui_.repeat_dropdown->currentIndex() + 1;
+	const auto frequency = ui_.repeat_dropdown->currentIndex() + 1;
 	ui_.sequenz_line_edit->end( false );
 
 	if( frequency == 10 )
@@ -322,7 +322,7 @@ void patchbot_gui::on_arrow_right_button_clicked()
 
 void patchbot_gui::on_center_button_clicked()
 {
-	auto frequency = ui_.repeat_dropdown->currentIndex() + 1;
+	const auto frequency = ui_.repeat_dropdown->currentIndex() + 1;
 
 	if( frequency == 10 )
 	{
@@ -378,7 +378,7 @@ void patchbot_gui::on_map_scrollbar_v_valueChanged( int change )
 	ui_.map_placeholder_label->setPixmap( pixmap_ );
 }
 
-void patchbot_gui::on_sequenz_scrollbar_h_valueChanged( int change )
+void patchbot_gui::on_sequenz_scrollbar_h_valueChanged( int change ) const
 {
 	ui_.sequenz_line_edit->setCursorPosition( change * 2 );
 }

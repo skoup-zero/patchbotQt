@@ -4,7 +4,7 @@
 
 namespace patchbot
 {
-	
+
 	/// @class updates all objects that can change in map.
 	class controls
 	{
@@ -20,11 +20,12 @@ namespace patchbot
 		///	@param		terrain pointer to operate on.
 		controls( terrain &terrain );
 
-		controls& operator=( const controls&);
-		
-		void add_instruction( direction d, int frequency);
+		controls &operator=( const controls & );
+
+		///	@brief		adds and removes instructions.
+		void add_instruction( direction d, int frequency );
 		void remove_instruction();
-		
+
 		///	@brief		Updates Map in following order: patchbot, enemies, doors.
 		void update_world();
 
@@ -40,10 +41,9 @@ namespace patchbot
 		///	@brief		Moves a robot to another tile.
 		///	@details	Swaps the occupant pointer of two tiles.
 		///	@param		x, y robot coordinates.
-		///	@param		d direction to move.
 		///	@throws		invalid_argument if tile has no robot or direction is invalid.
 		void move_robot( unsigned int x, unsigned int y ) const;
-
+		
 		///	@brief		Checks if tile at robot is dangerous.
 		///	@param		x, y robot coordinates.
 		///	@return		true if it kills robot.
@@ -63,19 +63,21 @@ namespace patchbot
 
 		///	@brief		Checks if the next tile for robot is a wall for it's type.
 		///	@param		x, y tile coordinates.
-		///	@param		d direction to check next tile.
 		///	@throws		invalid_argument if tile has no robot.
 		///	@return		true if the next tile is a wall for robot.
 		bool wall_next_tile( unsigned int x, unsigned int y ) const;
 
-		bool door_next_tile( unsigned int x, unsigned int y);
+		///	@brief		Checks if next tile is a closed door.
+		///	@param		x, y Robot Coordinates.
+		///	@return		true if next tile is a door.
+		bool door_next_tile( unsigned int x, unsigned int y );
 
 		///	@brief		Updates all open doors.
 		void update_doors();
+		///	@brief		Check if Patchbot reached the server.
+		bool check_win() const;
 
 		/// GETTER 
 		bool until_wall() const noexcept;
-
-		int tile_cost(unsigned int x, unsigned int y) const;
 	};
 }

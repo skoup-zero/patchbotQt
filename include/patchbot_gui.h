@@ -8,7 +8,6 @@
 #include <QMessageBox>
 
 #include <model.hpp>
-#include <path_finding.hpp>
 
 namespace patchbot
 {
@@ -24,6 +23,7 @@ namespace patchbot
 		controls controls_;
 		QTimer timer_;
 		QPixmap pixmap_;
+		
 
 	public:
 
@@ -39,7 +39,7 @@ namespace patchbot
 		void activate_program_buttons( bool activate ) const;
 
 		///	@brief	Adjusts sequence scrollbar for long instructions.
-		void adjust_sequence_scrollbar();
+		void adjust_sequence_scrollbar() const;
 
 	public slots:
 
@@ -77,6 +77,6 @@ namespace patchbot
 		void on_map_scrollbar_v_valueChanged( int change );
 
 		/// @brief	Scrollbars for sequence line.
-		void on_sequenz_scrollbar_h_valueChanged( int change );
+		void on_sequenz_scrollbar_h_valueChanged( int change ) const;
 	};
 }

@@ -24,13 +24,15 @@ model::model( terrain &&ter, std::filesystem::path current_path )
 	pixel_terrain_height_ = terrain_.height() * pixel_tga_height_;
 }
 
+
 void model::render_map( QPixmap &pixmap, unsigned int screen_width, unsigned int screen_height,
 	const unsigned int scroll_value_x, const unsigned int scroll_value_y )
 {
+
 	/* render entire map if it fits in Label */
-	auto width = ( pixel_terrain_width_ < screen_width )
+	const auto width = ( pixel_terrain_width_ < screen_width )
 		? pixel_terrain_width_ : screen_width;
-	auto height = ( pixel_terrain_height_ < screen_height )
+	const auto height = ( pixel_terrain_height_ < screen_height )
 		? pixel_terrain_height_ : screen_height;
 
 	const int left_border = std::floor( scroll_value_x / pixel_tga_width_ );
@@ -90,31 +92,20 @@ void model::render_map( QPixmap &pixmap, unsigned int screen_width, unsigned int
 					assets_.robot_img.at( robot_type::dead ) );
 			}
 
-			/* draw Arrows */
+			/* draw Arrows for debug */
 			if( arrows_is_on )
 			{
-				if( tile.predecessor_ != direction::undefined )
-				{
-					const auto arrow = tile.predecessor_;
-					
+				const auto arrow = std::get<1>(
+					dijkstra_path_tree_[terrain_.width() * y + x] );
+
+				if( arrow != direction::undefined )
 					painter.drawPixmap( ( x - left_border ) * pixel_tga_width_ - scroll_value_x % 32,
 						( y - top_border ) * pixel_tga_height_ - scroll_value_y % 32,
 						assets_.arrow_img.at( arrow ) );
-				}
 			}
 		}
 	painter.end();
 }
-
-bool model::check_win()
-{
-	const auto &tile = terrain_.at( terrain_.patchbot_->x_, terrain_.patchbot_->y_ );
-	if( tile.type() == tile_type::server )
-		return true;
-
-	return false;
-}
-
 
 /// SETTER
 void model::set_game_is_on( const bool status )
@@ -122,6 +113,11 @@ void model::set_game_is_on( const bool status )
 	game_is_on_ = status;
 }
 
+void model::load_dijkstra_path()
+{
+	dijkstra_path_tree_ = dijkstra::calculate_paths( terrain_ );
+	arrows_is_on = true;
+}
 
 /// GETTER
 int model::pixel_tga_width() const noexcept

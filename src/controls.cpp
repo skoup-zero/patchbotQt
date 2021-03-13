@@ -133,8 +133,11 @@ bool controls::obstacle( unsigned const int x, unsigned const int y )
 		return false;
 	}
 
-	auto const has_wheels = robot->r_type_ != robot_type::follower ||
-		robot->r_type_ != robot_type::hunter || robot->r_type_ != robot_type::sniffer;
+	auto const has_wheels =
+		robot->r_type_ == robot_type::patchbot ||
+		robot->r_type_ == robot_type::pusher ||
+		robot->r_type_ == robot_type::digger ||
+		robot->r_type_ == robot_type::swimmer;
 
 	/* obsacle for robots with wheels */
 	if( tile.type() == tile_type::alien_weed && has_wheels )
@@ -169,8 +172,8 @@ bool controls::wall( const unsigned int x, const unsigned int y, const robot_typ
 	/* breakable walls */
 	if( tile.type() == tile_type::rock_wall && r_type != robot_type::digger )
 		return true;
-	/* server (wall) for KI */
-	if( tile.type() == tile_type::server && r_type != robot_type::patchbot )
+	/* server (wall) */
+	if( tile.type() == tile_type::server )
 		return true;
 	/* secret door (wall) for KI */
 	if( tile.type() == tile_type::secret_path && r_type != robot_type::patchbot )
@@ -221,7 +224,7 @@ bool controls::wall_next_tile( const unsigned int x, const unsigned int y ) cons
 	}
 }
 
-bool controls::door_next_tile( unsigned const int x, unsigned const int y)
+bool controls::door_next_tile( unsigned const int x, unsigned const int y )
 {
 	if( !terrain_.at( x, y ).occupant_ )
 		throw std::invalid_argument( "ERROR: no robot at tile" );
@@ -246,7 +249,7 @@ bool controls::door_next_tile( unsigned const int x, unsigned const int y)
 
 		default: throw std::invalid_argument( "ERROR: reading Robot direction" );
 	}
-
+	/* review this */
 	if( !tile->door_ )
 		return false;
 
@@ -285,25 +288,42 @@ void controls::update_doors()
 	}
 }
 
+bool controls::check_win() const
+{
+	const auto x = terrain_.patchbot_->x_;
+	const auto y = terrain_.patchbot_->y_;
+
+	if( direction_.size() == 0 )
+		return false;
+
+	switch( direction_[0] )
+	{
+		case direction::up:
+			return ( y <= 0 ) ?
+				false : terrain_.at( x, y - 1 ).type() == tile_type::server;
+
+		case direction::down:
+			return ( y >= terrain_.height() - 1 ) ?
+				false : terrain_.at( x, y + 1 ).type() == tile_type::server;
+
+		case direction::left:
+			return ( x <= 0 ) ? false :
+				terrain_.at( x - 1, y ).type() == tile_type::server;
+
+		case direction::right:
+			return ( x >= terrain_.width() - 1) ?
+				false : terrain_.at( x + 1, y ).type() == tile_type::server;
+
+		case direction::wait: return false;
+
+		default: throw std::invalid_argument( "ERROR: reading Robot direction" );
+	}
+
+}
 
 /// GETTER
 
 bool controls::until_wall() const noexcept
 {
 	return until_wall_;
-}
-
-int controls::tile_cost(unsigned const int x, unsigned const int y) const
-{
-	if( dangerous_tile( x, y ) || wall( x, y, robot_type::follower ) )
-		return 0;
-	
-	if( terrain_.at( x, y ).type() == tile_type::alien_weed )
-		return 2;
-
-	if( terrain_.at( x, y ).door_ )
-		if( !terrain_.at( x, y ).door_is_open() )
-			return 2;
-
-	return 1;
 }
