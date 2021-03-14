@@ -15,14 +15,17 @@ namespace patchbot
 			std::tuple<unsigned int, unsigned int, unsigned int> const &t2 ) const;
 	};
 
+	///	@class to find a path to patchbot.
 	class dijkstra
 	{
 	public:
-
 		///	@brief		Calculates paths to Patchbot using Dijkstra Algorithm.
+		///	@details	Each node expands at most 4 nodes.
+		///				Lowest cost of each valid node is saved in a vector with
+		///				their cost and direction. 
 		///	@param		terrain as graph.
-		///	@return		Shortest Paths.
+		///	@return		vector as tree that contains shortest paths to Patchbot.
 		static std::vector<std::tuple< unsigned int, direction>>
-		calculate_paths( terrain &terrain );
+			calculate_paths( terrain &terrain );
 	};
 }

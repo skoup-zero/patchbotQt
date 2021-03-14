@@ -53,7 +53,7 @@ namespace patchbot
 		///				If 1 then the first bit is the least significant bit.
 		///				If 0 then the first bit is the most significant bit.
 		/// @return		1 (true) if system is little endian.
-		static const bool is_system_little_endian();
+		static bool is_system_little_endian();
 
 		/// @brief		Swaps two bytes.
 		/// @param		2 byte word.
@@ -65,11 +65,11 @@ namespace patchbot
 
 		/// @brief		Function to acces a specific pixel at given index.
 		/// @param		x, y as coordiantes.
-		/// @param		width, heigth as image_size.
+		/// @param		width, height as image_size.
 		/// @return		index of pixel.
 		/// @throws		out_of_range for invalid coordinates.
 		static unsigned int pixel_index( unsigned int x, unsigned int y,
-			unsigned int width, unsigned int heigth );
+			unsigned int width, unsigned int height );
 
 		image_header header() const noexcept;
 		std::vector<unsigned char> pixels() const noexcept;

@@ -24,10 +24,12 @@ void controls::add_instruction( const direction d, const int frequency )
 
 void controls::remove_instruction()
 {
+	if( frequency_.empty() || direction_.empty() )
+		throw std::out_of_range( "ERROR: no Instructions" );
+
 	frequency_.pop_back();
 	direction_.pop_back();
 }
-
 
 void controls::update_world()
 {
@@ -38,22 +40,25 @@ void controls::update_world()
 
 void controls::update_patchbot()
 {
-	if( !frequency_.size() )
+	if( frequency_.empty() || direction_.empty() )
 		throw std::out_of_range( "ERROR: no Instructions" );
 
+	const auto x = terrain_.patchbot_->x_, y = terrain_.patchbot_->y_;
+
 	/* Patchbot doesn't move if the next tile is a wall */
-	if( wall_next_tile( terrain_.patchbot_->x_, terrain_.patchbot_->y_ ) )
+	if( wall_next_tile( x, y, direction_[0] ) )
 	{
 		update_instruction();
 		return;
 	}
+
 	/* Patchbot waits at first contact with an obstacle */
-	if( obstacle( terrain_.patchbot_->x_, terrain_.patchbot_->y_ ) )
+	if( obstacle( x, y, direction_[0] ) )
 		return;
 
-	move_robot( terrain_.patchbot_->x_, terrain_.patchbot_->y_ );
+	move_robot( x, y, direction_[0] );
 
-	if( dangerous_tile( terrain_.patchbot_->x_, terrain_.patchbot_->y_ ) )
+	if( dangerous_tile( x, y ) )
 	{
 		terrain_.patchbot_->kill_robot();
 		return;
@@ -65,7 +70,7 @@ void controls::update_patchbot()
 void controls::update_instruction()
 {
 	auto const patchbot_reached_wall =
-		wall_next_tile( terrain_.patchbot_->x_, terrain_.patchbot_->y_ );
+		wall_next_tile( terrain_.patchbot_->x_, terrain_.patchbot_->y_, direction_[0] );
 
 	if( frequency_[0] == 0 && !until_wall_ )
 		until_wall_ = true;
@@ -76,39 +81,45 @@ void controls::update_instruction()
 		frequency_.erase( frequency_.begin() );
 		direction_.erase( direction_.begin() );
 	}
-	else if( frequency_[0] != 0 )
+	else if( frequency_[0] > 0 )
 		frequency_[0]--;
 }
 
-void controls::move_robot( unsigned int const x, unsigned int const y ) const
+void controls::move_robot( const unsigned int x, const unsigned int y, const direction d ) const
 {
 	if( !terrain_.at( x, y ).occupant_ )
 		throw std::invalid_argument( "ERROR: no robot at tile" );
 
-	switch( direction_[0] )
+	auto &robot = terrain_.at( x, y ).occupant_;
+
+	/* only for patchbot right now */
+	switch( d )
 	{
 		case direction::up:
-			terrain_.at( x, y - 1 ).occupant_.swap( terrain_.at( x, y ).occupant_ );
+			terrain_.at( x, y - 1 ).occupant_.swap( robot );
 			terrain_.patchbot_->y_--; break;
 
 		case direction::down:
-			terrain_.at( x, y + 1 ).occupant_.swap( terrain_.at( x, y ).occupant_ );
-			terrain_.patchbot_->y_++; break;
+			terrain_.at( x, y + 1 ).occupant_.swap( robot );
+			terrain_.patchbot_->y_++;
+			break;
 
 		case direction::left:
-			terrain_.at( x - 1, y ).occupant_.swap( terrain_.at( x, y ).occupant_ );
-			terrain_.patchbot_->x_--; break;
+			terrain_.at( x - 1, y ).occupant_.swap( robot );
+			terrain_.patchbot_->x_--;
+			break;
 
 		case direction::right:
-			terrain_.at( x + 1, y ).occupant_.swap( terrain_.at( x, y ).occupant_ );
-			terrain_.patchbot_->x_++; break;
+			terrain_.at( x + 1, y ).occupant_.swap( robot );
+			terrain_.patchbot_->x_++;
+			break;
 
 		case direction::wait: break;
 		default: throw std::invalid_argument( "ERROR: reading Robot direction" );
 	}
 }
 
-bool controls::dangerous_tile( unsigned const int  x, unsigned const int y ) const
+bool controls::dangerous_tile( const unsigned int  x, const unsigned int y ) const
 {
 	auto const &tile = terrain_.at( x, y );
 
@@ -118,7 +129,7 @@ bool controls::dangerous_tile( unsigned const int  x, unsigned const int y ) con
 	return tile.type() == tile_type::water && tile.occupant_->r_type_ != robot_type::swimmer;
 }
 
-bool controls::obstacle( unsigned const int x, unsigned const int y )
+bool controls::obstacle( const unsigned int x, const unsigned int y, const direction d )
 {
 	if( !terrain_.at( x, y ).occupant_ )
 		throw std::invalid_argument( "ERROR: no robot at tile" );
@@ -153,7 +164,8 @@ bool controls::obstacle( unsigned const int x, unsigned const int y )
 		return true;
 	}
 
-	return door_next_tile( x, y );
+	/* wait if next tile is closed door */
+	return door_next_tile( x, y, d );
 }
 
 bool controls::wall( const unsigned int x, const unsigned int y, const robot_type r_type ) const
@@ -166,14 +178,11 @@ bool controls::wall( const unsigned int x, const unsigned int y, const robot_typ
 
 	/* environment as walls */
 
-	/* actual walls */
-	if( tile.type() == tile_type::concrete_wall )
+	/* actual walls and server as wall */
+	if( tile.type() == tile_type::concrete_wall || tile.type() == tile_type::server )
 		return true;
 	/* breakable walls */
 	if( tile.type() == tile_type::rock_wall && r_type != robot_type::digger )
-		return true;
-	/* server (wall) */
-	if( tile.type() == tile_type::server )
 		return true;
 	/* secret door (wall) for KI */
 	if( tile.type() == tile_type::secret_path && r_type != robot_type::patchbot )
@@ -199,12 +208,12 @@ bool controls::wall( const unsigned int x, const unsigned int y, const robot_typ
 	return false;
 }
 
-bool controls::wall_next_tile( const unsigned int x, const unsigned int y ) const
+bool controls::wall_next_tile( const unsigned int x, const unsigned int y, const direction d ) const
 {
 	if( !terrain_.at( x, y ).occupant_ )
 		throw std::invalid_argument( "ERROR: no robot at tile" );
 
-	switch( direction_[0] )
+	switch( d )
 	{
 		case direction::up:
 			return wall( x, y - 1, terrain_.at( x, y ).occupant_->r_type_ );
@@ -224,14 +233,14 @@ bool controls::wall_next_tile( const unsigned int x, const unsigned int y ) cons
 	}
 }
 
-bool controls::door_next_tile( unsigned const int x, unsigned const int y )
+bool controls::door_next_tile( const unsigned int x, const unsigned int y, const direction d )
 {
 	if( !terrain_.at( x, y ).occupant_ )
 		throw std::invalid_argument( "ERROR: no robot at tile" );
 
 	tile *tile;
 
-	switch( direction_[0] )
+	switch( d )
 	{
 		case direction::up:
 			tile = &terrain_.at( x, y - 1 ); break;
@@ -249,7 +258,7 @@ bool controls::door_next_tile( unsigned const int x, unsigned const int y )
 
 		default: throw std::invalid_argument( "ERROR: reading Robot direction" );
 	}
-	/* review this */
+
 	if( !tile->door_ )
 		return false;
 
@@ -258,23 +267,14 @@ bool controls::door_next_tile( unsigned const int x, unsigned const int y )
 
 	auto &robot = terrain_.at( x, y ).occupant_;
 
-	if( !tile->door_is_automatic() && robot->r_type_ == robot_type::patchbot )
-	{
-		robot->update_obstructed();
-		tile->door_set_timer();		/* open door */
-		open_doors_.push_back( tile );	/* saving opened doors */
-		return true;
-	}
+	/* Patchbot can't use automatic doors */
+	if( tile->door_is_automatic() && robot->r_type_ == robot_type::patchbot )
+		return false;
 
-	if( tile->door_is_automatic() && robot->r_type_ != robot_type::patchbot )
-	{
-		robot->update_obstructed();
-		tile->door_set_timer();		/* open door */
-		open_doors_.push_back( tile );	/* saving opened doors */
-		return true;
-	}
-
-	return false;
+	robot->update_obstructed();
+	tile->door_set_timer();		/* open door */
+	open_doors_.push_back( tile );	/* save opened door */
+	return true;
 }
 
 void controls::update_doors()
@@ -293,9 +293,10 @@ bool controls::check_win() const
 	const auto x = terrain_.patchbot_->x_;
 	const auto y = terrain_.patchbot_->y_;
 
-	if( direction_.size() == 0 )
+	if( direction_.empty() )
 		return false;
 
+	/* if statement to ensure coordinates are in map bounds */
 	switch( direction_[0] )
 	{
 		case direction::up:
@@ -311,7 +312,7 @@ bool controls::check_win() const
 				terrain_.at( x - 1, y ).type() == tile_type::server;
 
 		case direction::right:
-			return ( x >= terrain_.width() - 1) ?
+			return ( x >= terrain_.width() - 1 ) ?
 				false : terrain_.at( x + 1, y ).type() == tile_type::server;
 
 		case direction::wait: return false;
@@ -326,4 +327,19 @@ bool controls::check_win() const
 bool controls::until_wall() const noexcept
 {
 	return until_wall_;
+}
+
+bool controls::patchbot_dead() const noexcept
+{
+	return !terrain_.patchbot_->alive();
+}
+
+bool controls::patchbot_obstructed() const noexcept
+{
+	return terrain_.patchbot_->obstructed();
+}
+
+bool controls::instructions_empty() const noexcept
+{
+	return frequency_.empty();
 }

@@ -95,8 +95,8 @@ void model::render_map( QPixmap &pixmap, unsigned int screen_width, unsigned int
 			/* draw Arrows for debug */
 			if( arrows_is_on )
 			{
-				const auto arrow = std::get<1>(
-					dijkstra_path_tree_[terrain_.width() * y + x] );
+				const auto arrow = std::get<1>
+					( dijkstra_path_tree_[terrain_.width() * y + x] );
 
 				if( arrow != direction::undefined )
 					painter.drawPixmap( ( x - left_border ) * pixel_tga_width_ - scroll_value_x % 32,

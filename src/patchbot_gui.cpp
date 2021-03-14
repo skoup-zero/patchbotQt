@@ -43,7 +43,9 @@ void patchbot_gui::refresh_window()
 	pixmap_ = pixmap_.scaled( ui_.map_placeholder_label->size(), Qt::IgnoreAspectRatio );
 
 	ui_.map_scrollbar_h->setMaximum( model_.pixel_terrain_width() - width );
+	ui_.map_scrollbar_h->setPageStep( ui_.map_scroll_area->width() );
 	ui_.map_scrollbar_v->setMaximum( model_.pixel_terrain_height() - height );
+	ui_.map_scrollbar_v->setPageStep( ui_.map_scroll_area->height() );
 
 	model_.render_map( pixmap_, width, height,
 		ui_.map_scrollbar_h->value(), ui_.map_scrollbar_v->value() );
@@ -84,6 +86,7 @@ void patchbot_gui::adjust_sequence_scrollbar() const
 		ui_.sequenz_line_edit->end( false );
 		ui_.sequenz_scrollbar_h->setRange( 0, ui_.sequenz_line_edit->cursorPosition() / 2 );
 		ui_.sequenz_scrollbar_h->setValue( ui_.sequenz_scrollbar_h->maximum() );
+		ui_.sequenz_scrollbar_h->setPageStep( 50 );
 	}
 	else
 		ui_.sequenz_scrollbar_h->setMaximum( 0 );
@@ -107,7 +110,7 @@ void patchbot_gui::on_change_colonie_button_clicked()
 		try
 		{
 			auto &temp = ( terrain::load_map_from_file( casted_path ) );
-			model_ = model( std::move( temp ), casted_path);
+			model_ = model( std::move( temp ), casted_path );
 		}
 		catch( std::exception &exc )
 		{
@@ -168,7 +171,7 @@ void patchbot_gui::on_mission_cancel_button_clicked()
 	auto temp = ( terrain::load_map_from_file( model_.current_path_ ) );
 	model_ = model( std::move( temp ), model_.current_path_ );
 	controls_ = controls( model_.terrain_ );
-	
+
 	refresh_window();
 }
 
@@ -182,37 +185,38 @@ void patchbot_gui::on_mission_step_button_clicked()
 		on_mission_cancel_button_clicked();
 		return;
 	}
-	else if( !model_.terrain_.patchbot_->alive() )
+
+	if( controls_.patchbot_dead() )
 	{
 		QMessageBox::about( this, "!!! LOSE !!!", "patchbot died" );
 		on_mission_cancel_button_clicked();
 		return;
 	}
-	else if( full_command.size() <= 0 )
+
+	if( controls_.instructions_empty() )
 	{
 		QMessageBox::about( this, "!!! LOSE !!!", "you didn't found the server" );
 		on_mission_cancel_button_clicked();
 		return;
 	}
-	else
+
+	controls_.update_world();
+
+	/* Skip instruction edit if until wall is active or patchbot is obstructed */
+	if( !controls_.until_wall() && !controls_.patchbot_obstructed() )
 	{
-		controls_.update_world();
+		if( full_command.at( 1 ).digitValue() <= 1 || full_command.at( 1 ) == 'X' )
+			full_command.remove( 0, 2 );
 
-		/* Skip instruction edit if until wall is active or patchbot is obstructed */
-		if( !controls_.until_wall() && !model_.terrain_.patchbot_->obstructed() )
+		else
 		{
-			if( full_command.at( 1 ).digitValue() <= 1 || full_command.at( 1 ) == 'X' )
-				full_command.remove( 0, 2 );
-
-			else
-			{
-				const auto frequency = full_command.at( 1 ).digitValue() - 1;
-				full_command.replace( 1, 1, QString::fromStdString( std::to_string( frequency ) ) );
-			}
+			const auto frequency = full_command.at( 1 ).digitValue() - 1;
+			full_command.replace( 1, 1, QString::fromStdString( std::to_string( frequency ) ) );
 		}
 	}
+
 	model_.load_dijkstra_path();
-	
+
 	ui_.sequenz_line_edit->setText( full_command );
 	refresh_window();
 }

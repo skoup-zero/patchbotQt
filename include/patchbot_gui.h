@@ -23,7 +23,7 @@ namespace patchbot
 		controls controls_;
 		QTimer timer_;
 		QPixmap pixmap_;
-		
+
 
 	public:
 

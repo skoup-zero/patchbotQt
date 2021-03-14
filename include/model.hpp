@@ -36,7 +36,8 @@ namespace patchbot
 		///	@param		pixmap to draw on.
 		///	@param		screen_width, screen_height - size of view.
 		///	@param		scroll_value_x, scroll_value_y - scroll values.
-		void render_map( QPixmap &pixmap, unsigned int screen_width, unsigned int screen_height,
+		void render_map( QPixmap &pixmap,
+			unsigned int screen_width, unsigned int screen_height,
 			unsigned int scroll_value_x, unsigned int scroll_value_y );
 
 		/// SETTER

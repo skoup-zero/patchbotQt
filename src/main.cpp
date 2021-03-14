@@ -96,18 +96,14 @@ Testat 5
 
 
 VERBESSERUNG:
-- roboter warten vor der tür
+- roboter warten vor der tür.
 
 - interne befehlsrepräsentation: extra konstruktor gelöscht und befehle werden
 	nun im controller seperat vom Qstring gebaut
 
 - anfängerfehler behoben ( if/else für bool variable )
 
-- controls::move_robot -> const
-- controls::dangerous_tile -> const
-- controls::wall -> const, parameter -> const
-- controls::wall_next_tile -> const, parameter -> const
-
+- methoden sind nun const
 
 - verweis auf terrain jetzt als referenz statt pointer
 

@@ -19,7 +19,6 @@ namespace patchbot
 		///	@brief		Constructor for first initialization.
 		///	@param		terrain pointer to operate on.
 		controls( terrain &terrain );
-
 		controls &operator=( const controls & );
 
 		///	@brief		adds and removes instructions.
@@ -41,9 +40,10 @@ namespace patchbot
 		///	@brief		Moves a robot to another tile.
 		///	@details	Swaps the occupant pointer of two tiles.
 		///	@param		x, y robot coordinates.
+		///	@param		d direction to move.
 		///	@throws		invalid_argument if tile has no robot or direction is invalid.
-		void move_robot( unsigned int x, unsigned int y ) const;
-		
+		void move_robot( unsigned int x, unsigned int y, direction d ) const;
+
 		///	@brief		Checks if tile at robot is dangerous.
 		///	@param		x, y robot coordinates.
 		///	@return		true if it kills robot.
@@ -51,9 +51,10 @@ namespace patchbot
 
 		///	@brief		Checks if tile at robot is an obstacle.
 		///	@param		x, y robot coordinates.
+		///	@param		d direction to move.
 		///	@throws		invalid_argument if tile has no robot.
 		///	@return		true if it's an obstacle.
-		bool obstacle( unsigned int x, unsigned int y );
+		bool obstacle( unsigned int x, unsigned int y, direction d );
 
 		///	@brief		Checks if a tile is a wall for a type of robot.
 		///	@param		x, y tile coordinates.
@@ -63,14 +64,16 @@ namespace patchbot
 
 		///	@brief		Checks if the next tile for robot is a wall for it's type.
 		///	@param		x, y tile coordinates.
+		///	@param		d direction to move.
 		///	@throws		invalid_argument if tile has no robot.
 		///	@return		true if the next tile is a wall for robot.
-		bool wall_next_tile( unsigned int x, unsigned int y ) const;
+		bool wall_next_tile( unsigned int x, unsigned int y, direction d ) const;
 
 		///	@brief		Checks if next tile is a closed door.
 		///	@param		x, y Robot Coordinates.
+		///	@param		d direction to move.
 		///	@return		true if next tile is a door.
-		bool door_next_tile( unsigned int x, unsigned int y );
+		bool door_next_tile( unsigned int x, unsigned int y, direction d );
 
 		///	@brief		Updates all open doors.
 		void update_doors();
@@ -79,5 +82,8 @@ namespace patchbot
 
 		/// GETTER 
 		bool until_wall() const noexcept;
+		bool patchbot_dead() const noexcept;
+		bool patchbot_obstructed() const noexcept;
+		bool instructions_empty() const noexcept;
 	};
 }

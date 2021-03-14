@@ -18,7 +18,7 @@ image image::load_tga_from_file( const std::filesystem::path &path )
 		throw std::runtime_error( "couldn´t open file" );
 
 	input.seekg( 0, input.end );
-	int input_size = input.tellg();
+	const int input_size = input.tellg();
 	input.seekg( 0, input.beg );
 
 	if( input_size < 18 ) /* exc: corrupted tga file */
@@ -66,7 +66,7 @@ image image::load_tga_from_file( const std::filesystem::path &path )
 	if( static_cast<int>( header.bits_per_pixel ) != 32 ) /* exc: image type is not RGBA */
 		throw patchbot_exception( patchbot_enum_exception::image_format_exception );
 
-	unsigned int img_size = static_cast<int>( header.image_heigth )
+	const unsigned int img_size = static_cast<int>( header.image_heigth )
 		* static_cast<int>( header.image_width ) * 4;
 
 	if( input_size + 18 <= img_size ) /* exc: file size is not big enough */
@@ -75,13 +75,13 @@ image image::load_tga_from_file( const std::filesystem::path &path )
 	std::vector<unsigned char> buffer;
 	buffer.resize( img_size );
 
-	for( int i = 0; i < img_size; i++ )
+	for( auto i = 0; i < img_size; i++ )
 		input.read( reinterpret_cast<char *>( &buffer[i] ), 1 );
 	
 	return image( std::move( header ), std::move( buffer ) );
 }
 
-const bool image::is_system_little_endian()
+bool image::is_system_little_endian()
 {
 	const unsigned int endian_test = 1;
 	const auto first_byte = reinterpret_cast<const unsigned char *> ( &endian_test );
@@ -103,9 +103,9 @@ QPixmap image::qpixmap_converter() const
 
 /// GETTER
 
-unsigned int image::pixel_index( unsigned int x, unsigned int y, unsigned int width, unsigned int heigth )
+unsigned int image::pixel_index( unsigned int x, unsigned int y, unsigned int width, unsigned int height )
 {
-	if( x >= width || y >= heigth )
+	if( x >= width || y >= height )
 		throw std::out_of_range{ "coordinates out of range" };
 
 	return ( width * 4 * y ) + ( x * 4 );

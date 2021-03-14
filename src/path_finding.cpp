@@ -14,30 +14,33 @@ std::vector<std::tuple<unsigned int, direction>> dijkstra::calculate_paths( terr
 	const auto width = terrain.width();
 	const auto height = terrain.height();
 
+	/* priority queue as Min-Heap */
 	std::priority_queue<
 		std::tuple<unsigned int, unsigned int, unsigned int>,
 		std::vector<std::tuple<unsigned int, unsigned int, unsigned int>>,
 		compare_nodes> pq;
 
+	/* initialize path tree with max costs and undefined direction */
 	std::vector<std::tuple<unsigned int, direction>> path_tree(
 		width * height, std::make_tuple( UINT_MAX, direction::undefined ) );
 
+	/* nodes are ( cost, x, y ) tuple */
 	pq.push( std::make_tuple( 0, terrain.patchbot_->x_, terrain.patchbot_->y_ ) );
 
 	while( !pq.empty() )
 	{
-		auto const cost = std::get<0>( pq.top() );
+		const auto cost = std::get<0>( pq.top() );
 		const auto x = std::get<1>( pq.top() );
 		const auto y = std::get<2>( pq.top() );
 		pq.pop();
-		
+
 		/* UP */
 		if( y > 0 )
 		{
 			const auto child_cost = terrain.at( x, y - 1 ).node_cost();
 			const auto index = width * ( y - 1 ) + x;
 
-			if( child_cost > 0 && std::get<0>( path_tree[index] ) > cost + child_cost)
+			if( child_cost > 0 && std::get<0>( path_tree[index] ) > cost + child_cost )
 			{
 				std::get<0>( path_tree[index] ) = cost + child_cost;
 				std::get<1>( path_tree[index] ) = direction::down;
@@ -88,5 +91,5 @@ std::vector<std::tuple<unsigned int, direction>> dijkstra::calculate_paths( terr
 		}
 	}
 
-	return path_tree;
+	return std::move( path_tree );
 }
