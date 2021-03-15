@@ -24,7 +24,7 @@ std::vector<std::tuple<unsigned int, direction>> dijkstra::calculate_paths( terr
 	std::vector<std::tuple<unsigned int, direction>> path_tree
 	( width * height, std::make_tuple( UINT_MAX, direction::undefined ) );
 
-	/* vector with all nodes that have been visited */
+	/* vector with all nodes that have been visited for equal distance nodes */
 	std::vector<bool> closed( width * height, false );
 
 	/* nodes are tuple < distance, x, y > */
@@ -40,11 +40,16 @@ std::vector<std::tuple<unsigned int, direction>> dijkstra::calculate_paths( terr
 		/* UP */
 		if( y > 0 && terrain.at( x, y - 1 ).node_cost() > 0 )
 		{
+			const bool replace = rand() % 2;
 			const auto current = terrain.at( x, y - 1 ).node_cost() + distance;
 			const auto index = width * ( y - 1 ) + x;
 
-			if( std::get<0>( path_tree[index] ) > current )
+			if( std::get<0>( path_tree[index] ) > current ||
+				std::get<0>( path_tree[index] ) == current && replace && !closed[index] )
 			{
+				if( std::get<0>( path_tree[index] ) == current )
+					closed[index] = true;
+
 				std::get<0>( path_tree[index] ) = current;
 				std::get<1>( path_tree[index] ) = direction::down;
 				pq.push( std::make_tuple( current, x, y - 1 ) );
@@ -54,11 +59,16 @@ std::vector<std::tuple<unsigned int, direction>> dijkstra::calculate_paths( terr
 		/* RIGHT */
 		if( x < width - 1 && terrain.at( x + 1, y ).node_cost() > 0 )
 		{
+			const bool replace = rand() % 2;
 			const auto current = terrain.at( x + 1, y ).node_cost() + distance;
 			const auto index = width * y + x + 1;
 
-			if( std::get<0>( path_tree[index] ) > current )
+			if( std::get<0>( path_tree[index] ) > current ||
+				std::get<0>( path_tree[index] ) == current && replace && !closed[index] )
 			{
+				if( std::get<0>( path_tree[index] ) == current )
+					closed[index] = true;
+
 				std::get<0>( path_tree[index] ) = current;
 				std::get<1>( path_tree[index] ) = direction::left;
 				pq.push( std::make_tuple( current, x + 1, y ) );
@@ -68,11 +78,16 @@ std::vector<std::tuple<unsigned int, direction>> dijkstra::calculate_paths( terr
 		/* DOWN */
 		if( y < height - 1 && terrain.at( x, y + 1 ).node_cost() > 0 )
 		{
+			const bool replace = rand() % 2;
 			const auto current = terrain.at( x, y + 1 ).node_cost() + distance;
 			const auto index = width * ( y + 1 ) + x;
 
-			if( std::get<0>( path_tree[index] ) > current )
+			if( std::get<0>( path_tree[index] ) > current ||
+				std::get<0>( path_tree[index] ) == current && replace && !closed[index] )
 			{
+				if( std::get<0>( path_tree[index] ) == current )
+					closed[index] = true;
+
 				std::get<0>( path_tree[index] ) = current;
 				std::get<1>( path_tree[index] ) = direction::up;
 				pq.push( std::make_tuple( current, x, y + 1 ) );
@@ -82,33 +97,21 @@ std::vector<std::tuple<unsigned int, direction>> dijkstra::calculate_paths( terr
 		/* LEFT */
 		if( x > 0 && terrain.at( x - 1, y ).node_cost() > 0 )
 		{
+			const bool replace = rand() % 2;
 			const auto current = terrain.at( x - 1, y ).node_cost() + distance;
 			const auto index = width * y + x - 1;
 
-			if( std::get<0>( path_tree[index] ) > current )
+			if( std::get<0>( path_tree[index] ) > current ||
+				std::get<0>( path_tree[index] ) == current && replace && !closed[index] )
 			{
+				if( std::get<0>( path_tree[index] ) == current )
+					closed[index] = true;
+
 				std::get<0>( path_tree[index] ) = current;
 				std::get<1>( path_tree[index] ) = direction::right;
 				pq.push( std::make_tuple( current, x - 1, y ) );
 			}
 		}
 	}
-
 	return std::move( path_tree );
 }
-
-/*
- * ANMERKUNG TESTAT (zufälligen pfad bei gleicher distanz)
- *		mit dem folgenden code versucht führt aber zu sehr langen rechnen 
- *
- 	if( std::get<0>( path_tree[index] ) > current ||
- 		std::get<0>( path_tree[index] ) == current && rand() % 2 && !closed[index])
-	{
-		closed[index] = true;
-		std::get<0>( path_tree[index] ) = current;
-		std::get<1>( path_tree[index] ) = direction::down;
-		pq.push( std::make_tuple( current, x, y - 1 ) );
-	}
-
-	Überlegung mit einer closed list das zu implementieren
- */
