@@ -24,7 +24,6 @@ namespace patchbot
 		QTimer timer_;
 		QPixmap pixmap_;
 
-
 	public:
 
 		patchbot_gui( QWidget *parent = Q_NULLPTR );

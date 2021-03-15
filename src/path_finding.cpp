@@ -20,76 +20,95 @@ std::vector<std::tuple<unsigned int, direction>> dijkstra::calculate_paths( terr
 		std::vector<std::tuple<unsigned int, unsigned int, unsigned int>>,
 		compare_nodes> pq;
 
-	/* initialize path tree with max costs and undefined direction */
-	std::vector<std::tuple<unsigned int, direction>> path_tree(
-		width * height, std::make_tuple( UINT_MAX, direction::undefined ) );
+	/* initialize path tree with max distance and undefined direction */
+	std::vector<std::tuple<unsigned int, direction>> path_tree
+	( width * height, std::make_tuple( UINT_MAX, direction::undefined ) );
 
-	/* nodes are ( cost, x, y ) tuple */
+	/* vector with all nodes that have been visited */
+	std::vector<bool> closed( width * height, false );
+
+	/* nodes are tuple < distance, x, y > */
 	pq.push( std::make_tuple( 0, terrain.patchbot_->x_, terrain.patchbot_->y_ ) );
 
 	while( !pq.empty() )
 	{
-		const auto cost = std::get<0>( pq.top() );
+		const auto distance = std::get<0>( pq.top() );
 		const auto x = std::get<1>( pq.top() );
 		const auto y = std::get<2>( pq.top() );
 		pq.pop();
 
 		/* UP */
-		if( y > 0 )
+		if( y > 0 && terrain.at( x, y - 1 ).node_cost() > 0 )
 		{
-			const auto child_cost = terrain.at( x, y - 1 ).node_cost();
+			const auto current = terrain.at( x, y - 1 ).node_cost() + distance;
 			const auto index = width * ( y - 1 ) + x;
 
-			if( child_cost > 0 && std::get<0>( path_tree[index] ) > cost + child_cost )
+			if( std::get<0>( path_tree[index] ) > current )
 			{
-				std::get<0>( path_tree[index] ) = cost + child_cost;
+				std::get<0>( path_tree[index] ) = current;
 				std::get<1>( path_tree[index] ) = direction::down;
-				pq.push( std::make_tuple( cost + child_cost, x, y - 1 ) );
+				pq.push( std::make_tuple( current, x, y - 1 ) );
 			}
 		}
 
 		/* RIGHT */
-		if( x < width - 1 )
+		if( x < width - 1 && terrain.at( x + 1, y ).node_cost() > 0 )
 		{
-			const auto child_cost = terrain.at( x + 1, y ).node_cost();
+			const auto current = terrain.at( x + 1, y ).node_cost() + distance;
 			const auto index = width * y + x + 1;
 
-			if( child_cost > 0 && std::get<0>( path_tree[index] ) > cost + child_cost )
+			if( std::get<0>( path_tree[index] ) > current )
 			{
-				std::get<0>( path_tree[index] ) = cost + child_cost;
+				std::get<0>( path_tree[index] ) = current;
 				std::get<1>( path_tree[index] ) = direction::left;
-				pq.push( std::make_tuple( cost + child_cost, x + 1, y ) );
+				pq.push( std::make_tuple( current, x + 1, y ) );
 			}
 		}
 
 		/* DOWN */
-		if( y < height - 1 )
+		if( y < height - 1 && terrain.at( x, y + 1 ).node_cost() > 0 )
 		{
-			const auto child_cost = terrain.at( x, y + 1 ).node_cost();
+			const auto current = terrain.at( x, y + 1 ).node_cost() + distance;
 			const auto index = width * ( y + 1 ) + x;
 
-			if( child_cost > 0 && std::get<0>( path_tree[index] ) > cost + child_cost )
+			if( std::get<0>( path_tree[index] ) > current )
 			{
-				std::get<0>( path_tree[index] ) = cost + child_cost;
+				std::get<0>( path_tree[index] ) = current;
 				std::get<1>( path_tree[index] ) = direction::up;
-				pq.push( std::make_tuple( cost + child_cost, x, y + 1 ) );
+				pq.push( std::make_tuple( current, x, y + 1 ) );
 			}
 		}
 
 		/* LEFT */
-		if( x > 0 )
+		if( x > 0 && terrain.at( x - 1, y ).node_cost() > 0 )
 		{
-			const auto child_cost = terrain.at( x - 1, y ).node_cost();
+			const auto current = terrain.at( x - 1, y ).node_cost() + distance;
 			const auto index = width * y + x - 1;
 
-			if( child_cost > 0 && std::get<0>( path_tree[index] ) > cost + child_cost )
+			if( std::get<0>( path_tree[index] ) > current )
 			{
-				std::get<0>( path_tree[index] ) = cost + child_cost;
+				std::get<0>( path_tree[index] ) = current;
 				std::get<1>( path_tree[index] ) = direction::right;
-				pq.push( std::make_tuple( cost + child_cost, x - 1, y ) );
+				pq.push( std::make_tuple( current, x - 1, y ) );
 			}
 		}
 	}
 
 	return std::move( path_tree );
 }
+
+/*
+ * ANMERKUNG TESTAT (zufälligen pfad bei gleicher distanz)
+ *		mit dem folgenden code versucht führt aber zu sehr langen rechnen 
+ *
+ 	if( std::get<0>( path_tree[index] ) > current ||
+ 		std::get<0>( path_tree[index] ) == current && rand() % 2 && !closed[index])
+	{
+		closed[index] = true;
+		std::get<0>( path_tree[index] ) = current;
+		std::get<1>( path_tree[index] ) = direction::down;
+		pq.push( std::make_tuple( current, x, y - 1 ) );
+	}
+
+	Überlegung mit einer closed list das zu implementieren
+ */

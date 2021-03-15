@@ -53,7 +53,7 @@ void controls::update_patchbot()
 	}
 
 	/* Patchbot waits at first contact with an obstacle */
-	if( obstacle( x, y, direction_[0] ) )
+	if( obstacle( x, y, direction_[0] ))
 		return;
 
 	move_robot( x, y, direction_[0] );
@@ -178,8 +178,11 @@ bool controls::wall( const unsigned int x, const unsigned int y, const robot_typ
 
 	/* environment as walls */
 
-	/* actual walls and server as wall */
-	if( tile.type() == tile_type::concrete_wall || tile.type() == tile_type::server )
+	/* actual walls */
+	if( tile.type() == tile_type::concrete_wall )
+		return true;
+	/* server (wall) for KI */
+	if( tile.type() == tile_type::server && r_type != robot_type::patchbot )
 		return true;
 	/* breakable walls */
 	if( tile.type() == tile_type::rock_wall && r_type != robot_type::digger )
@@ -292,7 +295,7 @@ bool controls::check_win() const
 {
 	const auto x = terrain_.patchbot_->x_;
 	const auto y = terrain_.patchbot_->y_;
-
+	
 	if( direction_.empty() )
 		return false;
 
@@ -319,7 +322,6 @@ bool controls::check_win() const
 
 		default: throw std::invalid_argument( "ERROR: reading Robot direction" );
 	}
-
 }
 
 /// GETTER

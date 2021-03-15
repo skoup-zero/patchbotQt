@@ -6,7 +6,7 @@
 
 namespace patchbot
 {
-	///	@struct to compare costs of nodes in priority queue
+	///	@struct to compare distances of nodes in priority queue
 	///		to implement it as a Min-Heap.
 	struct compare_nodes
 	{
@@ -21,8 +21,8 @@ namespace patchbot
 	public:
 		///	@brief		Calculates paths to Patchbot using Dijkstra Algorithm.
 		///	@details	Each node expands at most 4 nodes.
-		///				Lowest cost of each valid node is saved in a vector with
-		///				their cost and direction. 
+		///				Shortest distance of each valid node is saved in a vector with
+		///				their distances and direction.
 		///	@param		terrain as graph.
 		///	@return		vector as tree that contains shortest paths to Patchbot.
 		static std::vector<std::tuple< unsigned int, direction>>

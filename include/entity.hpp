@@ -123,6 +123,10 @@ namespace patchbot
 		bool door_is_open() const;
 		bool door_is_automatic() const;
 
+		///	@brief		value of each tile.
+		///	@return		0 if robot, danger or wall.
+		///				1 if it isn't an obstacle.
+		///				2 if it is an obstacle.
 		int node_cost() const;
 	};
 }

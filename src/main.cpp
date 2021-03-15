@@ -107,4 +107,11 @@ VERBESSERUNG:
 
 - verweis auf terrain jetzt als referenz statt pointer
 
+
+ FRAGEN:
+
+	testat 7:
+		dijkstra algorithmus nur neu aufrufen, wenn patchbot sich bewegt hat
+			-> aber digger kann felswände zerstören und somit die kosten der pfade ändern
+				ohne das patchbot sich bewegt.
 */
