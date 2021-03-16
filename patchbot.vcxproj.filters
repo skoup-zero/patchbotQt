@@ -50,7 +50,7 @@
     <ClCompile Include="src\controls.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\model.cpp">
+    <ClCompile Include="src\render_engine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\path_finding.cpp">
@@ -78,7 +78,7 @@
     <ClInclude Include="include\controls.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\model.hpp">
+    <ClInclude Include="include\render_engine.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\path_finding.hpp">

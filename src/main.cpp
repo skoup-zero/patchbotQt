@@ -87,31 +87,20 @@ int main( int argc, char *argv[] )
 
 /*
 
-Testat 5
-[Funktionalität] Warten vor der Tür ->done
-[Schlichtheit] interne Befehls-Repräsentation ->done
-[Schlichtheit] inline if else, um bool Variable zu schreiben -> done
-[const] bei Methoden -> done
-[Referenzen] Verweise nach Möglichkeit als Referenz speichern -> done
+Testat 6
 
+- auto wegen lesbarkeit aufpassen !!! nochmal ganzen code durchegehen !
+- neue aufgabenstellung ansehen
+- struct statt tupel
+- kein zweites mal einfügen nur richtung ändern
+- kein std move bei lokalen return
+- render_engine zu renderer umbenenen
+- 
 
-VERBESSERUNG:
-- roboter warten vor der tür.
+Testat 6
+[Schlichtheit] redundanter Code für die 4 Richtungen, Kacheln bis zu 2x eingefügt,
+	selbst wenn es nur eine Richtung gibt, auto bei primitiven Typen möglichst vermeiden ->done
+[Lesbarkeit] render_engine in renderer (o.Ä.) umbenennen ->done
+ 
 
-- interne befehlsrepräsentation: extra konstruktor gelöscht und befehle werden
-	nun im controller seperat vom Qstring gebaut
-
-- anfängerfehler behoben ( if/else für bool variable )
-
-- methoden sind nun const
-
-- verweis auf terrain jetzt als referenz statt pointer
-
-
- FRAGEN:
-
-	testat 7:
-		dijkstra algorithmus nur neu aufrufen, wenn patchbot sich bewegt hat
-			-> aber digger kann felswände zerstören und somit die kosten der pfade ändern
-				ohne das patchbot sich bewegt.
 */

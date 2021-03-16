@@ -43,7 +43,7 @@ void controls::update_patchbot()
 	if( frequency_.empty() || direction_.empty() )
 		throw std::out_of_range( "ERROR: no Instructions" );
 
-	const auto x = terrain_.patchbot_->x_, y = terrain_.patchbot_->y_;
+	const unsigned int x = terrain_.patchbot_->x_, y = terrain_.patchbot_->y_;
 
 	/* Patchbot doesn't move if the next tile is a wall */
 	if( wall_next_tile( x, y, direction_[0] ) )
@@ -69,7 +69,7 @@ void controls::update_patchbot()
 
 void controls::update_instruction()
 {
-	auto const patchbot_reached_wall =
+	const bool patchbot_reached_wall =
 		wall_next_tile( terrain_.patchbot_->x_, terrain_.patchbot_->y_, direction_[0] );
 
 	if( frequency_[0] == 0 && !until_wall_ )
@@ -121,7 +121,7 @@ void controls::move_robot( const unsigned int x, const unsigned int y, const dir
 
 bool controls::dangerous_tile( const unsigned int  x, const unsigned int y ) const
 {
-	auto const &tile = terrain_.at( x, y );
+	const tile &tile = terrain_.at( x, y );
 
 	if( tile.type() == tile_type::precipice )
 		return true;
@@ -134,7 +134,7 @@ bool controls::obstacle( const unsigned int x, const unsigned int y, const direc
 	if( !terrain_.at( x, y ).occupant_ )
 		throw std::invalid_argument( "ERROR: no robot at tile" );
 
-	auto &tile = terrain_.at( x, y );
+	tile &tile = terrain_.at( x, y );
 	auto &robot = tile.occupant_;
 
 	/* obstructed robots can move again */
@@ -174,7 +174,7 @@ bool controls::wall( const unsigned int x, const unsigned int y, const robot_typ
 	if( x >= terrain_.width() || y >= terrain_.height() )
 		return true;
 
-	auto const &tile = terrain_.at( x, y );
+	const tile &tile = terrain_.at( x, y );
 
 	/* environment as walls */
 
@@ -293,8 +293,8 @@ void controls::update_doors()
 
 bool controls::check_win() const
 {
-	const auto x = terrain_.patchbot_->x_;
-	const auto y = terrain_.patchbot_->y_;
+	const unsigned int x = terrain_.patchbot_->x_;
+	const unsigned int y = terrain_.patchbot_->y_;
 	
 	if( direction_.empty() )
 		return false;

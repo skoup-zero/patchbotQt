@@ -11,8 +11,8 @@ bool compare_nodes::operator()(
 
 std::vector<std::tuple<unsigned int, direction>> dijkstra::calculate_paths( terrain &terrain )
 {
-	const auto width = terrain.width();
-	const auto height = terrain.height();
+	const unsigned int width = terrain.width();
+	const unsigned int height = terrain.height();
 
 	/* priority queue as Min-Heap */
 	std::priority_queue<
@@ -24,94 +24,60 @@ std::vector<std::tuple<unsigned int, direction>> dijkstra::calculate_paths( terr
 	std::vector<std::tuple<unsigned int, direction>> path_tree
 	( width * height, std::make_tuple( UINT_MAX, direction::undefined ) );
 
-	/* vector with all nodes that have been visited for equal distance nodes */
-	std::vector<bool> closed( width * height, false );
-
 	/* nodes are tuple < distance, x, y > */
 	pq.push( std::make_tuple( 0, terrain.patchbot_->x_, terrain.patchbot_->y_ ) );
 
+	/* lamba function expand child nodes */
+	auto handle_direction = [&]( const unsigned int x, const unsigned int y,
+		const unsigned int distance, const direction d )
+	{
+		const bool replace = rand() % 2;
+		const unsigned int index = width * y + x;
+
+		if( std::get<0>( path_tree[index] ) > distance )
+		{
+			std::get<0>( path_tree[index] ) = distance;
+			std::get<1>( path_tree[index] ) = d;
+			pq.push( std::make_tuple( distance, x, y ) );
+		}
+		else if( replace && std::get<0>( path_tree[index] ) == distance )
+			std::get<1>( path_tree[index] ) = d;
+	};
+
 	while( !pq.empty() )
 	{
-		const auto distance = std::get<0>( pq.top() );
-		const auto x = std::get<1>( pq.top() );
-		const auto y = std::get<2>( pq.top() );
+		const unsigned int distance = std::get<0>( pq.top() );
+		const unsigned int x = std::get<1>( pq.top() );
+		const unsigned int y = std::get<2>( pq.top() );
 		pq.pop();
 
 		/* UP */
 		if( y > 0 && terrain.at( x, y - 1 ).node_cost() > 0 )
 		{
-			const bool replace = rand() % 2;
-			const auto current = terrain.at( x, y - 1 ).node_cost() + distance;
-			const auto index = width * ( y - 1 ) + x;
-
-			if( std::get<0>( path_tree[index] ) > current ||
-				std::get<0>( path_tree[index] ) == current && replace && !closed[index] )
-			{
-				if( std::get<0>( path_tree[index] ) == current )
-					closed[index] = true;
-
-				std::get<0>( path_tree[index] ) = current;
-				std::get<1>( path_tree[index] ) = direction::down;
-				pq.push( std::make_tuple( current, x, y - 1 ) );
-			}
+			const unsigned int current = terrain.at( x, y - 1 ).node_cost() + distance;
+			handle_direction( x, y - 1, current, direction::down );
 		}
 
 		/* RIGHT */
 		if( x < width - 1 && terrain.at( x + 1, y ).node_cost() > 0 )
 		{
-			const bool replace = rand() % 2;
-			const auto current = terrain.at( x + 1, y ).node_cost() + distance;
-			const auto index = width * y + x + 1;
-
-			if( std::get<0>( path_tree[index] ) > current ||
-				std::get<0>( path_tree[index] ) == current && replace && !closed[index] )
-			{
-				if( std::get<0>( path_tree[index] ) == current )
-					closed[index] = true;
-
-				std::get<0>( path_tree[index] ) = current;
-				std::get<1>( path_tree[index] ) = direction::left;
-				pq.push( std::make_tuple( current, x + 1, y ) );
-			}
+			const unsigned int current = terrain.at( x + 1, y ).node_cost() + distance;
+			handle_direction( x + 1, y, current, direction::left );
 		}
 
 		/* DOWN */
 		if( y < height - 1 && terrain.at( x, y + 1 ).node_cost() > 0 )
 		{
-			const bool replace = rand() % 2;
-			const auto current = terrain.at( x, y + 1 ).node_cost() + distance;
-			const auto index = width * ( y + 1 ) + x;
-
-			if( std::get<0>( path_tree[index] ) > current ||
-				std::get<0>( path_tree[index] ) == current && replace && !closed[index] )
-			{
-				if( std::get<0>( path_tree[index] ) == current )
-					closed[index] = true;
-
-				std::get<0>( path_tree[index] ) = current;
-				std::get<1>( path_tree[index] ) = direction::up;
-				pq.push( std::make_tuple( current, x, y + 1 ) );
-			}
+			const unsigned int current = terrain.at( x, y + 1 ).node_cost() + distance;
+			handle_direction( x, y + 1, current, direction::up );
 		}
 
 		/* LEFT */
 		if( x > 0 && terrain.at( x - 1, y ).node_cost() > 0 )
 		{
-			const bool replace = rand() % 2;
-			const auto current = terrain.at( x - 1, y ).node_cost() + distance;
-			const auto index = width * y + x - 1;
-
-			if( std::get<0>( path_tree[index] ) > current ||
-				std::get<0>( path_tree[index] ) == current && replace && !closed[index] )
-			{
-				if( std::get<0>( path_tree[index] ) == current )
-					closed[index] = true;
-
-				std::get<0>( path_tree[index] ) = current;
-				std::get<1>( path_tree[index] ) = direction::right;
-				pq.push( std::make_tuple( current, x - 1, y ) );
-			}
+			const unsigned int current = terrain.at( x - 1, y ).node_cost() + distance;
+			handle_direction( x - 1, y, current, direction::right );
 		}
 	}
-	return std::move( path_tree );
+	return path_tree;
 }

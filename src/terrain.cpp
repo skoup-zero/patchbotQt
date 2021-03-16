@@ -68,7 +68,7 @@ terrain terrain::load_map_from_file( const std::filesystem::path &path )
 			{
 				if( r_it->first == 'p' )
 				{
-					auto temp = tile( tile_type::patchbot_start );
+					tile temp = tile( tile_type::patchbot_start );
 					temp.occupant_ = std::make_shared<robot>( r_it->second );
 					temp.occupant_->x_ = counter_width;
 					temp.occupant_->y_ = counter_height;
@@ -78,7 +78,7 @@ terrain terrain::load_map_from_file( const std::filesystem::path &path )
 				}
 				else
 				{
-					auto temp = tile( tile_type::enemy_start );
+					tile temp = tile( tile_type::enemy_start );
 					temp.occupant_ = std::make_shared<robot>( r_it->second );
 					temp.occupant_->x_ = counter_width;
 					temp.occupant_->y_ = counter_height;
@@ -93,12 +93,12 @@ terrain terrain::load_map_from_file( const std::filesystem::path &path )
 
 				if( t_it->first == 'd' || t_it->first == 'D' )
 				{
-					auto temp = tile( t_it->second, true );
+					tile temp = tile( t_it->second, true );
 					tiles.push_back( temp );
 				}
 				else
 				{
-					auto temp = tile( t_it->second );
+					tile temp = tile( t_it->second );
 					tiles.push_back( temp );
 				}
 			}

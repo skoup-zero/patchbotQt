@@ -110,7 +110,7 @@ void patchbot_gui::on_change_colonie_button_clicked()
 		try
 		{
 			auto &temp = ( terrain::load_map_from_file( casted_path ) );
-			model_ = model( std::move( temp ), casted_path );
+			model_ = render_engine( std::move( temp ), casted_path );
 		}
 		catch( std::exception &exc )
 		{
@@ -169,7 +169,7 @@ void patchbot_gui::on_mission_cancel_button_clicked()
 
 	/* reload map when canceled */
 	auto temp = ( terrain::load_map_from_file( model_.current_path_ ) );
-	model_ = model( std::move( temp ), model_.current_path_ );
+	model_ = render_engine( std::move( temp ), model_.current_path_ );
 	controls_ = controls( model_.terrain_ );
 
 	refresh_window();

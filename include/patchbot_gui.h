@@ -7,7 +7,7 @@
 #include <QTimer>
 #include <QMessageBox>
 
-#include <model.hpp>
+#include <render_engine.hpp>
 
 namespace patchbot
 {
@@ -19,7 +19,7 @@ namespace patchbot
 	private:
 
 		Ui::patchbot_guiClass ui_;
-		model model_;
+		render_engine model_;
 		controls controls_;
 		QTimer timer_;
 		QPixmap pixmap_;

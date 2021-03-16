@@ -8,8 +8,8 @@
 
 namespace patchbot
 {
-	/// @class model for data
-	class model
+	/// @class render_engine for data
+	class render_engine
 	{
 		unsigned int pixel_tga_width_;
 		unsigned int pixel_tga_height_;
@@ -27,8 +27,8 @@ namespace patchbot
 		/* shortest path to patchbot */
 		std::vector<std::tuple<unsigned int, direction>> dijkstra_path_tree_;
 
-		model();
-		model( terrain &&ter, std::filesystem::path current_path );
+		render_engine();
+		render_engine( terrain &&ter, std::filesystem::path current_path );
 
 		///	@brief		Renders visible part of map.
 		///	@details	Loads preloaded TGA images and draws it to a pixmap

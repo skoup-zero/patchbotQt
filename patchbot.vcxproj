@@ -101,7 +101,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\controls.cpp" />
-    <ClCompile Include="src\model.cpp" />
+    <ClCompile Include="src\render_engine.cpp" />
     <ClCompile Include="src\path_finding.cpp" />
     <ClCompile Include="src\terrain.cpp" />
     <ClCompile Include="src\tga_loader.cpp" />
@@ -117,7 +117,7 @@
     <ClInclude Include="include\controls.hpp" />
     <ClInclude Include="include\entity.hpp" />
     <ClInclude Include="include\exceptions.hpp" />
-    <ClInclude Include="include\model.hpp" />
+    <ClInclude Include="include\render_engine.hpp" />
     <ClInclude Include="include\path_finding.hpp" />
     <ClInclude Include="include\terrain.hpp" />
     <ClInclude Include="include\tga_loader.hpp" />
