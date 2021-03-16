@@ -103,4 +103,12 @@ Testat 6
 [Lesbarkeit] render_engine in renderer (o.Ä.) umbenennen ->done
  
 
+VERBESSERUNG:
+- 3er tupel welche einen knoten repräsentieren jetzt als node struct
+- 2er tupel mit distance und direction jetzt als std::pair
+- alle unnötigen auto ersetzt durch datentypen
+- rednundanter code beim expandieren ersetzt durch eine lambda funktion.
+
+=> viel übersichtlicher und kürzer.
+
 */

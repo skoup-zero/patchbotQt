@@ -1,18 +1,22 @@
 #pragma once
 
 #include <controls.hpp>
-
 #include <queue>
 
 namespace patchbot
 {
+	///	@struct node represents a node.
+	struct node
+	{
+		unsigned int distance_, x_, y_;
+		node( unsigned int distance, unsigned int x, unsigned int y );
+	};
+
 	///	@struct to compare distances of nodes in priority queue
 	///		to implement it as a Min-Heap.
 	struct compare_nodes
 	{
-		bool operator()(
-			std::tuple<unsigned int, unsigned int, unsigned int> const &t1,
-			std::tuple<unsigned int, unsigned int, unsigned int> const &t2 ) const;
+		bool operator()( const node &d1, const node &d2 ) const;
 	};
 
 	///	@class to find a path to patchbot.
@@ -25,7 +29,7 @@ namespace patchbot
 		///				their distances and direction.
 		///	@param		terrain as graph.
 		///	@return		vector as tree that contains shortest paths to Patchbot.
-		static std::vector<std::tuple< unsigned int, direction>>
+		static std::vector<std::pair< unsigned int, direction>>
 			calculate_paths( terrain &terrain );
 	};
 }

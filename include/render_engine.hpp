@@ -25,7 +25,7 @@ namespace patchbot
 		std::filesystem::path current_path_;
 
 		/* shortest path to patchbot */
-		std::vector<std::tuple<unsigned int, direction>> dijkstra_path_tree_;
+		std::vector<std::pair<unsigned int, direction>> dijkstra_path_tree_;
 
 		render_engine();
 		render_engine( terrain &&ter, std::filesystem::path current_path );

@@ -2,30 +2,31 @@
 
 using namespace patchbot;
 
-bool compare_nodes::operator()(
-	std::tuple<unsigned int, unsigned int, unsigned int> const &t1,
-	std::tuple<unsigned int, unsigned int, unsigned int> const &t2 ) const
+node::node( const unsigned int distance, const unsigned int x, const unsigned int y )
+	:distance_{ distance }
+	, x_{ x }
+	, y_{ y }
+{}
+
+bool compare_nodes::operator()( const node &d1, const node &d2 ) const
 {
-	return std::get<0>( t1 ) > std::get<0>( t2 );
+	return d1.distance_ > d2.distance_;
 }
 
-std::vector<std::tuple<unsigned int, direction>> dijkstra::calculate_paths( terrain &terrain )
+std::vector<std::pair<unsigned int, direction>> dijkstra::calculate_paths( terrain &terrain )
 {
 	const unsigned int width = terrain.width();
 	const unsigned int height = terrain.height();
 
 	/* priority queue as Min-Heap */
-	std::priority_queue<
-		std::tuple<unsigned int, unsigned int, unsigned int>,
-		std::vector<std::tuple<unsigned int, unsigned int, unsigned int>>,
-		compare_nodes> pq;
+	std::priority_queue<node, std::vector<node>, compare_nodes> pq;
 
 	/* initialize path tree with max distance and undefined direction */
-	std::vector<std::tuple<unsigned int, direction>> path_tree
-	( width * height, std::make_tuple( UINT_MAX, direction::undefined ) );
+	std::vector<std::pair<unsigned int, direction>> path_tree
+	( width * height, std::make_pair( UINT_MAX, direction::undefined ) );
 
-	/* nodes are tuple < distance, x, y > */
-	pq.push( std::make_tuple( 0, terrain.patchbot_->x_, terrain.patchbot_->y_ ) );
+	/* coordinates of patchbot as root */
+	pq.push( node( 0, terrain.patchbot_->x_, terrain.patchbot_->y_ ) );
 
 	/* lamba function expand child nodes */
 	auto handle_direction = [&]( const unsigned int x, const unsigned int y,
@@ -34,21 +35,21 @@ std::vector<std::tuple<unsigned int, direction>> dijkstra::calculate_paths( terr
 		const bool replace = rand() % 2;
 		const unsigned int index = width * y + x;
 
-		if( std::get<0>( path_tree[index] ) > distance )
+		if( path_tree[index].first > distance )
 		{
-			std::get<0>( path_tree[index] ) = distance;
-			std::get<1>( path_tree[index] ) = d;
-			pq.push( std::make_tuple( distance, x, y ) );
+			path_tree[index].first = distance;
+			path_tree[index].second = d;
+			pq.push( node( distance, x, y ) );
 		}
-		else if( replace && std::get<0>( path_tree[index] ) == distance )
-			std::get<1>( path_tree[index] ) = d;
+		else if( replace && path_tree[index].first == distance )
+			path_tree[index].second = d;
 	};
 
 	while( !pq.empty() )
 	{
-		const unsigned int distance = std::get<0>( pq.top() );
-		const unsigned int x = std::get<1>( pq.top() );
-		const unsigned int y = std::get<2>( pq.top() );
+		const unsigned int distance = pq.top().distance_;
+		const unsigned int x = pq.top().x_;
+		const unsigned int y = pq.top().y_;
 		pq.pop();
 
 		/* UP */
