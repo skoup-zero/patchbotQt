@@ -2,8 +2,8 @@
 
 using namespace patchbot;
 
-controls::controls( terrain &terrain )
-	:terrain_{ terrain }
+controls::controls( patchbot::terrain &t )
+	:terrain_{ t }
 {}
 
 controls &controls::operator=( const controls &other )
@@ -34,7 +34,7 @@ void controls::remove_instruction()
 void controls::update_world()
 {
 	update_patchbot();
-	//update_enemies();
+	update_enemies();
 	update_doors();
 }
 
@@ -83,6 +83,25 @@ void controls::update_instruction()
 	}
 	else if( frequency_[0] > 0 )
 		frequency_[0]--;
+}
+
+void controls::init_enemies()
+{
+	for( auto t : terrain_.robots_ )
+	{
+		if( t->r_type_ == robot_type::bugger )
+		{
+			enemy_kis_.push_back( std::make_unique<bugger_ki>( terrain_, t ) );
+		}
+	}
+} 
+
+void controls::update_enemies()
+{
+	for ( auto it = enemy_kis_.begin(); it != enemy_kis_.end(); ++it)
+	{
+		(*it)->action();
+	}
 }
 
 void controls::move_robot( const unsigned int x, const unsigned int y, const direction d ) const
@@ -144,7 +163,7 @@ bool controls::obstacle( const unsigned int x, const unsigned int y, const direc
 		return false;
 	}
 
-	auto const has_wheels =
+	const bool has_wheels =
 		robot->r_type_ == robot_type::patchbot ||
 		robot->r_type_ == robot_type::pusher ||
 		robot->r_type_ == robot_type::digger ||
@@ -324,6 +343,11 @@ bool controls::check_win() const
 	}
 }
 
+void controls::load_dijkstra_path()
+{
+	terrain_.set_dijkstra_path( dijkstra::calculate_paths( terrain_ ) );
+}
+
 /// GETTER
 
 bool controls::until_wall() const noexcept
@@ -344,4 +368,9 @@ bool controls::patchbot_obstructed() const noexcept
 bool controls::instructions_empty() const noexcept
 {
 	return frequency_.empty();
+}
+
+terrain controls::terrain() const noexcept
+{
+	return terrain_;
 }

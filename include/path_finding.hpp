@@ -1,6 +1,6 @@
 #pragma once
 
-#include <controls.hpp>
+#include <terrain.hpp>
 #include <queue>
 
 namespace patchbot

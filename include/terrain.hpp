@@ -25,6 +25,9 @@ namespace patchbot
 		std::shared_ptr<robot> patchbot_;
 		std::vector<std::shared_ptr<robot>> robots_;
 
+		/* shortest path to Patchbot */
+		std::vector<std::pair<unsigned int, direction>> dijkstra_path_tree_;
+
 		///	@brief		reads the symbols from a txt file .
 		///	@details	creates a vector with instances of Tile and pointers to Robot, 
 		///				which will be returned as a map represented by the class terrain.
@@ -48,6 +51,11 @@ namespace patchbot
 		///	@return		a tile at given coordinates
 		tile &at( unsigned int x, unsigned int y );
 
+		/// SETTER
+		void terrain::set_dijkstra_path( 
+			std::vector<std::pair<unsigned int, direction>> &dijkstra_path_tree );
+		
+		/// GETTER 
 		unsigned int width() const noexcept;
 		unsigned int height() const noexcept;
 	};

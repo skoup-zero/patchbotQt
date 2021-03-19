@@ -91,11 +91,10 @@ void render_engine::render_map( QPixmap &pixmap, unsigned int screen_width, unsi
 					( y - top_border ) * pixel_tga_height_ - scroll_value_y % 32,
 					assets_.robot_img.at( robot_type::dead ) );
 			}
-
 			/* draw Arrows for debug */
-			if( arrows_is_on )
+			if( arrow_is_on_ )
 			{
-				const direction arrow = dijkstra_path_tree_[terrain_.width() * y + x].second;
+				const direction arrow = terrain_.dijkstra_path_tree_[terrain_.width() * y + x].second;
 
 				if( arrow != direction::undefined )
 					painter.drawPixmap( ( x - left_border ) * pixel_tga_width_ - scroll_value_x % 32,
@@ -112,11 +111,11 @@ void render_engine::set_game_is_on( const bool status )
 	game_is_on_ = status;
 }
 
-void render_engine::load_dijkstra_path()
+void render_engine::arrows_on()
 {
-	dijkstra_path_tree_ = dijkstra::calculate_paths( terrain_ );
-	arrows_is_on = true;
+	arrow_is_on_ = true;
 }
+
 
 /// GETTER
 int render_engine::pixel_tga_width() const noexcept

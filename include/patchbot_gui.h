@@ -19,7 +19,7 @@ namespace patchbot
 	private:
 
 		Ui::patchbot_guiClass ui_;
-		render_engine model_;
+		render_engine render_engine_;
 		controls controls_;
 		QTimer timer_;
 		QPixmap pixmap_;

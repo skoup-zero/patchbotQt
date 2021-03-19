@@ -2,7 +2,6 @@
 
 #include <terrain.hpp>
 #include <tga_loader.hpp>
-#include <path_finding.hpp>
 
 #include <QPainter>
 
@@ -16,16 +15,13 @@ namespace patchbot
 		unsigned int pixel_terrain_width_;
 		unsigned int pixel_terrain_height_;
 		bool game_is_on_ = false;
-		bool arrows_is_on = false;
+		bool arrow_is_on_ = false;
 
 	public:
 		/* preloaded TGA's */
 		load_assets assets_;
 		terrain terrain_;
 		std::filesystem::path current_path_;
-
-		/* shortest path to patchbot */
-		std::vector<std::pair<unsigned int, direction>> dijkstra_path_tree_;
 
 		render_engine();
 		render_engine( terrain &&ter, std::filesystem::path current_path );
@@ -42,7 +38,7 @@ namespace patchbot
 
 		/// SETTER
 		void set_game_is_on( bool status );
-		void load_dijkstra_path();
+		void arrows_on();
 
 		/// GETTER 
 		int pixel_tga_width() const noexcept;

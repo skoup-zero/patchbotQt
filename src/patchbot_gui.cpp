@@ -4,8 +4,8 @@ using namespace patchbot;
 
 patchbot_gui::patchbot_gui( QWidget *parent )
 	: QMainWindow( parent )
-	, model_()
-	, controls_( model_.terrain_ )
+	, render_engine_()
+	, controls_( render_engine_.terrain_ )
 	, timer_( QTimer() )
 {
 	ui_.setupUi( this );
@@ -34,20 +34,20 @@ patchbot_gui::patchbot_gui( QWidget *parent )
 void patchbot_gui::refresh_window()
 {
 	/* size is entire map if it fits in label */
-	const auto width = ( ui_.map_scroll_area->width() < model_.pixel_terrain_width() )
-		? ui_.map_scroll_area->width() : model_.pixel_terrain_width();
-	const auto height = ( ui_.map_scroll_area->height() < model_.pixel_terrain_height() )
-		? ui_.map_scroll_area->height() : model_.pixel_terrain_height();
+	const auto width = ( ui_.map_scroll_area->width() < render_engine_.pixel_terrain_width() )
+		? ui_.map_scroll_area->width() : render_engine_.pixel_terrain_width();
+	const auto height = ( ui_.map_scroll_area->height() < render_engine_.pixel_terrain_height() )
+		? ui_.map_scroll_area->height() : render_engine_.pixel_terrain_height();
 
 	ui_.map_placeholder_label->resize( width, height );
 	pixmap_ = pixmap_.scaled( ui_.map_placeholder_label->size(), Qt::IgnoreAspectRatio );
 
-	ui_.map_scrollbar_h->setMaximum( model_.pixel_terrain_width() - width );
+	ui_.map_scrollbar_h->setMaximum( render_engine_.pixel_terrain_width() - width );
 	ui_.map_scrollbar_h->setPageStep( ui_.map_scroll_area->width() );
-	ui_.map_scrollbar_v->setMaximum( model_.pixel_terrain_height() - height );
+	ui_.map_scrollbar_v->setMaximum( render_engine_.pixel_terrain_height() - height );
 	ui_.map_scrollbar_v->setPageStep( ui_.map_scroll_area->height() );
 
-	model_.render_map( pixmap_, width, height,
+	render_engine_.render_map( pixmap_, width, height,
 		ui_.map_scrollbar_h->value(), ui_.map_scrollbar_v->value() );
 	ui_.map_placeholder_label->setPixmap( pixmap_ );
 
@@ -110,7 +110,7 @@ void patchbot_gui::on_change_colonie_button_clicked()
 		try
 		{
 			auto &temp = ( terrain::load_map_from_file( casted_path ) );
-			model_ = render_engine( std::move( temp ), casted_path );
+			render_engine_ = render_engine( std::move( temp ), casted_path );
 		}
 		catch( std::exception &exc )
 		{
@@ -147,7 +147,7 @@ void patchbot_gui::on_mission_start_button_clicked()
 	ui_.mission_auto_button->setEnabled( true );
 	ui_.mission_cancel_button->setEnabled( true );
 
-	model_.set_game_is_on( true );
+	render_engine_.set_game_is_on( true );
 
 	refresh_window();
 }
@@ -164,13 +164,13 @@ void patchbot_gui::on_mission_cancel_button_clicked()
 	ui_.mission_start_button->setEnabled( true );
 
 	ui_.sequenz_line_edit->setText( "" );
-	model_.set_game_is_on( false );
+	render_engine_.set_game_is_on( false );
 	timer_.stop();
 
 	/* reload map when canceled */
-	auto temp = ( terrain::load_map_from_file( model_.current_path_ ) );
-	model_ = render_engine( std::move( temp ), model_.current_path_ );
-	controls_ = controls( model_.terrain_ );
+	auto temp = ( terrain::load_map_from_file( render_engine_.current_path_ ) );
+	render_engine_ = render_engine( std::move( temp ), render_engine_.current_path_ );
+	controls_ = controls( render_engine_.terrain_ );
 
 	refresh_window();
 }
@@ -215,8 +215,11 @@ void patchbot_gui::on_mission_step_button_clicked()
 		}
 	}
 
-	model_.load_dijkstra_path();
+	controls_.load_dijkstra_path();
+	render_engine_.arrows_on();
 
+	controls_.init_enemies();
+	
 	ui_.sequenz_line_edit->setText( full_command );
 	refresh_window();
 }
@@ -366,7 +369,7 @@ void patchbot_gui::on_delete_button_clicked()
 /////////////////////////////////////////////
 void patchbot_gui::on_map_scrollbar_h_valueChanged( int change )
 {
-	model_.render_map( pixmap_,
+	render_engine_.render_map( pixmap_,
 		ui_.map_placeholder_label->width(), ui_.map_placeholder_label->height(),
 		change, ui_.map_scrollbar_v->value() );
 
@@ -375,7 +378,7 @@ void patchbot_gui::on_map_scrollbar_h_valueChanged( int change )
 
 void patchbot_gui::on_map_scrollbar_v_valueChanged( int change )
 {
-	model_.render_map( pixmap_,
+	render_engine_.render_map( pixmap_,
 		ui_.map_placeholder_label->width(), ui_.map_placeholder_label->height(),
 		ui_.map_scrollbar_h->value(), change );
 

@@ -111,4 +111,9 @@ VERBESSERUNG:
 
 => viel übersichtlicher und kürzer.
 
+
+	-TODOS:
+	compiler optimierung -> header wenn möglcih in cpp
+	- cycle in includes vermeiden
+	- render engine terrain zu contro terr
 */

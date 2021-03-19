@@ -123,6 +123,11 @@ terrain terrain::load_map_from_file( const std::filesystem::path &path )
 	return terrain( std::move( tiles ), std::move( robots ), std::move( patchbot ), width, height );
 }
 
+/// SETTER
+void terrain::set_dijkstra_path( std::vector<std::pair<unsigned int, direction>> &dijkstra_path_tree )
+{
+	dijkstra_path_tree_ = dijkstra_path_tree;
+}
 
 /// GETTER
 

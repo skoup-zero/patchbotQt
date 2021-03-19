@@ -1,6 +1,8 @@
 #pragma once
 
 #include <terrain.hpp>
+#include <path_finding.hpp>
+#include <state_machine.hpp>
 
 namespace patchbot
 {
@@ -14,11 +16,13 @@ namespace patchbot
 		std::vector<tile *> open_doors_;
 		bool until_wall_ = false;
 
+		std::vector<std::unique_ptr<state_machine>> enemy_kis_;
+		
 	public:
-
+		
 		///	@brief		Constructor for first initialization.
 		///	@param		terrain pointer to operate on.
-		controls( terrain &terrain );
+		controls( terrain &t );
 		controls &operator=( const controls & );
 
 		///	@brief		adds and removes instructions.
@@ -36,6 +40,9 @@ namespace patchbot
 
 		///	@brief		Updates Patchbot's instructions.
 		void update_instruction();
+
+		void init_enemies();
+		void update_enemies();
 
 		///	@brief		Moves a robot to another tile.
 		///	@details	Swaps the occupant pointer of two tiles.
@@ -80,10 +87,14 @@ namespace patchbot
 		///	@brief		Check if Patchbot reached the server.
 		bool check_win() const;
 
+		void load_dijkstra_path();
+		
 		/// GETTER 
 		bool until_wall() const noexcept;
 		bool patchbot_dead() const noexcept;
 		bool patchbot_obstructed() const noexcept;
 		bool instructions_empty() const noexcept;
+
+		terrain terrain() const noexcept;
 	};
 }
