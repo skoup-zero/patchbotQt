@@ -123,6 +123,271 @@ terrain terrain::load_map_from_file( const std::filesystem::path &path )
 	return terrain( std::move( tiles ), std::move( robots ), std::move( patchbot ), width, height );
 }
 
+
+void terrain::move_robot( const unsigned int x, const unsigned int y, const direction d )
+{
+	if( !at( x, y ).occupant_ )
+		throw std::invalid_argument( "ERROR: no robot at tile" );
+
+	auto &robot = at( x, y ).occupant_;
+
+	switch( d )
+	{
+		case direction::up:
+			if( y > 0 )
+			{
+				at( x, y - 1 ).occupant_.swap( robot );
+				at( x, y - 1 ).occupant_->y_--; break;
+			}
+
+		case direction::right:
+			if( x < width_ - 1 )
+			{
+				at( x + 1, y ).occupant_.swap( robot );
+				at( x + 1, y ).occupant_->x_++; break;
+			}
+
+		case direction::down:
+			if( y < height_ - 1 )
+			{
+				at( x, y + 1 ).occupant_.swap( robot );
+				at( x, y + 1 ).occupant_->y_++; break;
+			}
+
+		case direction::left:
+			if( x > 0 )
+			{
+				at( x - 1, y ).occupant_.swap( robot );
+				at( x - 1, y ).occupant_->x_--; break;
+			}
+
+			//case direction::wait: break;
+			//default: throw std::invalid_argument( "ERROR: reading Robot direction" );
+	}
+}
+
+bool terrain::dangerous_tile( const unsigned int  x, const unsigned int y )
+{
+	const tile &tile = at( x, y );
+
+	if( tile.type() == tile_type::precipice )
+		return true;
+
+	return tile.type() == tile_type::water && tile.occupant_->r_type_ != robot_type::swimmer;
+}
+
+bool terrain::obstacle( const unsigned int x, const unsigned int y, const direction d )
+{
+	if( !at( x, y ).occupant_ )
+		throw std::invalid_argument( "ERROR: no robot at tile" );
+
+	tile &tile = at( x, y );
+	auto &robot = tile.occupant_;
+
+	/* obstructed robots can move again */
+	if( robot->obstructed() )
+	{
+		robot->update_obstructed();
+		return false;
+	}
+
+	const bool has_wheels =
+		robot->r_type_ == robot_type::patchbot ||
+		robot->r_type_ == robot_type::pusher ||
+		robot->r_type_ == robot_type::digger ||
+		robot->r_type_ == robot_type::swimmer;
+
+	/* obsacle for robots with wheels */
+	if( tile.type() == tile_type::alien_weed && has_wheels )
+	{
+		robot->update_obstructed();
+		return true;
+	}
+
+	/* obstacle for robots with legs */
+	if( tile.type() == tile_type::gravel && !has_wheels )
+	{
+		robot->update_obstructed();
+		return true;
+	}
+
+	/* wait if next tile is closed door */
+	return door_next_tile( x, y, d );
+}
+
+bool terrain::wall( const unsigned int x, const unsigned int y, const robot_type r_type )
+{
+	/* map boundaries as walls */
+	if( x >= width_ || y >= height_ )
+		return true;
+
+	const tile &tile = at( x, y );
+
+	/* environment as walls */
+
+	/* actual walls */
+	if( tile.type() == tile_type::concrete_wall )
+		return true;
+	/* server (wall) for KI */
+	if( tile.type() == tile_type::server && r_type != robot_type::patchbot )
+		return true;
+	/* breakable walls */
+	if( tile.type() == tile_type::rock_wall && r_type != robot_type::digger )
+		return true;
+	/* secret door (wall) for KI */
+	if( tile.type() == tile_type::secret_path && r_type != robot_type::patchbot )
+		return true;
+	/* automatic door (wall) for Patchbot */
+	if( tile.type() == tile_type::automatic_door &&
+		( r_type == robot_type::patchbot || r_type == robot_type::bugger ) )
+		return true;
+	/* manual door and dangerous tiles (wall) for bugger */
+	if( r_type == robot_type::bugger && ( tile.type() == tile_type::manual_door ||
+		tile.type() == tile_type::water || tile.type() == tile_type::precipice ) )
+		return true;
+
+	/* robots as walls */
+
+	if( tile.occupant_ )
+	{	/* patchbot and bugger interpret all other robots as walls */
+		if( tile.occupant_ && r_type == robot_type::patchbot )
+			return true;
+		/* follower, hunter, sniffer interpret other enemies as walls */
+		if( tile.occupant_->r_type_ != robot_type::patchbot &&
+			( r_type == robot_type::follower || r_type == robot_type::hunter
+				|| r_type == robot_type::sniffer ) )
+			return true;
+	}
+
+	return false;
+}
+
+bool terrain::wall_next_tile( const unsigned int x, const unsigned int y, const direction d )
+{
+	if( !at( x, y ).occupant_ )
+		throw std::invalid_argument( "ERROR: no robot at tile" );
+
+	switch( d )
+	{
+		case direction::up:
+			return wall( x, y - 1, at( x, y ).occupant_->r_type_ );
+
+		case direction::down:
+			return wall( x, y + 1, at( x, y ).occupant_->r_type_ );
+
+		case direction::left:
+			return wall( x - 1, y, at( x, y ).occupant_->r_type_ );
+
+		case direction::right:
+			return wall( x + 1, y, at( x, y ).occupant_->r_type_ );
+
+		default: return false;
+			/*	case direction::wait: return false;
+
+				default: throw std::invalid_argument( "ERROR: reading Robot direction" );*/
+	}
+}
+
+bool terrain::door_next_tile( const unsigned int x, const unsigned int y, const direction d )
+{
+	if( !at( x, y ).occupant_ )
+		throw std::invalid_argument( "ERROR: no robot at tile" );
+
+	tile *tile;
+
+	switch( d )
+	{
+		case direction::up:
+			if( y > 0 )
+				tile = &at( x, y - 1 );
+			else
+				return false;
+			break;
+
+		case direction::right:
+			if( x < width_ - 1 )
+				tile = &at( x + 1, y );
+			else
+				return false;
+			break;
+
+		case direction::down:
+			if( y < height_ - 1 )
+				tile = &at( x, y + 1 );
+			else
+				return false;
+			break;
+
+		case direction::left:
+			if( x > 0 )
+				tile = &at( x - 1, y );
+			else
+				return false;
+			break;
+
+		default: return false;
+			//case direction::wait: return false;
+
+			//default: throw std::invalid_argument( "ERROR: reading Robot direction" );
+	}
+
+	if( !tile->door_ )
+		return false;
+
+	if( tile->door_is_open() )
+		return false;
+
+	auto &robot = at( x, y ).occupant_;
+
+	/* Patchbot can't use automatic doors */
+	if( tile->door_is_automatic() && robot->r_type_ == robot_type::patchbot )
+		return false;
+
+	robot->update_obstructed();
+	tile->door_set_timer();		/* open door */
+	open_doors_.push_back( tile );	/* save opened door */
+	return true;
+}
+
+bool terrain::robot_next_tile( const unsigned x, const  unsigned y, const direction d )
+{
+	if( x >= width_ || y >= height_ )
+		return false;
+
+	switch( d )
+	{
+		case direction::up:
+			return ( y > 0 ) ? !( at( x, y - 1 ).occupant_ == nullptr ) : false;
+
+		case direction::right:
+			return ( x < width_ - 1 ) ? !( at( x + 1, y ).occupant_ == nullptr ) : false;
+
+		case direction::down:
+			return ( y < height_ - 1 ) ? !( at( x, y + 1 ).occupant_ == nullptr ) : false;
+
+		case direction::left:
+			return ( x > 0 ) ? !( at( x - 1, y ).occupant_ == nullptr ) : false;
+
+
+		default: return false;
+			/*	case direction::wait: return false;
+
+				default: throw std::invalid_argument( "ERROR: reading Robot direction" );*/
+	}
+}
+
+
+void terrain::update_doors()
+{
+	for( auto i = 0; i < open_doors_.size(); i++ )
+	{
+		open_doors_[i]->door_decrement_timer();
+
+		if( !open_doors_[i]->door_is_open() )
+			open_doors_.erase( open_doors_.begin() + i );
+	}
+}
+
 /// SETTER
 void terrain::set_dijkstra_path( std::vector<std::pair<unsigned int, direction>> &dijkstra_path_tree )
 {

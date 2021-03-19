@@ -148,7 +148,8 @@ void patchbot_gui::on_mission_start_button_clicked()
 	ui_.mission_cancel_button->setEnabled( true );
 
 	render_engine_.set_game_is_on( true );
-
+	controls_.init_enemies();
+	
 	refresh_window();
 }
 
@@ -217,8 +218,6 @@ void patchbot_gui::on_mission_step_button_clicked()
 
 	controls_.load_dijkstra_path();
 	render_engine_.arrows_on();
-
-	controls_.init_enemies();
 	
 	ui_.sequenz_line_edit->setText( full_command );
 	refresh_window();

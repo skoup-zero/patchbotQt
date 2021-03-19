@@ -109,6 +109,8 @@ VERBESSERUNG:
 - alle unnötigen auto ersetzt durch datentypen
 - rednundanter code beim expandieren ersetzt durch eine lambda funktion.
 
+- controls: robot interactionen in terrain klasse verschoben damit ki auch interagieren können
+
 => viel übersichtlicher und kürzer.
 
 

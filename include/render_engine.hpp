@@ -16,11 +16,12 @@ namespace patchbot
 		unsigned int pixel_terrain_height_;
 		bool game_is_on_ = false;
 		bool arrow_is_on_ = false;
-
+		
 	public:
+		terrain terrain_;
+		
 		/* preloaded TGA's */
 		load_assets assets_;
-		terrain terrain_;
 		std::filesystem::path current_path_;
 
 		render_engine();
