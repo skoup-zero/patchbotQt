@@ -38,6 +38,7 @@ void controls::update_world()
 	update_patchbot();
 	update_enemies();
 	terrain_.update_doors();
+	terrain_.update_graves();
 }
 
 void controls::update_patchbot()
@@ -45,24 +46,22 @@ void controls::update_patchbot()
 	if( frequency_.empty() || direction_.empty() )
 		throw std::out_of_range( "ERROR: no Instructions" );
 
-	const unsigned int x = terrain_.patchbot_->x_, y = terrain_.patchbot_->y_;
-
 	/* Patchbot doesn't move if the next tile is a wall */
-	if( terrain_.wall_next_tile( x, y, direction_[0] ) )
+	if( terrain_.wall_next_tile( terrain_.patchbot_->x_, terrain_.patchbot_->y_, direction_[0] ) )
 	{
 		update_instruction();
 		return;
 	}
 
 	/* Patchbot waits at first contact with an obstacle */
-	if( terrain_.obstacle( x, y, direction_[0] ) )
+	if( terrain_.obstacle( terrain_.patchbot_->x_, terrain_.patchbot_->y_, direction_[0] ) )
 		return;
 
-	terrain_.move_robot( x, y, direction_[0] );
+	terrain_.move_robot( terrain_.patchbot_->x_, terrain_.patchbot_->y_, direction_[0] );
 
-	if( terrain_.dangerous_tile( x, y ) )
+	if( terrain_.dangerous_tile( terrain_.patchbot_->x_, terrain_.patchbot_->y_ ) )
 	{
-		terrain_.patchbot_->kill_robot();
+		terrain_.add_grave( terrain_.patchbot_->x_, terrain_.patchbot_->y_ );
 		return;
 	}
 
@@ -90,7 +89,7 @@ void controls::update_instruction()
 void controls::init_enemies()
 {
 	enemy_kis_.clear();
-
+	
 	for( auto t : terrain_.robots_ )
 	{
 		if( t->r_type_ == robot_type::bugger )
@@ -171,7 +170,8 @@ bool controls::until_wall() const noexcept
 
 bool controls::patchbot_dead() const noexcept
 {
-	return !terrain_.patchbot_->alive();
+	return terrain_.at
+	( terrain_.patchbot_->x_, terrain_.patchbot_->y_ ).occupant_ == nullptr;
 }
 
 bool controls::patchbot_obstructed() const noexcept

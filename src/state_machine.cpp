@@ -12,7 +12,7 @@ void state_machine::action()
 	std::cout << "THIS SHOULD NOT BE INVOKED" << std::endl;
 }
 
-bool state_machine::is_alive() const noexcept
+bool state_machine::is_alive()
 {
-	return self_->alive();
+	return !(terrain_.at(self_->x_, self_->y_).occupant_ == nullptr);
 }

@@ -16,6 +16,6 @@ namespace patchbot
 	public:
 
 		virtual void action();
-		bool is_alive() const noexcept;
+		bool is_alive();
 	};
 }

@@ -47,7 +47,7 @@ namespace patchbot
 
 		///	@brief		Check if Patchbot reached the server.
 		bool check_win() const;
-
+		
 		void load_dijkstra_path() const;
 		
 		/// GETTER 

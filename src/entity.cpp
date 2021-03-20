@@ -12,17 +12,17 @@ void robot::update_obstructed()
 	obstructed_ = ( obstructed_ ) ? false : true;
 }
 
-void robot::kill_robot()
-{
-	alive_ = false;
-}
+//void robot::kill_robot()
+//{
+//	alive_ = false;
+//}
 
 
 /// GETTER
-bool robot::alive() const noexcept
-{
-	return alive_;
-}
+//bool robot::alive() const noexcept
+//{
+//	return alive_;
+//}
 
 bool robot::obstructed() const noexcept
 {

@@ -47,7 +47,7 @@ namespace patchbot
 	///			and the environment
 	class robot
 	{
-		bool alive_ = true;
+		/*bool alive_ = true;*/
 		bool obstructed_ = false;
 
 	public:
@@ -60,7 +60,7 @@ namespace patchbot
 		void update_obstructed();
 
 		/// @brief		Sets alive to false.
-		void kill_robot();
+		/*void kill_robot();*/
 
 		/// Getter 
 		bool alive() const noexcept;

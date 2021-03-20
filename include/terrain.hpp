@@ -18,6 +18,7 @@ namespace patchbot
 		unsigned int height_;
 		std::vector<tile> tiles_;
 		std::vector<tile *> open_doors_;
+		std::vector<tile *> graves_;
 
 		terrain( std::vector<tile> &&tiles, std::vector<std::shared_ptr<robot>> &&robots_,
 			std::shared_ptr<robot> patchbot, unsigned int width, unsigned int height );
@@ -97,6 +98,10 @@ namespace patchbot
 
 		///	@brief		Updates all open doors.
 		void update_doors();
+
+		///	@brief		Updates all graves.
+		void update_graves();
+		void add_grave( unsigned int x, unsigned int y );
 		
 		/// SETTER
 		void terrain::set_dijkstra_path( 

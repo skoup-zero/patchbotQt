@@ -125,12 +125,12 @@ terrain terrain::load_map_from_file( const std::filesystem::path &path )
 
 
 void terrain::move_robot( const unsigned int x, const unsigned int y, const direction d )
-{
+{	
 	if( !at( x, y ).occupant_ )
-		throw std::invalid_argument( "ERROR: no robot at tile" );
+		throw std::invalid_argument( "ERROR: no robot at tile1" );
 
 	auto &robot = at( x, y ).occupant_;
-
+	
 	switch( d )
 	{
 		case direction::up:
@@ -168,6 +168,9 @@ void terrain::move_robot( const unsigned int x, const unsigned int y, const dire
 
 bool terrain::dangerous_tile( const unsigned int  x, const unsigned int y )
 {
+	if( !at( x, y ).occupant_ )
+		throw std::invalid_argument( "ERROR: no robot at tile2" );
+	
 	const tile &tile = at( x, y );
 
 	if( tile.type() == tile_type::precipice )
@@ -179,7 +182,7 @@ bool terrain::dangerous_tile( const unsigned int  x, const unsigned int y )
 bool terrain::obstacle( const unsigned int x, const unsigned int y, const direction d )
 {
 	if( !at( x, y ).occupant_ )
-		throw std::invalid_argument( "ERROR: no robot at tile" );
+		throw std::invalid_argument( "ERROR: no robot at tile3" );
 
 	tile &tile = at( x, y );
 	auto &robot = tile.occupant_;
@@ -262,7 +265,7 @@ bool terrain::wall( const unsigned int x, const unsigned int y, const robot_type
 bool terrain::wall_next_tile( const unsigned int x, const unsigned int y, const direction d )
 {
 	if( !at( x, y ).occupant_ )
-		throw std::invalid_argument( "ERROR: no robot at tile" );
+		throw std::invalid_argument( "ERROR: no robot at tile4" );
 
 	switch( d )
 	{
@@ -286,9 +289,9 @@ bool terrain::wall_next_tile( const unsigned int x, const unsigned int y, const 
 }
 
 bool terrain::door_next_tile( const unsigned int x, const unsigned int y, const direction d )
-{
+{	
 	if( !at( x, y ).occupant_ )
-		throw std::invalid_argument( "ERROR: no robot at tile" );
+		throw std::invalid_argument( "ERROR: no robot at tile5" );
 
 	tile *tile;
 
@@ -384,6 +387,27 @@ void terrain::update_doors()
 			open_doors_.erase( open_doors_.begin() + i );
 	}
 }
+
+void terrain::update_graves()
+{ 
+	for( auto i = 0; i < graves_.size(); i++ )
+	{	
+		graves_[i]->grave_decrement_timer();
+
+		if( !graves_[i]->grave_ )
+			graves_.erase( graves_.begin() + i );
+	}
+}
+
+void terrain::add_grave( const unsigned int x, const unsigned int y )
+{
+	tile &t = at( x, y );
+	t.grave_set_timer();
+	t.occupant_ = nullptr;
+	graves_.push_back( &t );
+}
+
+
 
 /// SETTER
 void terrain::set_dijkstra_path( std::vector<std::pair<unsigned int, direction>> &dijkstra_path_tree )

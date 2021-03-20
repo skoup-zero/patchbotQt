@@ -14,10 +14,7 @@ void bugger_ai::action()
 }
 
 void bugger_ai::find_wall()
-{
-	if( terrain_.dangerous_tile( self_->x_, self_->y_ ) )
-		self_->kill_robot();
-	
+{	
 	if( d_current_ == direction::undefined )
 		switch( rand() % 4 )
 		{
@@ -43,9 +40,6 @@ void bugger_ai::find_wall()
 
 void bugger_ai::wait()
 {
-	if( terrain_.dangerous_tile( self_->x_, self_->y_ ) )
-		self_->kill_robot();
-	
 	if( !terrain_.robot_next_tile( self_->x_, self_->y_, d_current_ ) )
 	{
 		state_ = &bugger_ai::follow_wall;
@@ -54,10 +48,7 @@ void bugger_ai::wait()
 }
 
 void bugger_ai::follow_wall()
-{
-	if( terrain_.dangerous_tile( self_->x_, self_->y_ ) )
-		self_->kill_robot();
-	
+{	
 	if( d_current_ == direction::undefined )
 		d_current_ = wall_in_vicinity();
 

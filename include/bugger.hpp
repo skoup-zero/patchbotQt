@@ -19,6 +19,7 @@ namespace patchbot
 
 		void turn();
 		void move() const;
+		
 		direction wall_in_vicinity() const;
 		bool wall_on_left() const;
 		bool next_tile_is_start() const;

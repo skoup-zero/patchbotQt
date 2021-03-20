@@ -88,25 +88,21 @@ void pusher_type_ai::push_robot()
 
 	if( !target_r )
 		return;
-
+	
 	if( terrain_.wall_next_tile( target_r->x_, target_r->y_, d_current_ ) ||
 		terrain_.robot_next_tile( target_r->x_, target_r->y_, d_current_ ) )
 	{
 		d_current_ = direction::undefined;
 		return;
 	}
-
 	terrain_.move_robot( target_r->x_, target_r->y_, d_current_ );
-
+	
 	if( terrain_.dangerous_tile( target_r->x_, target_r->y_ ) )
-		target_r->kill_robot();
+		terrain_.add_grave( target_r->x_, target_r->y_ );	
 }
 
 void pusher_type_ai::next_move()
 {
-	if( terrain_.dangerous_tile( self_->x_, self_->y_ ) )
-		self_->kill_robot();
-
 	if( self_->r_type_ == robot_type::digger )
 		break_wall();
 	
@@ -117,6 +113,9 @@ void pusher_type_ai::next_move()
 		!terrain_.robot_next_tile( self_->x_, self_->y_, d_current_ ) &&
 		d_current_ != direction::undefined )
 		terrain_.move_robot( self_->x_, self_->y_, d_current_ );
+	
+	if( terrain_.dangerous_tile( self_->x_, self_->y_ ) )
+		terrain_.add_grave( self_->x_, self_->y_ );
 }
 
 void pusher_type_ai::break_wall()

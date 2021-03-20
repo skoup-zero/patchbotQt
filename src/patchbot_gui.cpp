@@ -172,7 +172,7 @@ void patchbot_gui::on_mission_cancel_button_clicked()
 	auto temp = ( terrain::load_map_from_file( render_engine_.current_path_ ) );
 	render_engine_ = render_engine( std::move( temp ), render_engine_.current_path_ );
 	controls_ = controls( render_engine_.terrain_ );
-
+	
 	refresh_window();
 }
 
