@@ -1,6 +1,7 @@
 #include <controls.hpp>
 #include <path_finding.hpp>
 
+
 using namespace patchbot;
 
 controls::controls( patchbot::terrain &t )
@@ -54,7 +55,7 @@ void controls::update_patchbot()
 	}
 
 	/* Patchbot waits at first contact with an obstacle */
-	if( terrain_.obstacle( x, y, direction_[0] ))
+	if( terrain_.obstacle( x, y, direction_[0] ) )
 		return;
 
 	terrain_.move_robot( x, y, direction_[0] );
@@ -89,21 +90,36 @@ void controls::update_instruction()
 void controls::init_enemies()
 {
 	enemy_kis_.clear();
-	
+
 	for( auto t : terrain_.robots_ )
 	{
 		if( t->r_type_ == robot_type::bugger )
 		{
-			enemy_kis_.push_back( std::make_unique<bugger_ki>( terrain_, t ) );
+			enemy_kis_.push_back
+			( std::make_unique<bugger_ai>( terrain_, t ) );
+		}
+		else if( t->r_type_ == robot_type::pusher
+			|| t->r_type_ == robot_type::digger
+			|| t->r_type_ == robot_type::swimmer )
+		{
+			enemy_kis_.push_back
+			( std::make_unique<pusher_type_ai>( terrain_, t ) );
 		}
 	}
-} 
+}
 
 void controls::update_enemies()
 {
-	for ( auto it = enemy_kis_.begin(); it != enemy_kis_.end(); ++it)
+	auto it = enemy_kis_.begin();
+	while( it != enemy_kis_.end() )
 	{
-		(*it)->action();
+		if( ( *it )->is_alive() )
+		{
+			( *it )->action();
+			++it;
+		}
+		else
+			it = enemy_kis_.erase( it );
 	}
 }
 
@@ -112,7 +128,7 @@ bool controls::check_win() const
 {
 	const unsigned int x = terrain_.patchbot_->x_;
 	const unsigned int y = terrain_.patchbot_->y_;
-	
+
 	if( direction_.empty() )
 		return false;
 

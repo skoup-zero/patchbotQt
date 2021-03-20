@@ -49,7 +49,6 @@ namespace patchbot
 	{
 		bool alive_ = true;
 		bool obstructed_ = false;
-		std::uint8_t grave_timer_ = 0;
 
 	public:
 		robot_type r_type_;
@@ -105,23 +104,33 @@ namespace patchbot
 	/// @class	tile represents a tile from a map which might have an occupant 
 	class tile
 	{
-		std::uint8_t timer_ = 0;
+		std::uint8_t door_timer_ = 0;
+		std::uint8_t grave_timer_ = 0;
 		tile_type t_type_;
 
 	public:
 		/* true if tile is door */
 		const bool door_;
+
+		/* true if grave is on it */
+		bool grave_ = false;
 		std::shared_ptr<robot> occupant_;
 
 		tile( tile_type type, const bool door = false );
-		
-		void door_decrement_timer();
+
 		/// @brief		Sets timer of door to 10.
 		void door_set_timer();
+		void door_decrement_timer();
+
+		void grave_set_timer();
+		void grave_decrement_timer();
 
 		tile_type type() const noexcept;
 		bool door_is_open() const;
 		bool door_is_automatic() const;
+
+		///	@brief		tile type changes from rock_wall to gravel.
+		void break_wall();
 
 		///	@brief		value of each tile.
 		///	@return		0 if robot, danger or wall.

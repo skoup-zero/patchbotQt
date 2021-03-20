@@ -246,18 +246,15 @@ bool terrain::wall( const unsigned int x, const unsigned int y, const robot_type
 		tile.type() == tile_type::water || tile.type() == tile_type::precipice ) )
 		return true;
 
-	/* robots as walls */
 
-	if( tile.occupant_ )
-	{	/* patchbot and bugger interpret all other robots as walls */
-		if( tile.occupant_ && r_type == robot_type::patchbot )
-			return true;
-		/* follower, hunter, sniffer interpret other enemies as walls */
-		if( tile.occupant_->r_type_ != robot_type::patchbot &&
-			( r_type == robot_type::follower || r_type == robot_type::hunter
-				|| r_type == robot_type::sniffer ) )
-			return true;
-	}
+	/* follower, hunter, sniffer interpret other enemies as walls */
+	if( tile.occupant_ &&
+		( r_type == robot_type::follower || r_type == robot_type::hunter || r_type == robot_type::sniffer ) )
+		return true;
+	
+	/* all other robots are walls for patchbot */
+	if( tile.occupant_ && r_type == robot_type::patchbot )
+		return true;
 
 	return false;
 }
@@ -395,7 +392,6 @@ void terrain::set_dijkstra_path( std::vector<std::pair<unsigned int, direction>>
 }
 
 /// GETTER
-
 const tile &terrain::at( unsigned int index ) const
 {
 	if( index > height_ * width_ )

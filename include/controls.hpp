@@ -1,7 +1,9 @@
 #pragma once
 
 #include <terrain.hpp>
-#include <state_machine.hpp>
+#include <bugger.hpp>
+#include <pusher_type.hpp>
+#include <follower_type.hpp>
 
 namespace patchbot
 {
