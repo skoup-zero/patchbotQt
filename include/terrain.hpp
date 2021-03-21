@@ -53,7 +53,7 @@ namespace patchbot
 		///	@return		a tile at given coordinates
 		tile &at( unsigned int x, unsigned int y );
 
-		
+
 		/* ROBOT INTERACTION */
 
 		///	@brief		Moves a robot to another tile.
@@ -79,14 +79,14 @@ namespace patchbot
 		///	@param		x, y tile coordinates.
 		///	@param		r_type robot type. 
 		///	@return		true if it's a wall.
-		bool wall( unsigned int x, unsigned int y, robot_type r_type ) ;
+		bool wall( unsigned int x, unsigned int y, robot_type r_type );
 
 		///	@brief		Checks if the next tile for robot is a wall for it's type.
 		///	@param		x, y tile coordinates.
 		///	@param		d direction to move.
 		///	@throws		invalid_argument if tile has no robot.
 		///	@return		true if the next tile is a wall for robot.
-		bool wall_next_tile( unsigned int x, unsigned int y, direction d ) ;
+		bool wall_next_tile( unsigned int x, unsigned int y, direction d );
 
 		///	@brief		Checks if next tile is a closed door.
 		///	@param		x, y Robot Coordinates.
@@ -101,14 +101,15 @@ namespace patchbot
 
 		///	@brief		Updates all graves.
 		void update_graves();
-		void add_grave( unsigned int x, unsigned int y );
-		
+		void kill_robot_at( unsigned int x, unsigned int y );
+
 		/// SETTER
-		void terrain::set_dijkstra_path( 
-			std::vector<std::pair<unsigned int, direction>> &dijkstra_path_tree );
+		void load_dijkstra_path();
 		
 		/// GETTER 
 		unsigned int width() const noexcept;
 		unsigned int height() const noexcept;
+
+		direction dijkstra_at( unsigned int x, unsigned int y ) const;
 	};
 }

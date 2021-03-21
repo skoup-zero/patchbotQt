@@ -149,7 +149,7 @@ void patchbot_gui::on_mission_start_button_clicked()
 
 	render_engine_.set_game_is_on( true );
 	controls_.init_enemies();
-	
+
 	refresh_window();
 }
 
@@ -172,7 +172,7 @@ void patchbot_gui::on_mission_cancel_button_clicked()
 	auto temp = ( terrain::load_map_from_file( render_engine_.current_path_ ) );
 	render_engine_ = render_engine( std::move( temp ), render_engine_.current_path_ );
 	controls_ = controls( render_engine_.terrain_ );
-	
+
 	refresh_window();
 }
 
@@ -215,10 +215,9 @@ void patchbot_gui::on_mission_step_button_clicked()
 			full_command.replace( 1, 1, QString::fromStdString( std::to_string( frequency ) ) );
 		}
 	}
-
-	controls_.load_dijkstra_path();
+	/* uncomment next line to show arrows */
 	render_engine_.arrows_on();
-	
+
 	ui_.sequenz_line_edit->setText( full_command );
 	refresh_window();
 }

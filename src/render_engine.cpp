@@ -66,7 +66,7 @@ void render_engine::render_map( QPixmap &pixmap, unsigned int screen_width, unsi
 					( y - top_border ) * pixel_tga_height_ - scroll_value_y % 32, img );
 
 			/* draw Robots */
-			if( tile.occupant_  )
+			if( tile.occupant_ )
 			{
 				const auto &robot = tile.occupant_;
 				const auto &img = assets_.robot_img.at( robot->r_type_ );
@@ -85,7 +85,7 @@ void render_engine::render_map( QPixmap &pixmap, unsigned int screen_width, unsi
 						( y - top_border ) * pixel_tga_height_ - scroll_value_y % 32, img );
 				}
 			}
-			else if( tile.grave_ )
+			else if( tile.is_grave() )
 			{
 				painter.drawPixmap( ( x - left_border ) * pixel_tga_width_ - scroll_value_x % 32,
 					( y - top_border ) * pixel_tga_height_ - scroll_value_y % 32,

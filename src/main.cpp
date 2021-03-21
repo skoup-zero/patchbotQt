@@ -84,38 +84,3 @@ int main( int argc, char *argv[] )
 		return EXIT_FAILURE;
 	}
 }
-
-/*
-
-Testat 6
-
-- auto wegen lesbarkeit aufpassen !!! nochmal ganzen code durchegehen !
-- neue aufgabenstellung ansehen
-- struct statt tupel
-- kein zweites mal einfügen nur richtung ändern
-- kein std move bei lokalen return
-- render_engine zu renderer umbenenen
-- 
-
-Testat 6
-[Schlichtheit] redundanter Code für die 4 Richtungen, Kacheln bis zu 2x eingefügt,
-	selbst wenn es nur eine Richtung gibt, auto bei primitiven Typen möglichst vermeiden ->done
-[Lesbarkeit] render_engine in renderer (o.Ä.) umbenennen ->done
- 
-
-VERBESSERUNG:
-- 3er tupel welche einen knoten repräsentieren jetzt als node struct
-- 2er tupel mit distance und direction jetzt als std::pair
-- alle unnötigen auto ersetzt durch datentypen
-- rednundanter code beim expandieren ersetzt durch eine lambda funktion.
-
-- controls: robot interactionen in terrain klasse verschoben damit ki auch interagieren können
-
-=> viel übersichtlicher und kürzer.
-
-
-	-TODOS:
-	compiler optimierung -> header wenn möglcih in cpp
-	- cycle in includes vermeiden
-	- render engine terrain zu contro terr
-*/

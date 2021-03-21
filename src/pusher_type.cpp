@@ -98,7 +98,7 @@ void pusher_type_ai::push_robot()
 	terrain_.move_robot( target_r->x_, target_r->y_, d_current_ );
 	
 	if( terrain_.dangerous_tile( target_r->x_, target_r->y_ ) )
-		terrain_.add_grave( target_r->x_, target_r->y_ );	
+		terrain_.kill_robot_at( target_r->x_, target_r->y_ );	
 }
 
 void pusher_type_ai::next_move()
@@ -115,7 +115,7 @@ void pusher_type_ai::next_move()
 		terrain_.move_robot( self_->x_, self_->y_, d_current_ );
 	
 	if( terrain_.dangerous_tile( self_->x_, self_->y_ ) )
-		terrain_.add_grave( self_->x_, self_->y_ );
+		terrain_.kill_robot_at( self_->x_, self_->y_ );
 }
 
 void pusher_type_ai::break_wall()

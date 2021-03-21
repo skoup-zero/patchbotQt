@@ -1,4 +1,5 @@
 #include <terrain.hpp>
+#include <path_finding.hpp>
 
 using namespace patchbot;
 
@@ -160,9 +161,6 @@ void terrain::move_robot( const unsigned int x, const unsigned int y, const dire
 				at( x - 1, y ).occupant_.swap( robot );
 				at( x - 1, y ).occupant_->x_--; break;
 			}
-
-			//case direction::wait: break;
-			//default: throw std::invalid_argument( "ERROR: reading Robot direction" );
 	}
 }
 
@@ -251,7 +249,7 @@ bool terrain::wall( const unsigned int x, const unsigned int y, const robot_type
 
 
 	/* follower, hunter, sniffer interpret other enemies as walls */
-	if( tile.occupant_ &&
+	if( tile.occupant_ && tile.occupant_->r_type_ != robot_type::patchbot &&
 		( r_type == robot_type::follower || r_type == robot_type::hunter || r_type == robot_type::sniffer ) )
 		return true;
 	
@@ -394,12 +392,12 @@ void terrain::update_graves()
 	{	
 		graves_[i]->grave_decrement_timer();
 
-		if( !graves_[i]->grave_ )
+		if( !graves_[i]->is_grave() )
 			graves_.erase( graves_.begin() + i );
 	}
 }
 
-void terrain::add_grave( const unsigned int x, const unsigned int y )
+void terrain::kill_robot_at( const unsigned int x, const unsigned int y )
 {
 	tile &t = at( x, y );
 	t.grave_set_timer();
@@ -408,11 +406,10 @@ void terrain::add_grave( const unsigned int x, const unsigned int y )
 }
 
 
-
 /// SETTER
-void terrain::set_dijkstra_path( std::vector<std::pair<unsigned int, direction>> &dijkstra_path_tree )
+void terrain::load_dijkstra_path()
 {
-	dijkstra_path_tree_ = dijkstra_path_tree;
+	dijkstra_path_tree_ = dijkstra::calculate_paths(*this);
 }
 
 /// GETTER
@@ -442,4 +439,15 @@ unsigned int terrain::width() const noexcept
 unsigned int terrain::height() const noexcept
 {
 	return height_;
+}
+
+ direction terrain::dijkstra_at(const unsigned int x, const unsigned int y) const
+{
+	 if( dijkstra_path_tree_.empty() )
+		 return direction::undefined;
+	
+	if( x >= width_ || y >= height_ )
+		return direction::undefined;
+	
+	return dijkstra_path_tree_[width_ * y + x].second;
 }

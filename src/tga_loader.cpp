@@ -77,7 +77,7 @@ image image::load_tga_from_file( const std::filesystem::path &path )
 
 	for( auto i = 0; i < img_size; i++ )
 		input.read( reinterpret_cast<char *>( &buffer[i] ), 1 );
-	
+
 	return image( std::move( header ), std::move( buffer ) );
 }
 

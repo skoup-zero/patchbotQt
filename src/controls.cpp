@@ -6,7 +6,9 @@ using namespace patchbot;
 
 controls::controls( patchbot::terrain &t )
 	:terrain_{ t }
-{}
+{
+	terrain_.load_dijkstra_path();
+}
 
 controls &controls::operator=( const controls &other )
 {
@@ -57,11 +59,14 @@ void controls::update_patchbot()
 	if( terrain_.obstacle( terrain_.patchbot_->x_, terrain_.patchbot_->y_, direction_[0] ) )
 		return;
 
+	if( direction_[0] != direction::wait )
+		terrain_.load_dijkstra_path();
+
 	terrain_.move_robot( terrain_.patchbot_->x_, terrain_.patchbot_->y_, direction_[0] );
 
 	if( terrain_.dangerous_tile( terrain_.patchbot_->x_, terrain_.patchbot_->y_ ) )
 	{
-		terrain_.add_grave( terrain_.patchbot_->x_, terrain_.patchbot_->y_ );
+		terrain_.kill_robot_at( terrain_.patchbot_->x_, terrain_.patchbot_->y_ );
 		return;
 	}
 
@@ -88,29 +93,27 @@ void controls::update_instruction()
 
 void controls::init_enemies()
 {
-	enemy_kis_.clear();
-	
+	/* reset ai's after new start */
+	enemy_ais_.clear();
+
 	for( auto t : terrain_.robots_ )
 	{
 		if( t->r_type_ == robot_type::bugger )
-		{
-			enemy_kis_.push_back
-			( std::make_unique<bugger_ai>( terrain_, t ) );
-		}
-		else if( t->r_type_ == robot_type::pusher
-			|| t->r_type_ == robot_type::digger
-			|| t->r_type_ == robot_type::swimmer )
-		{
-			enemy_kis_.push_back
-			( std::make_unique<pusher_type_ai>( terrain_, t ) );
-		}
+			enemy_ais_.push_back( std::make_unique<bugger_ai>( terrain_, t ) );
+
+		else if( t->r_type_ == robot_type::pusher || t->r_type_ == robot_type::digger ||
+			t->r_type_ == robot_type::swimmer )
+			enemy_ais_.push_back( std::make_unique<pusher_type_ai>( terrain_, t ) );
+
+		else
+			enemy_ais_.push_back( std::make_unique<follower_type>( terrain_, t ) );
 	}
 }
 
 void controls::update_enemies()
 {
-	auto it = enemy_kis_.begin();
-	while( it != enemy_kis_.end() )
+	auto it = enemy_ais_.begin();
+	while( it != enemy_ais_.end() )
 	{
 		if( ( *it )->is_alive() )
 		{
@@ -118,10 +121,9 @@ void controls::update_enemies()
 			++it;
 		}
 		else
-			it = enemy_kis_.erase( it );
+			it = enemy_ais_.erase( it );
 	}
 }
-
 
 bool controls::check_win() const
 {
@@ -156,22 +158,16 @@ bool controls::check_win() const
 	}
 }
 
-void controls::load_dijkstra_path() const
-{
-	terrain_.set_dijkstra_path( dijkstra::calculate_paths( terrain_ ) );
-}
-
 /// GETTER
+bool controls::patchbot_dead() const
+{
+	return terrain_.at
+	( terrain_.patchbot_->x_, terrain_.patchbot_->y_ ).occupant_ == nullptr;
+}
 
 bool controls::until_wall() const noexcept
 {
 	return until_wall_;
-}
-
-bool controls::patchbot_dead() const noexcept
-{
-	return terrain_.at
-	( terrain_.patchbot_->x_, terrain_.patchbot_->y_ ).occupant_ == nullptr;
 }
 
 bool controls::patchbot_obstructed() const noexcept

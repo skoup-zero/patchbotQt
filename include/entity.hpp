@@ -16,7 +16,7 @@ namespace patchbot
 		wait,
 		undefined
 	};
-	
+
 	enum class robot_type
 	{
 		patchbot,
@@ -47,7 +47,6 @@ namespace patchbot
 	///			and the environment
 	class robot
 	{
-		/*bool alive_ = true;*/
 		bool obstructed_ = false;
 
 	public:
@@ -59,11 +58,7 @@ namespace patchbot
 		/// @brief		Swtiches obstructed_ to opposite bool
 		void update_obstructed();
 
-		/// @brief		Sets alive to false.
-		/*void kill_robot();*/
-
 		/// Getter 
-		bool alive() const noexcept;
 		bool obstructed() const noexcept;
 	};
 
@@ -107,35 +102,35 @@ namespace patchbot
 		std::uint8_t door_timer_ = 0;
 		std::uint8_t grave_timer_ = 0;
 		tile_type t_type_;
+		bool grave_ = false;
 
 	public:
-		/* true if tile is door */
 		const bool door_;
-
-		/* true if grave is on it */
-		bool grave_ = false;
 		std::shared_ptr<robot> occupant_;
 
-		tile( tile_type type, const bool door = false );
+		tile( tile_type type, bool door = false );
 
 		/// @brief		Sets timer of door to 10.
 		void door_set_timer();
 		void door_decrement_timer();
 
+		///	@brief		Sets timer of grave to 5.
 		void grave_set_timer();
 		void grave_decrement_timer();
-
-		tile_type type() const noexcept;
-		bool door_is_open() const;
-		bool door_is_automatic() const;
 
 		///	@brief		tile type changes from rock_wall to gravel.
 		void break_wall();
 
-		///	@brief		value of each tile.
+		///	@brief		value of each tile for dijkstra.
 		///	@return		0 if robot, danger or wall.
 		///				1 if it isn't an obstacle.
 		///				2 if it is an obstacle.
 		int node_cost() const;
+
+		///	GETTER 
+		tile_type type() const noexcept;
+		bool door_is_open() const;
+		bool door_is_automatic() const;
+		bool is_grave() const noexcept;
 	};
 }
