@@ -163,7 +163,7 @@ patchbot::load_assets::load_assets()
 		image::load_tga_from_file( R"(assets\tga\grafiken\umgebungen\tuer_automatisch_geschlossen.tga)" )
 		.qpixmap_converter() ) );
 	terrain_img.insert( std::pair <tile_type, QPixmap>( tile_type::automatic_door_open,
-		image::load_tga_from_file( R"(assets\tga\grafiken\umgebungen\tuer_manuell_offen.tga)" )
+		image::load_tga_from_file( R"(assets\tga\grafiken\umgebungen\tuer_automatisch_offen.tga)" )
 		.qpixmap_converter() ) );
 	terrain_img.insert( std::pair <tile_type, QPixmap>( tile_type::concrete_wall,
 		image::load_tga_from_file( R"(assets\tga\grafiken\umgebungen\wand_beton.tga)" )

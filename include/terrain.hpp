@@ -19,7 +19,8 @@ namespace patchbot
 		std::vector<tile> tiles_;
 		std::vector<tile *> open_doors_;
 		std::vector<tile *> graves_;
-
+		bool patchbot_corrupted_ = false;
+		
 		terrain( std::vector<tile> &&tiles, std::vector<std::shared_ptr<robot>> &&robots_,
 			std::shared_ptr<robot> patchbot, unsigned int width, unsigned int height );
 
@@ -63,6 +64,20 @@ namespace patchbot
 		///	@throws		invalid_argument if tile has no robot or direction is invalid.
 		void move_robot( unsigned int x, unsigned int y, direction d );
 
+		///	@brief		Pushes a roboter (if possible) to another tile and
+		///				kills if it lands on a dangerous tile.
+		///	@param		x, y coordinates of pushing roboter.
+		///	@param		d direction to push.
+		void push_robot( unsigned int x, unsigned int y, direction d );
+
+		///	@brief		Kills robot at a position and replaces it with a grave.
+		///	@details	Robot death is marked as a nullptr on terrain (map) so
+		///				other robots can't interact with it anymore.
+		///	@param		x, y as robot coordinates.
+		void kill_robot( unsigned int x, unsigned int y );
+		
+		void corrupt_patchbot( unsigned int x, unsigned int y, direction d );
+		
 		///	@brief		Checks if tile at robot is dangerous.
 		///	@param		x, y robot coordinates.
 		///	@return		true if it kills robot.
@@ -89,27 +104,34 @@ namespace patchbot
 		bool wall_next_tile( unsigned int x, unsigned int y, direction d );
 
 		///	@brief		Checks if next tile is a closed door.
-		///	@param		x, y Robot Coordinates.
+		///	@param		x, y robot coordinates.
 		///	@param		d direction to move.
 		///	@return		true if next tile is a door.
 		bool door_next_tile( unsigned int x, unsigned int y, direction d );
 
+		///	@brief		Checks if Robot is on next tile.
+		///	@param		x, y robot coordinates. 
+		///	@param		d direction to look.
+		///	@return		true if robot is on next tile.
 		bool robot_next_tile( unsigned int x, unsigned int y, direction d );
-
+		
 		///	@brief		Updates all open doors.
 		void update_doors();
 
 		///	@brief		Updates all graves.
 		void update_graves();
-		void kill_robot_at( unsigned int x, unsigned int y );
 
+		///	@brief		Get direction from dijkstra graph.
+		///	@param		x, y as coordinates.
+		///	@return		direction at dijkstra position.
+		direction dijkstra_at( unsigned int x, unsigned int y ) const;
+		
 		/// SETTER
 		void load_dijkstra_path();
-		
+
 		/// GETTER 
 		unsigned int width() const noexcept;
 		unsigned int height() const noexcept;
-
-		direction dijkstra_at( unsigned int x, unsigned int y ) const;
+		bool patchbot_corrupted() const noexcept;
 	};
 }

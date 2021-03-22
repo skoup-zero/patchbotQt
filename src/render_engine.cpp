@@ -52,8 +52,7 @@ void render_engine::render_map( QPixmap &pixmap, unsigned int screen_width, unsi
 			const auto &img = assets_.terrain_img.at( tile.type() );
 
 			if( tile.door_ && tile.door_is_open() )
-			{
-				/* draw open door */
+			{/* draw open door */
 				const auto &open_door_img =
 					( tile.door_is_automatic() ) ? assets_.terrain_img.at( tile_type::automatic_door_open )
 					: assets_.terrain_img.at( tile_type::manual_door_open );
@@ -91,6 +90,7 @@ void render_engine::render_map( QPixmap &pixmap, unsigned int screen_width, unsi
 					( y - top_border ) * pixel_tga_height_ - scroll_value_y % 32,
 					assets_.robot_img.at( robot_type::dead ) );
 			}
+			
 			/* draw Arrows for debug */
 			if( arrow_is_on_ )
 			{

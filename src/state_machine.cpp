@@ -7,7 +7,7 @@ state_machine::state_machine( terrain &terrain, std::shared_ptr<robot> &self )
 	,self_{ self }
 {}
 
-void state_machine::action()
+void state_machine::process()
 {
 	std::cout << "THIS SHOULD NOT BE INVOKED" << std::endl;
 }

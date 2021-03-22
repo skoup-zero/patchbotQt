@@ -4,7 +4,7 @@
 
 namespace patchbot
 {
-	///	@class as base for all AI's distributet in derived classes depending on context.
+	///	@class as base for all AI's distributed in derived classes depending on context.
 	class state_machine
 	{
 	protected:
@@ -15,7 +15,7 @@ namespace patchbot
 
 	public:
 
-		virtual void action();
+		virtual void process();
 		bool is_alive();
 	};
 }

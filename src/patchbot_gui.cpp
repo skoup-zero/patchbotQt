@@ -182,25 +182,25 @@ void patchbot_gui::on_mission_step_button_clicked()
 
 	if( controls_.check_win() )
 	{
-		QMessageBox::about( this, "!!! WIN !!!", "you found the server" );
+		QMessageBox::about( this, "!!! WIN !!!", "you found the server!" );
 		on_mission_cancel_button_clicked();
 		return;
 	}
 
 	if( controls_.patchbot_dead() )
 	{
-		QMessageBox::about( this, "!!! LOSE !!!", "patchbot died" );
+		QMessageBox::about( this, "!!! LOSE !!!", "Patchbot died!" );
 		on_mission_cancel_button_clicked();
 		return;
 	}
 
 	if( controls_.instructions_empty() )
 	{
-		QMessageBox::about( this, "!!! LOSE !!!", "you didn't found the server" );
+		QMessageBox::about( this, "!!! LOSE !!!", "you didn't find the server!" );
 		on_mission_cancel_button_clicked();
 		return;
 	}
-
+	
 	controls_.update_world();
 
 	/* Skip instruction edit if until wall is active or patchbot is obstructed */
@@ -215,11 +215,18 @@ void patchbot_gui::on_mission_step_button_clicked()
 			full_command.replace( 1, 1, QString::fromStdString( std::to_string( frequency ) ) );
 		}
 	}
-	/* uncomment next line to show arrows */
-	render_engine_.arrows_on();
 
+	/* uncomment next line to show arrows */
+	/*render_engine_.arrows_on();*/
+	
 	ui_.sequenz_line_edit->setText( full_command );
 	refresh_window();
+
+	if( controls_.patchbot_corrupted() )
+	{
+		QMessageBox::about( this, "!!! LOSE !!!", "Patchbot has been corrupted!" );
+		on_mission_cancel_button_clicked();
+	}
 }
 
 void patchbot_gui::on_mission_auto_button_clicked()

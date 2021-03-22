@@ -1,14 +1,12 @@
 #include <pusher_type.hpp>
 
-#include "bugger.hpp"
-
 using namespace patchbot;
 
 pusher_type_ai::pusher_type_ai( terrain &terrain, std::shared_ptr<robot> &self )
 	:state_machine( terrain, self )
 {}
 
-void pusher_type_ai::action()
+void pusher_type_ai::process()
 {
 	( this->*state_ )( );
 }
@@ -16,111 +14,75 @@ void pusher_type_ai::action()
 void pusher_type_ai::horizontal()
 {
 	if( self_->x_ < terrain_.patchbot_->x_ )
-		d_current_ = direction::right;
+		current_d_ = direction::right;
 
 	else if( self_->x_ > terrain_.patchbot_->x_ )
-		d_current_ = direction::left;
+		current_d_ = direction::left;
 
 	else
-	{
-		state_ = &pusher_type_ai::vertical;
+	{	/* same x-axis */
+		switch_state();
 		return;
 	}
 
-	if( terrain_.wall_next_tile( self_->x_, self_->y_, d_current_ ) )
-	{
-		state_ = &pusher_type_ai::vertical;
-		return;
-	}
-
-	next_move();
-
-	if( d_current_ == direction::undefined )
-		state_ = &pusher_type_ai::vertical;
+	action();
 }
 
 void pusher_type_ai::vertical()
 {
 	if( self_->y_ < terrain_.patchbot_->y_ )
-		d_current_ = direction::down;
+		current_d_ = direction::down;
 
 	else if( self_->y_ > terrain_.patchbot_->y_ )
-		d_current_ = direction::up;
+		current_d_ = direction::up;
 
 	else
-	{
-		state_ = &pusher_type_ai::horizontal;
+	{	/* same y-axis */
+		switch_state();
 		return;
 	}
 
-	if( terrain_.wall_next_tile( self_->x_, self_->y_, d_current_ ) )
-	{
-		state_ = &pusher_type_ai::horizontal;
-		return;
-	}
-
-	next_move();
-
-	if( d_current_ == direction::undefined )
-		state_ = &pusher_type_ai::horizontal;
+	action();
 }
 
-void pusher_type_ai::push_robot()
+void pusher_type_ai::action()
 {
-	std::shared_ptr<robot> target_r;
-
-	switch( d_current_ )
+	/* switch on wall */
+	if( terrain_.wall_next_tile( self_->x_, self_->y_, current_d_ ) )
 	{
-		case direction::up:
-			target_r = terrain_.at( self_->x_, self_->y_ - 1 ).occupant_; break;
-
-		case direction::right:
-			target_r = terrain_.at( self_->x_ + 1, self_->y_ ).occupant_; break;
-
-		case direction::down:
-			target_r = terrain_.at( self_->x_, self_->y_ + 1 ).occupant_; break;
-
-		case direction::left:
-			target_r = terrain_.at( self_->x_ - 1, self_->y_ ).occupant_; break;
-
-		default: d_current_ = direction::undefined; return;
-	}
-
-	if( !target_r )
-		return;
-	
-	if( terrain_.wall_next_tile( target_r->x_, target_r->y_, d_current_ ) ||
-		terrain_.robot_next_tile( target_r->x_, target_r->y_, d_current_ ) )
-	{
-		d_current_ = direction::undefined;
+		switch_state();
 		return;
 	}
-	terrain_.move_robot( target_r->x_, target_r->y_, d_current_ );
 	
-	if( terrain_.dangerous_tile( target_r->x_, target_r->y_ ) )
-		terrain_.kill_robot_at( target_r->x_, target_r->y_ );	
-}
-
-void pusher_type_ai::next_move()
-{
+	/* digger destroys rock walls */
 	if( self_->r_type_ == robot_type::digger )
 		break_wall();
-	
-	if( terrain_.robot_next_tile( self_->x_, self_->y_, d_current_ ) )
-		push_robot();
 
-	if( !terrain_.wall_next_tile( self_->x_, self_->y_, d_current_ ) &&
-		!terrain_.robot_next_tile( self_->x_, self_->y_, d_current_ ) &&
-		d_current_ != direction::undefined )
-		terrain_.move_robot( self_->x_, self_->y_, d_current_ );
-	
+	/* wait on obstacle */
+	if( terrain_.obstacle( self_->x_, self_->y_, current_d_ ) )
+		return;
+
+	/* push robot on target tile */
+	if( terrain_.robot_next_tile( self_->x_, self_->y_, current_d_ ) )
+		terrain_.push_robot( self_->x_, self_->y_, current_d_ );
+
+	/* wait if robot can't be pushed */
+	if( !terrain_.robot_next_tile( self_->x_, self_->y_, current_d_ ) )
+		terrain_.move_robot( self_->x_, self_->y_, current_d_ );
+	else
+	{
+		switch_state();
+		return;
+	}
+
+	/* destroy this AI if it drives on dangerous tile */
 	if( terrain_.dangerous_tile( self_->x_, self_->y_ ) )
-		terrain_.kill_robot_at( self_->x_, self_->y_ );
+		terrain_.kill_robot( self_->x_, self_->y_ );
 }
 
-void pusher_type_ai::break_wall()
+void pusher_type_ai::break_wall() const
 {
-	switch( d_current_ )
+	switch( current_d_ )
 	{
 		case direction::up:
 			if( self_->y_ > 0 &&
@@ -137,14 +99,19 @@ void pusher_type_ai::break_wall()
 		case direction::down:
 			if( self_->y_ < terrain_.height() - 1 &&
 				terrain_.at( self_->x_, self_->y_ + 1 ).type() == tile_type::rock_wall )
-				terrain_.at( self_->x_, self_->y_ + 1 ).break_wall(); break;
+				terrain_.at( self_->x_, self_->y_ + 1 ).break_wall();
+			break;
 
 		case direction::left:
 			if( self_->x_ > 0 &&
 				terrain_.at( self_->x_ - 1, self_->y_ ).type() == tile_type::rock_wall )
 				terrain_.at( self_->x_ - 1, self_->y_ ).break_wall();
 			break;
-
-		default: d_current_ = direction::undefined; return;
 	}
+}
+
+void pusher_type_ai::switch_state()
+{
+	state_ = ( state_ == &pusher_type_ai::horizontal ) ?
+		&pusher_type_ai::vertical : &pusher_type_ai::horizontal;
 }

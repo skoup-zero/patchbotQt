@@ -51,6 +51,7 @@ namespace patchbot
 
 		/// GETTER
 		bool patchbot_dead() const;
+		bool patchbot_corrupted() const noexcept;
 		bool until_wall() const noexcept;
 		bool patchbot_obstructed() const noexcept;
 		bool instructions_empty() const noexcept;

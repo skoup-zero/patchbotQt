@@ -59,17 +59,22 @@ void controls::update_patchbot()
 	if( terrain_.obstacle( terrain_.patchbot_->x_, terrain_.patchbot_->y_, direction_[0] ) )
 		return;
 
-	if( direction_[0] != direction::wait )
-		terrain_.load_dijkstra_path();
+	/* push robot on next tile away */
+	if( terrain_.robot_next_tile( terrain_.patchbot_->x_, terrain_.patchbot_->y_, direction_[0] ) )
+		terrain_.push_robot( terrain_.patchbot_->x_, terrain_.patchbot_->y_, direction_[0] );
 
 	terrain_.move_robot( terrain_.patchbot_->x_, terrain_.patchbot_->y_, direction_[0] );
 
 	if( terrain_.dangerous_tile( terrain_.patchbot_->x_, terrain_.patchbot_->y_ ) )
 	{
-		terrain_.kill_robot_at( terrain_.patchbot_->x_, terrain_.patchbot_->y_ );
+		terrain_.kill_robot( terrain_.patchbot_->x_, terrain_.patchbot_->y_ );
 		return;
 	}
 
+	/* load dijstra only if patchbot moves */
+	if( direction_[0] != direction::wait )
+		terrain_.load_dijkstra_path();
+	
 	update_instruction();
 }
 
@@ -113,11 +118,12 @@ void controls::init_enemies()
 void controls::update_enemies()
 {
 	auto it = enemy_ais_.begin();
-	while( it != enemy_ais_.end() )
-	{
+	while( it != enemy_ais_.end() && !terrain_.patchbot_corrupted())
+	{	/* stop when end or game over */
+		
 		if( ( *it )->is_alive() )
 		{
-			( *it )->action();
+			( *it )->process();
 			++it;
 		}
 		else
@@ -163,6 +169,11 @@ bool controls::patchbot_dead() const
 {
 	return terrain_.at
 	( terrain_.patchbot_->x_, terrain_.patchbot_->y_ ).occupant_ == nullptr;
+}
+
+bool controls::patchbot_corrupted() const noexcept
+{
+	return terrain_.patchbot_corrupted();
 }
 
 bool controls::until_wall() const noexcept

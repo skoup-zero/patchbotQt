@@ -126,12 +126,12 @@ terrain terrain::load_map_from_file( const std::filesystem::path &path )
 
 
 void terrain::move_robot( const unsigned int x, const unsigned int y, const direction d )
-{	
+{
 	if( !at( x, y ).occupant_ )
-		throw std::invalid_argument( "ERROR: no robot at tile1" );
+		throw std::invalid_argument( "ERROR: no robot at tile" );
 
 	auto &robot = at( x, y ).occupant_;
-	
+
 	switch( d )
 	{
 		case direction::up:
@@ -164,11 +164,85 @@ void terrain::move_robot( const unsigned int x, const unsigned int y, const dire
 	}
 }
 
+void terrain::push_robot( const unsigned int x, const unsigned int y, direction d )
+{
+	std::shared_ptr<robot> target_r;
+
+	switch( d )
+	{
+		case direction::up:
+			target_r = at( x, y - 1 ).occupant_; break;
+
+		case direction::right:
+			target_r = at( x + 1, y ).occupant_; break;
+
+		case direction::down:
+			target_r = at( x, y + 1 ).occupant_; break;
+
+		case direction::left:
+			target_r = at( x - 1, y ).occupant_; break;
+
+		default: return;
+	}
+
+	if( !target_r )
+		return;
+
+	/* don't push if roboter is blocked */
+	if( wall_next_tile( target_r->x_, target_r->y_, d ) || robot_next_tile( target_r->x_, target_r->y_, d ) )
+		return;
+
+	move_robot( target_r->x_, target_r->y_, d );
+
+	/* kill roboter if it lands on dangerous tile */
+	if( dangerous_tile( target_r->x_, target_r->y_ ) )
+		kill_robot( target_r->x_, target_r->y_ );
+}
+
+void terrain::kill_robot( const unsigned int x, const unsigned int y )
+{
+	tile &t = at( x, y );
+	t.grave_set_timer();
+	t.occupant_ = nullptr;
+	graves_.push_back( &t );
+}
+
+void terrain::corrupt_patchbot( const unsigned x, const unsigned y, const direction d )
+{
+	/* can't corrupt patchbot on his save space */
+	if( at( patchbot_->x_, patchbot_->y_ ).type() == tile_type::secret_path )
+		return;
+	
+	switch( d )
+	{
+		case direction::up:
+			if( x == patchbot_->x_ && y - 1 == patchbot_->y_ )
+				patchbot_corrupted_ = true;
+			break;
+
+		case direction::right:
+			if( x + 1 == patchbot_->x_ && y == patchbot_->y_ )
+				patchbot_corrupted_ = true;
+			break;
+
+		case direction::down:
+			if( x == patchbot_->x_ && y + 1 == patchbot_->y_ )
+				patchbot_corrupted_ = true;
+			break;
+
+		case direction::left:
+			if( x - 1 == patchbot_->x_ && y == patchbot_->y_ )
+				patchbot_corrupted_ = true;
+			break;
+	}
+}
+
+
 bool terrain::dangerous_tile( const unsigned int  x, const unsigned int y )
 {
 	if( !at( x, y ).occupant_ )
-		throw std::invalid_argument( "ERROR: no robot at tile2" );
-	
+		throw std::invalid_argument( "ERROR: no robot at tile" );
+
 	const tile &tile = at( x, y );
 
 	if( tile.type() == tile_type::precipice )
@@ -180,7 +254,7 @@ bool terrain::dangerous_tile( const unsigned int  x, const unsigned int y )
 bool terrain::obstacle( const unsigned int x, const unsigned int y, const direction d )
 {
 	if( !at( x, y ).occupant_ )
-		throw std::invalid_argument( "ERROR: no robot at tile3" );
+		throw std::invalid_argument( "ERROR: no robot at tile" );
 
 	tile &tile = at( x, y );
 	auto &robot = tile.occupant_;
@@ -226,11 +300,8 @@ bool terrain::wall( const unsigned int x, const unsigned int y, const robot_type
 
 	/* environment as walls */
 
-	/* actual walls */
-	if( tile.type() == tile_type::concrete_wall )
-		return true;
-	/* server (wall) for KI */
-	if( tile.type() == tile_type::server && r_type != robot_type::patchbot )
+	/* concret wall and server walls for every robot */
+	if( tile.type() == tile_type::concrete_wall || tile.type() == tile_type::server )
 		return true;
 	/* breakable walls */
 	if( tile.type() == tile_type::rock_wall && r_type != robot_type::digger )
@@ -252,10 +323,6 @@ bool terrain::wall( const unsigned int x, const unsigned int y, const robot_type
 	if( tile.occupant_ && tile.occupant_->r_type_ != robot_type::patchbot &&
 		( r_type == robot_type::follower || r_type == robot_type::hunter || r_type == robot_type::sniffer ) )
 		return true;
-	
-	/* all other robots are walls for patchbot */
-	if( tile.occupant_ && r_type == robot_type::patchbot )
-		return true;
 
 	return false;
 }
@@ -263,7 +330,7 @@ bool terrain::wall( const unsigned int x, const unsigned int y, const robot_type
 bool terrain::wall_next_tile( const unsigned int x, const unsigned int y, const direction d )
 {
 	if( !at( x, y ).occupant_ )
-		throw std::invalid_argument( "ERROR: no robot at tile4" );
+		throw std::invalid_argument( "ERROR: no robot at tile" );
 
 	switch( d )
 	{
@@ -280,16 +347,13 @@ bool terrain::wall_next_tile( const unsigned int x, const unsigned int y, const 
 			return wall( x + 1, y, at( x, y ).occupant_->r_type_ );
 
 		default: return false;
-			/*	case direction::wait: return false;
-
-				default: throw std::invalid_argument( "ERROR: reading Robot direction" );*/
 	}
 }
 
 bool terrain::door_next_tile( const unsigned int x, const unsigned int y, const direction d )
-{	
+{
 	if( !at( x, y ).occupant_ )
-		throw std::invalid_argument( "ERROR: no robot at tile5" );
+		throw std::invalid_argument( "ERROR: no robot at tile" );
 
 	tile *tile;
 
@@ -324,9 +388,6 @@ bool terrain::door_next_tile( const unsigned int x, const unsigned int y, const 
 			break;
 
 		default: return false;
-			//case direction::wait: return false;
-
-			//default: throw std::invalid_argument( "ERROR: reading Robot direction" );
 	}
 
 	if( !tile->door_ )
@@ -352,6 +413,7 @@ bool terrain::robot_next_tile( const unsigned x, const  unsigned y, const direct
 	if( x >= width_ || y >= height_ )
 		return false;
 
+	//TODO review this
 	switch( d )
 	{
 		case direction::up:
@@ -366,14 +428,9 @@ bool terrain::robot_next_tile( const unsigned x, const  unsigned y, const direct
 		case direction::left:
 			return ( x > 0 ) ? !( at( x - 1, y ).occupant_ == nullptr ) : false;
 
-
 		default: return false;
-			/*	case direction::wait: return false;
-
-				default: throw std::invalid_argument( "ERROR: reading Robot direction" );*/
 	}
 }
-
 
 void terrain::update_doors()
 {
@@ -387,9 +444,9 @@ void terrain::update_doors()
 }
 
 void terrain::update_graves()
-{ 
+{
 	for( auto i = 0; i < graves_.size(); i++ )
-	{	
+	{
 		graves_[i]->grave_decrement_timer();
 
 		if( !graves_[i]->is_grave() )
@@ -397,19 +454,21 @@ void terrain::update_graves()
 	}
 }
 
-void terrain::kill_robot_at( const unsigned int x, const unsigned int y )
+direction terrain::dijkstra_at( const unsigned int x, const unsigned int y ) const
 {
-	tile &t = at( x, y );
-	t.grave_set_timer();
-	t.occupant_ = nullptr;
-	graves_.push_back( &t );
-}
+	if( dijkstra_path_tree_.empty() )
+		return direction::undefined;
 
+	if( x >= width_ || y >= height_ )
+		return direction::undefined;
+
+	return dijkstra_path_tree_[width_ * y + x].second;
+}
 
 /// SETTER
 void terrain::load_dijkstra_path()
 {
-	dijkstra_path_tree_ = dijkstra::calculate_paths(*this);
+	dijkstra_path_tree_ = dijkstra::calculate_paths( *this );
 }
 
 /// GETTER
@@ -441,13 +500,7 @@ unsigned int terrain::height() const noexcept
 	return height_;
 }
 
- direction terrain::dijkstra_at(const unsigned int x, const unsigned int y) const
+bool terrain::patchbot_corrupted() const noexcept
 {
-	 if( dijkstra_path_tree_.empty() )
-		 return direction::undefined;
-	
-	if( x >= width_ || y >= height_ )
-		return direction::undefined;
-	
-	return dijkstra_path_tree_[width_ * y + x].second;
+	return patchbot_corrupted_;
 }
