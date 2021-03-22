@@ -48,7 +48,7 @@ void controls::update_patchbot()
 	if( frequency_.empty() || direction_.empty() )
 		throw std::out_of_range( "ERROR: no Instructions" );
 
-	/* Patchbot doesn't move if the next tile is a wall */
+	/* Patchbot doesn't action if the next tile is a wall */
 	if( terrain_.wall_next_tile( terrain_.patchbot_->x_, terrain_.patchbot_->y_, direction_[0] ) )
 	{
 		update_instruction();
@@ -63,7 +63,9 @@ void controls::update_patchbot()
 	if( terrain_.robot_next_tile( terrain_.patchbot_->x_, terrain_.patchbot_->y_, direction_[0] ) )
 		terrain_.push_robot( terrain_.patchbot_->x_, terrain_.patchbot_->y_, direction_[0] );
 
-	terrain_.move_robot( terrain_.patchbot_->x_, terrain_.patchbot_->y_, direction_[0] );
+	/* stay if robot is still there */
+	if( !terrain_.robot_next_tile( terrain_.patchbot_->x_, terrain_.patchbot_->y_, direction_[0] ) )
+		terrain_.move_robot( terrain_.patchbot_->x_, terrain_.patchbot_->y_, direction_[0] );
 
 	if( terrain_.dangerous_tile( terrain_.patchbot_->x_, terrain_.patchbot_->y_ ) )
 	{
@@ -74,7 +76,7 @@ void controls::update_patchbot()
 	/* load dijstra only if patchbot moves */
 	if( direction_[0] != direction::wait )
 		terrain_.load_dijkstra_path();
-	
+
 	update_instruction();
 }
 
@@ -109,7 +111,7 @@ void controls::init_enemies()
 		else if( t->type() == robot_type::pusher || t->type() == robot_type::digger ||
 			t->type() == robot_type::swimmer )
 			enemy_ais_.push_back( std::make_unique<pusher_type_ai>( terrain_, t ) );
-
+	
 		else
 			enemy_ais_.push_back( std::make_unique<follower_type>( terrain_, t ) );
 	}
@@ -118,9 +120,9 @@ void controls::init_enemies()
 void controls::update_enemies()
 {
 	auto it = enemy_ais_.begin();
-	while( it != enemy_ais_.end() && !terrain_.patchbot_corrupted())
+	while( it != enemy_ais_.end() && !terrain_.patchbot_corrupted() )
 	{	/* stop when end or game over */
-		
+
 		if( ( *it )->is_alive() )
 		{
 			( *it )->process();

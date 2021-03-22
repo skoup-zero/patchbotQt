@@ -217,7 +217,7 @@ void patchbot_gui::on_mission_step_button_clicked()
 	}
 
 	/* uncomment next line to show arrows */
-	/*render_engine_.arrows_on();*/
+	//render_engine_.arrows_on();
 	
 	ui_.sequenz_line_edit->setText( full_command );
 	refresh_window();
@@ -338,7 +338,7 @@ void patchbot_gui::on_center_button_clicked()
 
 	if( frequency == 10 )
 	{
-		QMessageBox::information( this, "Are you sure?", "Patchbot would never move" );
+		QMessageBox::information( this, "Are you sure?", "Patchbot would never action" );
 		return;
 	}
 

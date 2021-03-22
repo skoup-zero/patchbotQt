@@ -15,12 +15,11 @@ void bugger_ai::process()
 
 void bugger_ai::follow_wall()
 {
-	/* if your starting point is reached move perpendicular */
+	/* if your starting point is reached action perpendicular */
 	if( current_d_ != direction::wait && self_->x_ == x_start_ && self_->y_ == y_start_ )
 	{
 		turn_clockwise();
 		state_ = &bugger_ai::find_wall;
-		find_wall();
 		return;
 	}
 	
@@ -33,7 +32,6 @@ void bugger_ai::follow_wall()
 	{
 		state_ = &bugger_ai::find_wall;
 		current_d_ = direction::wait; /* next state chooses direction randomly */
-		find_wall();
 		return;
 	}
 
@@ -51,7 +49,6 @@ void bugger_ai::follow_wall()
 		state_ = &bugger_ai::wait;
 		return;
 	}
-
 	move();
 }
 
@@ -79,17 +76,13 @@ void bugger_ai::find_wall()
 		x_start_ = self_->x_;
 		y_start_ = self_->y_;
 	}
-
 	move();
 }
 
 void bugger_ai::wait()
 {
 	if( !terrain_.robot_next_tile( self_->x_, self_->y_, current_d_ ) )
-	{
 		state_ = &bugger_ai::follow_wall;
-		move();
-	}
 }
 
 void bugger_ai::turn_clockwise()

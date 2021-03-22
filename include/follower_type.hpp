@@ -26,7 +26,7 @@ namespace patchbot
 
 		
 		///	@brief		Move to patchbot and corrupt him if possible.
-		void move();
+		void action();
 		
 		///	@brief		Get quickest direction to patchbot and reload
 		///				dijkstra if necessary. 

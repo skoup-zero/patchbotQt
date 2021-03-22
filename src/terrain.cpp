@@ -259,7 +259,7 @@ bool terrain::obstacle( const unsigned int x, const unsigned int y, const direct
 	tile &tile = at( x, y );
 	auto &robot = tile.occupant_;
 
-	/* obstructed robots can move again */
+	/* obstructed robots can action again */
 	if( robot->obstructed() )
 	{
 		robot->update_obstructed();
@@ -360,31 +360,23 @@ bool terrain::door_next_tile( const unsigned int x, const unsigned int y, const 
 	switch( d )
 	{
 		case direction::up:
-			if( y > 0 )
-				tile = &at( x, y - 1 );
-			else
-				return false;
+			if( y > 0 ) tile = &at( x, y - 1 );
+			else return false;
 			break;
 
 		case direction::right:
-			if( x < width_ - 1 )
-				tile = &at( x + 1, y );
-			else
-				return false;
+			if( x < width_ - 1 ) tile = &at( x + 1, y );
+			else return false;
 			break;
 
 		case direction::down:
-			if( y < height_ - 1 )
-				tile = &at( x, y + 1 );
-			else
-				return false;
+			if( y < height_ - 1 ) tile = &at( x, y + 1 );
+			else return false;
 			break;
 
 		case direction::left:
-			if( x > 0 )
-				tile = &at( x - 1, y );
-			else
-				return false;
+			if( x > 0 ) tile = &at( x - 1, y );
+			else return false;
 			break;
 
 		default: return false;

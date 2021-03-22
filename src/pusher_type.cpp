@@ -24,7 +24,6 @@ void pusher_type_ai::horizontal()
 		switch_state();
 		return;
 	}
-
 	action();
 }
 
@@ -41,7 +40,6 @@ void pusher_type_ai::vertical()
 		switch_state();
 		return;
 	}
-
 	action();
 }
 

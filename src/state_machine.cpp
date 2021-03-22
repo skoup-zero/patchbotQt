@@ -8,9 +8,7 @@ state_machine::state_machine( terrain &terrain, std::shared_ptr<robot> &self )
 {}
 
 void state_machine::process()
-{
-	std::cout << "THIS SHOULD NOT BE INVOKED" << std::endl;
-}
+{}
 
 bool state_machine::is_alive()
 {

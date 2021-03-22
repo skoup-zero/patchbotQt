@@ -60,7 +60,7 @@ namespace patchbot
 		///	@brief		Moves a robot to another tile.
 		///	@details	Swaps the occupant pointer of two tiles.
 		///	@param		x, y robot coordinates.
-		///	@param		d direction to move.
+		///	@param		d direction to action.
 		///	@throws		invalid_argument if tile has no robot or direction is invalid.
 		void move_robot( unsigned int x, unsigned int y, direction d );
 
@@ -85,7 +85,7 @@ namespace patchbot
 
 		///	@brief		Checks if tile at robot is an obstacle.
 		///	@param		x, y robot coordinates.
-		///	@param		d direction to move.
+		///	@param		d direction to action.
 		///	@throws		invalid_argument if tile has no robot.
 		///	@return		true if it's an obstacle.
 		bool obstacle( unsigned int x, unsigned int y, direction d );
@@ -98,14 +98,14 @@ namespace patchbot
 
 		///	@brief		Checks if the next tile for robot is a wall for it's type.
 		///	@param		x, y tile coordinates.
-		///	@param		d direction to move.
+		///	@param		d direction to action.
 		///	@throws		invalid_argument if tile has no robot.
 		///	@return		true if the next tile is a wall for robot.
 		bool wall_next_tile( unsigned int x, unsigned int y, direction d );
 
 		///	@brief		Checks if next tile is a closed door.
 		///	@param		x, y robot coordinates.
-		///	@param		d direction to move.
+		///	@param		d direction to action.
 		///	@return		true if next tile is a door.
 		bool door_next_tile( unsigned int x, unsigned int y, direction d );
 
@@ -128,7 +128,7 @@ namespace patchbot
 		
 		/// SETTER
 		void load_dijkstra_path();
-
+		
 		/// GETTER 
 		unsigned int width() const noexcept;
 		unsigned int height() const noexcept;

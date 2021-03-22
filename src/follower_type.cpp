@@ -47,19 +47,19 @@ void follower_type::follow()
 		state_ = ( self_->type() == robot_type::hunter ) ? &follower_type::hunt : &follower_type::wait;
 		return;
 	}
-	move();
+	action();
 	
 	/* hunter moves twice and saves path */
 	if( self_->type() == robot_type::hunter )
 	{
-		move();
+		action();
 		save_path();
 	}
 }
 
 void follower_type::hunt()
 {
-	/* hunting specific move */
+	/* hunting specific action */
 	auto follow_track = [&]()
 	{
 		current_d_ = path_[path_pos_];
@@ -88,7 +88,7 @@ void follower_type::hunt()
 	state_ = &follower_type::wait;
 }
 
-void follower_type::move()
+void follower_type::action()
 {
 	current_d_ = terrain_.dijkstra_at( self_->x_, self_->y_ );
 
@@ -188,11 +188,9 @@ void follower_type::save_path()
 {
 	unsigned int current_x = self_->x_;
 	unsigned int current_y = self_->y_;
-	unsigned int pb_x = terrain_.patchbot_->x_;
-	unsigned int pb_y = terrain_.patchbot_->y_;
 	bool searching_pb = true;
 
-	auto update_coordinates = [&]( unsigned int &x, unsigned int &y, direction d )
+	auto update_coordinates = [&]( unsigned int &x, unsigned int &y, const direction d )
 	{
 		switch( d )
 		{
@@ -203,16 +201,20 @@ void follower_type::save_path()
 		}
 	};
 
+	/* reset path */
+	path_pos_ = 0;
 	path_.clear();
-	direction current_d;
 
 	while( searching_pb )
 	{
-		current_d = terrain_.dijkstra_at( current_x, current_y );
-		path_.push_back( current_d );
-		update_coordinates( current_x, current_y, current_d );
+		const direction &current = terrain_.dijkstra_at( current_x, current_y );
 
-		if( current_x == pb_x && current_y == pb_y )
+		path_.push_back( current );
+		update_coordinates( current_x, current_y, current );
+
+		/* stop if patchbot reached  */
+		if(  current_x == terrain_.patchbot_->x_ && current_y == terrain_.patchbot_->y_
+			|| terrain_.wall( current_x, current_y, self_->type() ) ) /* to prevent deadlocks */
 			searching_pb = false;
 	}
 }
