@@ -33,7 +33,7 @@ void write_map_to_file( const patchbot::terrain &map )
 			for( auto iter = patchbot::robot_map.begin();
 				iter != patchbot::robot_map.end(); ++iter )
 			{
-				if( iter->second == temp->r_type_ )
+				if( iter->second == temp->type() )
 					output_file << iter->first;
 			}
 		}

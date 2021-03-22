@@ -103,11 +103,11 @@ void controls::init_enemies()
 
 	for( auto t : terrain_.robots_ )
 	{
-		if( t->r_type_ == robot_type::bugger )
+		if( t->type() == robot_type::bugger )
 			enemy_ais_.push_back( std::make_unique<bugger_ai>( terrain_, t ) );
 
-		else if( t->r_type_ == robot_type::pusher || t->r_type_ == robot_type::digger ||
-			t->r_type_ == robot_type::swimmer )
+		else if( t->type() == robot_type::pusher || t->type() == robot_type::digger ||
+			t->type() == robot_type::swimmer )
 			enemy_ais_.push_back( std::make_unique<pusher_type_ai>( terrain_, t ) );
 
 		else

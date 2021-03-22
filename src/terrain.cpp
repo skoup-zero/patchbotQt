@@ -248,7 +248,7 @@ bool terrain::dangerous_tile( const unsigned int  x, const unsigned int y )
 	if( tile.type() == tile_type::precipice )
 		return true;
 
-	return tile.type() == tile_type::water && tile.occupant_->r_type_ != robot_type::swimmer;
+	return tile.type() == tile_type::water && tile.occupant_->type() != robot_type::swimmer;
 }
 
 bool terrain::obstacle( const unsigned int x, const unsigned int y, const direction d )
@@ -267,10 +267,10 @@ bool terrain::obstacle( const unsigned int x, const unsigned int y, const direct
 	}
 
 	const bool has_wheels =
-		robot->r_type_ == robot_type::patchbot ||
-		robot->r_type_ == robot_type::pusher ||
-		robot->r_type_ == robot_type::digger ||
-		robot->r_type_ == robot_type::swimmer;
+		robot->type() == robot_type::patchbot ||
+		robot->type() == robot_type::pusher ||
+		robot->type() == robot_type::digger ||
+		robot->type() == robot_type::swimmer;
 
 	/* obsacle for robots with wheels */
 	if( tile.type() == tile_type::alien_weed && has_wheels )
@@ -320,7 +320,7 @@ bool terrain::wall( const unsigned int x, const unsigned int y, const robot_type
 
 
 	/* follower, hunter, sniffer interpret other enemies as walls */
-	if( tile.occupant_ && tile.occupant_->r_type_ != robot_type::patchbot &&
+	if( tile.occupant_ && tile.occupant_->type() != robot_type::patchbot &&
 		( r_type == robot_type::follower || r_type == robot_type::hunter || r_type == robot_type::sniffer ) )
 		return true;
 
@@ -335,16 +335,16 @@ bool terrain::wall_next_tile( const unsigned int x, const unsigned int y, const 
 	switch( d )
 	{
 		case direction::up:
-			return wall( x, y - 1, at( x, y ).occupant_->r_type_ );
+			return wall( x, y - 1, at( x, y ).occupant_->type() );
 
 		case direction::down:
-			return wall( x, y + 1, at( x, y ).occupant_->r_type_ );
+			return wall( x, y + 1, at( x, y ).occupant_->type() );
 
 		case direction::left:
-			return wall( x - 1, y, at( x, y ).occupant_->r_type_ );
+			return wall( x - 1, y, at( x, y ).occupant_->type() );
 
 		case direction::right:
-			return wall( x + 1, y, at( x, y ).occupant_->r_type_ );
+			return wall( x + 1, y, at( x, y ).occupant_->type() );
 
 		default: return false;
 	}
@@ -399,7 +399,7 @@ bool terrain::door_next_tile( const unsigned int x, const unsigned int y, const 
 	auto &robot = at( x, y ).occupant_;
 
 	/* Patchbot can't use automatic doors */
-	if( tile->door_is_automatic() && robot->r_type_ == robot_type::patchbot )
+	if( tile->door_is_automatic() && robot->type() == robot_type::patchbot )
 		return false;
 
 	robot->update_obstructed();

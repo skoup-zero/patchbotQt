@@ -55,7 +55,7 @@ void pusher_type_ai::action()
 	}
 	
 	/* digger destroys rock walls */
-	if( self_->r_type_ == robot_type::digger )
+	if( self_->type() == robot_type::digger )
 		break_wall();
 
 	/* wait on obstacle */

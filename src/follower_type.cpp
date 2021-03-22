@@ -20,11 +20,11 @@ void follower_type::wait()
 		return;
 
 	/* follower and hunter wait until patchbot is in sight */
-	if( self_->r_type_ != robot_type::sniffer && line_of_sight_blocked() )
+	if( self_->type() != robot_type::sniffer && line_of_sight_blocked() )
 		return;
 
 	/* hunter saves path to patchbot */
-	if( self_->r_type_ == robot_type::hunter )
+	if( self_->type() == robot_type::hunter )
 		save_path();
 
 	state_ = &follower_type::follow;
@@ -37,20 +37,20 @@ void follower_type::follow()
 	/* follower, sniffer wait and hunter hunts if patchbot is not reachable */
 	if( current_d_ == direction::undefined )
 	{
-		state_ = ( self_->r_type_ == robot_type::hunter ) ? &follower_type::hunt : &follower_type::wait;
+		state_ = ( self_->type() == robot_type::hunter ) ? &follower_type::hunt : &follower_type::wait;
 		return;
 	}
 
 	/* follower waits and hunter hunts if patchbot is not in sight */
-	if( line_of_sight_blocked() && self_->r_type_ != robot_type::sniffer )
+	if( line_of_sight_blocked() && self_->type() != robot_type::sniffer )
 	{
-		state_ = ( self_->r_type_ == robot_type::hunter ) ? &follower_type::hunt : &follower_type::wait;
+		state_ = ( self_->type() == robot_type::hunter ) ? &follower_type::hunt : &follower_type::wait;
 		return;
 	}
 	move();
 	
 	/* hunter moves twice and saves path */
-	if( self_->r_type_ == robot_type::hunter )
+	if( self_->type() == robot_type::hunter )
 	{
 		move();
 		save_path();
@@ -148,7 +148,7 @@ bool follower_type::line_of_sight_blocked()
 
 		const tile &tile = terrain_.at( x, y );
 
-		if( terrain_.wall( x, y, self_->r_type_ ) )
+		if( terrain_.wall( x, y, self_->type() ) )
 			return true;
 
 		if( tile.door_ && !tile.door_is_open() )

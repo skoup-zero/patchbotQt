@@ -48,9 +48,9 @@ namespace patchbot
 	class robot
 	{
 		bool obstructed_ = false;
-
-	public:
 		robot_type r_type_;
+	
+	public:
 		unsigned int x_, y_;
 
 		robot( robot_type type );
@@ -58,7 +58,8 @@ namespace patchbot
 		/// @brief		Swtiches obstructed_ to opposite bool
 		void update_obstructed();
 
-		/// Getter 
+		/// Getter
+		robot_type type() const noexcept;
 		bool obstructed() const noexcept;
 	};
 

@@ -13,6 +13,11 @@ void robot::update_obstructed()
 }
 
 
+robot_type robot::type() const noexcept
+{
+	return r_type_;
+}
+
 bool robot::obstructed() const noexcept
 {
 	return obstructed_;
