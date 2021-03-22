@@ -96,7 +96,7 @@ void render_engine::render_map( QPixmap &pixmap, unsigned int screen_width, unsi
 			{
 				const direction arrow = terrain_.dijkstra_path_tree_[terrain_.width() * y + x].second;
 
-				if( arrow != direction::undefined )
+				if( arrow != direction::wait )
 					painter.drawPixmap( ( x - left_border ) * pixel_tga_width_ - scroll_value_x % 32,
 						( y - top_border ) * pixel_tga_height_ - scroll_value_y % 32,
 						assets_.arrow_img.at( arrow ) );

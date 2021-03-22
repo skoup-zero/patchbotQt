@@ -457,10 +457,10 @@ void terrain::update_graves()
 direction terrain::dijkstra_at( const unsigned int x, const unsigned int y ) const
 {
 	if( dijkstra_path_tree_.empty() )
-		return direction::undefined;
+		return direction::wait;
 
 	if( x >= width_ || y >= height_ )
-		return direction::undefined;
+		return direction::wait;
 
 	return dijkstra_path_tree_[width_ * y + x].second;
 }

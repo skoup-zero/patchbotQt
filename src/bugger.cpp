@@ -16,7 +16,7 @@ void bugger_ai::process()
 void bugger_ai::follow_wall()
 {
 	/* if your starting point is reached move perpendicular */
-	if( current_d_ != direction::undefined && self_->x_ == x_start_ && self_->y_ == y_start_ )
+	if( current_d_ != direction::wait && self_->x_ == x_start_ && self_->y_ == y_start_ )
 	{
 		turn_clockwise();
 		state_ = &bugger_ai::find_wall;
@@ -25,14 +25,14 @@ void bugger_ai::follow_wall()
 	}
 	
 	/* look for a wall */
-	if( current_d_ == direction::undefined )
+	if( current_d_ == direction::wait )
 		current_d_ = wall_in_vicinity();
 
 	/* find a wall */
-	if( current_d_ == direction::undefined )
+	if( current_d_ == direction::wait )
 	{
 		state_ = &bugger_ai::find_wall;
-		current_d_ = direction::undefined; /* next state chooses direction randomly */
+		current_d_ = direction::wait; /* next state chooses direction randomly */
 		find_wall();
 		return;
 	}
@@ -58,7 +58,7 @@ void bugger_ai::follow_wall()
 void bugger_ai::find_wall()
 {
 	/* Go to a random direction if no wall in vicinity */
-	if( current_d_ == direction::undefined )
+	if( current_d_ == direction::wait )
 		switch( rand() % 4 )
 		{
 			case 0: current_d_ = direction::up; break;
@@ -158,7 +158,7 @@ direction bugger_ai::wall_in_vicinity() const
 	if( terrain_.wall_next_tile( self_->x_, self_->y_, direction::left ) )
 		return direction::up;
 
-	return direction::undefined;
+	return direction::wait;
 }
 
 bool bugger_ai::wall_on_left() const

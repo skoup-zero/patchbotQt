@@ -13,8 +13,7 @@ namespace patchbot
 		up,
 		right,
 		down,
-		wait,
-		undefined
+		wait
 	};
 
 	enum class robot_type

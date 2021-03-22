@@ -9,7 +9,7 @@ namespace patchbot
 	{
 		/* function represents state */
 		void ( follower_type:: *state_ )( ) = &follower_type::wait;
-		direction current_d_ = direction::undefined;
+		direction current_d_ = direction::wait;
 		
 		std::vector<direction> path_; /* saved path for Hunter */
 		unsigned int path_pos_ = 0;	/* path position for Hunter */

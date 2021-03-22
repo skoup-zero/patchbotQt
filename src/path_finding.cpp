@@ -21,9 +21,9 @@ std::vector<std::pair<unsigned int, direction>> dijkstra::calculate_paths( terra
 	/* priority queue as Min-Heap */
 	std::priority_queue<node, std::vector<node>, compare_nodes> pq;
 
-	/* initialize path tree with max distance and undefined direction */
+	/* initialize path tree with max distance and wait direction */
 	std::vector<std::pair<unsigned int, direction>> path_tree
-	( width * height, std::make_pair( UINT_MAX, direction::undefined ) );
+	( width * height, std::make_pair( UINT_MAX, direction::wait ) );
 
 	/* coordinates of patchbot as root */
 	pq.push( node( 0, terrain.patchbot_->x_, terrain.patchbot_->y_ ) );

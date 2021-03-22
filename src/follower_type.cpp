@@ -16,7 +16,7 @@ void follower_type::wait()
 	update_direction();
 
 	/* all types wait if patchbot is unreachable */
-	if( current_d_ == direction::undefined )
+	if( current_d_ == direction::wait )
 		return;
 
 	/* follower and hunter wait until patchbot is in sight */
@@ -35,7 +35,7 @@ void follower_type::follow()
 	update_direction();
 
 	/* follower, sniffer wait and hunter hunts if patchbot is not reachable */
-	if( current_d_ == direction::undefined )
+	if( current_d_ == direction::wait )
 	{
 		state_ = ( self_->type() == robot_type::hunter ) ? &follower_type::hunt : &follower_type::wait;
 		return;
@@ -98,7 +98,7 @@ void follower_type::move()
 		/* corrupt patchbot if its on the next tile */
 		terrain_.corrupt_patchbot( self_->x_, self_->y_, current_d_ );
 
-		current_d_ = direction::undefined;
+		current_d_ = direction::wait;
 		return;
 	}
 
@@ -111,7 +111,7 @@ void follower_type::move()
 void follower_type::update_direction()
 {
 	/* load dijkstra path if AI can't reach patchbot */
-	if( current_d_ == direction::undefined )
+	if( current_d_ == direction::wait )
 		terrain_.load_dijkstra_path();
 
 	current_d_ = terrain_.dijkstra_at( self_->x_, self_->y_ );
