@@ -9,7 +9,6 @@ namespace patchbot
 	{
 		/* function represents state */
 		void ( pusher_type_ai:: *state_ )( ) = &pusher_type_ai::horizontal;
-		direction current_d_ = direction::wait;
 		
 		/* states */
 		///	@brief		current axis the AI is moving.

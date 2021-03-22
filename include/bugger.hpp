@@ -9,7 +9,6 @@ namespace patchbot
 	{
 		/* function represents state */
 		void ( bugger_ai:: *state_ )( ) = &bugger_ai::follow_wall;
-		direction current_d_ = direction::wait;
 		
 		/* coordinates of first FOUND wall to follow */
 		unsigned int x_start_, y_start_;
