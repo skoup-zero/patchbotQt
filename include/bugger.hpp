@@ -37,6 +37,7 @@ namespace patchbot
 
 	public:
 		bugger_ai( terrain &terrain, std::shared_ptr<robot> &self );
+		~bugger_ai() override = default;
 
 		/* execute current state */
 		void process() override;

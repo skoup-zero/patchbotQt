@@ -13,9 +13,11 @@ namespace patchbot
 		direction current_d_ = direction::wait;
 
 		state_machine( terrain &terrain, std::shared_ptr<robot> &self );
-
+	
 	public:
+		virtual ~state_machine() = default;
+		
 		virtual void process();
-		bool is_alive();
+		bool is_alive() const;
 	};
 }

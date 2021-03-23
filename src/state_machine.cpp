@@ -10,7 +10,7 @@ state_machine::state_machine( terrain &terrain, std::shared_ptr<robot> &self )
 void state_machine::process()
 {}
 
-bool state_machine::is_alive()
+bool state_machine::is_alive() const
 {
 	return !(terrain_.at(self_->x_, self_->y_).occupant_ == nullptr);
 }

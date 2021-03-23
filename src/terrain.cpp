@@ -405,7 +405,6 @@ bool terrain::robot_next_tile( const unsigned x, const  unsigned y, const direct
 	if( x >= width_ || y >= height_ )
 		return false;
 
-	//TODO review this
 	switch( d )
 	{
 		case direction::up:

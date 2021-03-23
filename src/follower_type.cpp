@@ -119,30 +119,18 @@ void follower_type::update_direction()
 
 
 bool follower_type::line_of_sight_blocked()
-{//TODO review this
-	
+{
 	/* AI coordinates */
 	int x0 = static_cast<int>( self_->x_ );
 	int y0 = static_cast<int>( self_->y_ );
 
 	/* Patchbot coordinates */
-	int x1 = static_cast<int>( terrain_.patchbot_->x_ );
-	int y1 = static_cast<int>( terrain_.patchbot_->y_ );
-
-	int dx = abs( x1 - x0 );
-	int	sx = ( x0 < x1 ) ? 1 : -1;
-
-	int dy = -abs( y1 - y0 );
-	int	sy = ( y0 < y1 ) ? 1 : -1;
-
-	int err = dx + dy; /* error value */
+	const int x1 = static_cast<int>( terrain_.patchbot_->x_ );
+	const int y1 = static_cast<int>( terrain_.patchbot_->y_ );
 
 	/* lambda function returns true if AI can't see through that tile */
 	auto blocked_sight = [&]( const unsigned int x, const unsigned int y )
-	{
-		if( self_->x_ == x && self_->y_ == y )
-			return false;
-		
+	{	
 		if( x >= terrain_.width() || y >= terrain_.height() )
 			return true;
 
@@ -157,11 +145,18 @@ bool follower_type::line_of_sight_blocked()
 		return false;
 	};
 
-	while( !( x0 == x1 && y0 == y1 ) )
-	{
-		if( blocked_sight( x0, y0 ) )
-			return true;
+	/* distance on axis */
+	const int dx = abs( x1 - x0 );
+	const int dy = -abs( y1 - y0 );
 
+	/* slope on axis */
+	const int	sx = ( x0 < x1 ) ? 1 : -1; 
+	const int	sy = ( y0 < y1 ) ? 1 : -1;
+
+	int err = dx + dy; /* error value */
+
+	while( !( x0 == x1 && y0 == y1 ) ) /* until patchbot is reached */
+	{
 		const int e2 = 2 * err;
 
 		if( e2 > dy )
@@ -175,11 +170,10 @@ bool follower_type::line_of_sight_blocked()
 			err += dx;
 			y0 += sy;
 		}
+		
+		if( blocked_sight( x0, y0 ) )
+			return true;
 	}
-	
-	/* can't see patchbot on his save space */
-	if( blocked_sight( x0, y0 ) )
-		return true;
 	
 	return false;
 }

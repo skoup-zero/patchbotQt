@@ -28,6 +28,7 @@ namespace patchbot
 	
 	public:
 		pusher_type_ai( terrain &terrain, std::shared_ptr<robot> &self );
+		~pusher_type_ai() override = default;
 		
 		/* execute current state */
 		void process() override;
