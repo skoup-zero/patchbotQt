@@ -149,7 +149,6 @@ void patchbot_gui::on_mission_start_button_clicked()
 
 	render_engine_.set_game_is_on( true );
 	controls_.init_enemies();
-
 	refresh_window();
 }
 
@@ -200,7 +199,7 @@ void patchbot_gui::on_mission_step_button_clicked()
 		on_mission_cancel_button_clicked();
 		return;
 	}
-	
+
 	controls_.update_world();
 
 	/* Skip instruction edit if until wall is active or patchbot is obstructed */
@@ -218,7 +217,7 @@ void patchbot_gui::on_mission_step_button_clicked()
 
 	/* uncomment next line to show arrows */
 	//render_engine_.arrows_on();
-	
+
 	ui_.sequenz_line_edit->setText( full_command );
 	refresh_window();
 

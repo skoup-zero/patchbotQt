@@ -21,7 +21,6 @@ namespace patchbot
 		std::vector<std::unique_ptr<state_machine>> enemy_ais_;
 
 	public:
-
 		///	@brief		Constructor for first initialization.
 		///	@param		terrain pointer to operate on.
 		controls( terrain &t );
@@ -48,7 +47,7 @@ namespace patchbot
 		void update_enemies();
 
 		///	@brief		Check if Patchbot reached the server.
-		bool check_win() const;
+		bool check_win();
 
 		/// GETTER
 		bool patchbot_dead() const;

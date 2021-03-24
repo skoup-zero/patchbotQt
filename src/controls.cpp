@@ -94,8 +94,11 @@ void controls::update_instruction()
 	{
 		push_blocked_ = false;
 		until_wall_ = false;
-		frequency_.erase( frequency_.begin() );
-		direction_.erase( direction_.begin() );
+		
+		frequency_.erase( frequency_.begin() ); /* loose: frequency is empty */
+		
+		if( direction_.size() > 1 )
+			direction_.erase( direction_.begin() ); /* win: current direction towards server */
 	}
 	else if( frequency_[0] > 0 )
 		frequency_[0]--;
@@ -136,10 +139,11 @@ void controls::update_enemies()
 	}
 }
 
-bool controls::check_win() const
+bool controls::check_win()
 {
 	const unsigned int x = terrain_.patchbot_->x_;
 	const unsigned int y = terrain_.patchbot_->y_;
+
 
 	if( direction_.empty() )
 		return false;
