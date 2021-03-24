@@ -64,7 +64,9 @@ void controls::update_patchbot()
 		terrain_.push_robot( terrain_.patchbot_->x_, terrain_.patchbot_->y_, direction_[0] );
 
 	/* stay if robot is still there */
-	if( !terrain_.robot_next_tile( terrain_.patchbot_->x_, terrain_.patchbot_->y_, direction_[0] ) )
+	if( terrain_.robot_next_tile( terrain_.patchbot_->x_, terrain_.patchbot_->y_, direction_[0] ) )
+		push_blocked_ = true; /* to prevent deadlock (until wall) */
+	else
 		terrain_.move_robot( terrain_.patchbot_->x_, terrain_.patchbot_->y_, direction_[0] );
 
 	if( terrain_.dangerous_tile( terrain_.patchbot_->x_, terrain_.patchbot_->y_ ) )
@@ -88,8 +90,9 @@ void controls::update_instruction()
 	if( frequency_[0] == 0 && !until_wall_ )
 		until_wall_ = true;
 
-	if( frequency_[0] == 1 || frequency_[0] == 0 && patchbot_reached_wall )
+	if( frequency_[0] == 1 || frequency_[0] == 0 && ( patchbot_reached_wall || push_blocked_ ) )
 	{
+		push_blocked_ = false;
 		until_wall_ = false;
 		frequency_.erase( frequency_.begin() );
 		direction_.erase( direction_.begin() );
@@ -111,7 +114,7 @@ void controls::init_enemies()
 		else if( t->type() == robot_type::pusher || t->type() == robot_type::digger ||
 			t->type() == robot_type::swimmer )
 			enemy_ais_.push_back( std::make_unique<pusher_type_ai>( terrain_, t ) );
-	
+
 		else
 			enemy_ais_.push_back( std::make_unique<follower_type>( terrain_, t ) );
 	}

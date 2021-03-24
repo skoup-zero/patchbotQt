@@ -16,6 +16,7 @@ namespace patchbot
 		std::vector<int> frequency_;
 		std::vector<tile *> open_doors_;
 		bool until_wall_ = false;
+		bool push_blocked_ = false;
 
 		std::vector<std::unique_ptr<state_machine>> enemy_ais_;
 

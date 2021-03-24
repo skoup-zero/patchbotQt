@@ -59,6 +59,14 @@ void follower_type::follow()
 
 void follower_type::hunt()
 {
+	/* follow Patchbot again if you see him */
+	if(!line_of_sight_blocked() )
+	{
+		state_ = &follower_type::follow;
+		save_path();
+		return;
+	}
+	
 	/* hunting specific action */
 	auto follow_track = [&]()
 	{
@@ -74,7 +82,7 @@ void follower_type::hunt()
 		path_pos_++;
 		terrain_.move_robot( self_->x_, self_->y_, current_d_ );
 	};
-
+	
 	if( path_pos_ < path_.size() - 1 )
 	{
 		follow_track();
@@ -82,7 +90,7 @@ void follower_type::hunt()
 		return;
 	}
 
-	if( path_pos_ == path_.size() - 2 )
+	if( path_pos_ == path_.size() - 1 )
 		follow_track();
 
 	state_ = &follower_type::wait;

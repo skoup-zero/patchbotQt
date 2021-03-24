@@ -338,7 +338,7 @@ void patchbot_gui::on_center_button_clicked()
 
 	if( frequency == 10 )
 	{
-		QMessageBox::information( this, "Are you sure?", "Patchbot would never action" );
+		QMessageBox::information( this, "Are you sure?", "Patchbot would never move" );
 		return;
 	}
 

@@ -167,29 +167,45 @@ void terrain::move_robot( const unsigned int x, const unsigned int y, const dire
 void terrain::push_robot( const unsigned int x, const unsigned int y, direction d )
 {
 	std::shared_ptr<robot> target_r;
+	unsigned int next_x, next_y;
 
 	switch( d )
 	{
 		case direction::up:
+			next_x = x;
+			next_y = y - 2;
 			target_r = at( x, y - 1 ).occupant_; break;
 
 		case direction::right:
+			next_x = x + 2;
+			next_y = y;
 			target_r = at( x + 1, y ).occupant_; break;
 
 		case direction::down:
+			next_x = x;
+			next_y = y + 2;
 			target_r = at( x, y + 1 ).occupant_; break;
 
 		case direction::left:
+			next_x = x - 2;
+			next_y = y;
 			target_r = at( x - 1, y ).occupant_; break;
 
 		default: return;
 	}
 
+	/* no roboter to be pushed */
 	if( !target_r )
 		return;
 
 	/* don't push if roboter is blocked */
-	if( wall_next_tile( target_r->x_, target_r->y_, d ) || robot_next_tile( target_r->x_, target_r->y_, d ) )
+	if( wall( next_x, next_y, target_r->type() ) )
+		return;
+
+	tile &tile = at( next_x, next_y );
+
+	/* can't push robot on a closed door */
+	if( tile.occupant_ || tile.door_ && !tile.door_is_open() )
 		return;
 
 	move_robot( target_r->x_, target_r->y_, d );
@@ -212,7 +228,7 @@ void terrain::corrupt_patchbot( const unsigned x, const unsigned y, const direct
 	/* can't corrupt patchbot on his save space */
 	if( at( patchbot_->x_, patchbot_->y_ ).type() == tile_type::secret_path )
 		return;
-	
+
 	switch( d )
 	{
 		case direction::up:
