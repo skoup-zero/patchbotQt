@@ -164,7 +164,7 @@ void terrain::move_robot( const unsigned int x, const unsigned int y, const dire
 	}
 }
 
-void terrain::push_robot( const unsigned int x, const unsigned int y, direction d )
+void terrain::push_robot( const unsigned int x, const unsigned int y, const direction d )
 {
 	std::shared_ptr<robot> target_r;
 	unsigned int next_x, next_y;
@@ -202,9 +202,9 @@ void terrain::push_robot( const unsigned int x, const unsigned int y, direction 
 	if( wall( next_x, next_y, target_r->type() ) )
 		return;
 
-	tile &tile = at( next_x, next_y );
+	const tile &tile = at( next_x, next_y );
 
-	/* can't push robot on a closed door */
+	/* can't push robot on another robot or closed door */
 	if( tile.occupant_ || tile.door_ && !tile.door_is_open() )
 		return;
 
@@ -225,7 +225,7 @@ void terrain::kill_robot( const unsigned int x, const unsigned int y )
 
 void terrain::corrupt_patchbot( const unsigned x, const unsigned y, const direction d )
 {
-	/* can't corrupt patchbot on his save space */
+	/* can't corrupt patchbot on his safe space */
 	if( at( patchbot_->x_, patchbot_->y_ ).type() == tile_type::secret_path )
 		return;
 

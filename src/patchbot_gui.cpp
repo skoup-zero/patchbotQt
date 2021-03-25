@@ -53,7 +53,7 @@ void patchbot_gui::refresh_window()
 
 	adjust_sequence_scrollbar();
 
-	/* (OPTIONAL) Jumps Cursor to beginning so user can always see current command*/
+	/* (OPTIONAL) Jumps Cursor to beginning so user can always see current command */
 	ui_.sequenz_line_edit->setCursorPosition( 0 );
 	ui_.sequenz_scrollbar_h->setValue( 0 );
 }
@@ -106,7 +106,7 @@ void patchbot_gui::on_change_colonie_button_clicked()
 	if( !change_map_path.isNull() )
 	{
 		const QFileInfo path( change_map_path );
-		std::filesystem::path casted_path = change_map_path.toUtf8().constData();
+		const std::filesystem::path casted_path = change_map_path.toUtf8().constData();
 		try
 		{
 			auto &temp = ( terrain::load_map_from_file( casted_path ) );
@@ -371,7 +371,7 @@ void patchbot_gui::on_delete_button_clicked()
 /////////////////////////////////////////////
 ///////////////* SCROLLBARS *////////////////
 /////////////////////////////////////////////
-void patchbot_gui::on_map_scrollbar_h_valueChanged( int change )
+void patchbot_gui::on_map_scrollbar_h_valueChanged( const int change )
 {
 	render_engine_.render_map( pixmap_,
 		ui_.map_placeholder_label->width(), ui_.map_placeholder_label->height(),
@@ -380,7 +380,7 @@ void patchbot_gui::on_map_scrollbar_h_valueChanged( int change )
 	ui_.map_placeholder_label->setPixmap( pixmap_ );
 }
 
-void patchbot_gui::on_map_scrollbar_v_valueChanged( int change )
+void patchbot_gui::on_map_scrollbar_v_valueChanged( const int change )
 {
 	render_engine_.render_map( pixmap_,
 		ui_.map_placeholder_label->width(), ui_.map_placeholder_label->height(),
@@ -389,7 +389,7 @@ void patchbot_gui::on_map_scrollbar_v_valueChanged( int change )
 	ui_.map_placeholder_label->setPixmap( pixmap_ );
 }
 
-void patchbot_gui::on_sequenz_scrollbar_h_valueChanged( int change ) const
+void patchbot_gui::on_sequenz_scrollbar_h_valueChanged( const int change ) const
 {
 	ui_.sequenz_line_edit->setCursorPosition( change * 2 );
 }

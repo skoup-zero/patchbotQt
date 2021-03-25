@@ -7,7 +7,6 @@
 
 namespace patchbot
 {
-
 	/// @class updates all objects that can change in map.
 	class controls
 	{

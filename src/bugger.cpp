@@ -22,7 +22,7 @@ void bugger_ai::follow_wall()
 		state_ = &bugger_ai::find_wall;
 		return;
 	}
-	
+
 	/* look for a wall */
 	if( current_d_ == direction::wait )
 		current_d_ = wall_in_vicinity();
@@ -42,7 +42,7 @@ void bugger_ai::follow_wall()
 	/* follow next wall */
 	if( terrain_.wall_next_tile( self_->x_, self_->y_, current_d_ ) )
 		turn_clockwise();
-	
+
 	/* wait for robot */
 	if( terrain_.robot_next_tile( self_->x_, self_->y_, current_d_ ) )
 	{
@@ -111,7 +111,7 @@ void bugger_ai::turn_counterclockwise()
 
 
 void bugger_ai::move() const
-{ 
+{
 	if( !terrain_.wall_next_tile( self_->x_, self_->y_, current_d_ ) &&
 		!terrain_.robot_next_tile( self_->x_, self_->y_, current_d_ ) )
 		terrain_.move_robot( self_->x_, self_->y_, current_d_ );

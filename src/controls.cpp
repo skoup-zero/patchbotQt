@@ -69,6 +69,7 @@ void controls::update_patchbot()
 	else
 		terrain_.move_robot( terrain_.patchbot_->x_, terrain_.patchbot_->y_, direction_[0] );
 
+	/* kill patchbot if it is on a dangerous tile */
 	if( terrain_.dangerous_tile( terrain_.patchbot_->x_, terrain_.patchbot_->y_ ) )
 	{
 		terrain_.kill_robot( terrain_.patchbot_->x_, terrain_.patchbot_->y_ );
@@ -94,11 +95,11 @@ void controls::update_instruction()
 	{
 		push_blocked_ = false;
 		until_wall_ = false;
-		
-		frequency_.erase( frequency_.begin() ); /* loose: frequency is empty */
-		
+
+		frequency_.erase( frequency_.begin() );
+
 		if( direction_.size() > 1 )
-			direction_.erase( direction_.begin() ); /* win: current direction towards server */
+			direction_.erase( direction_.begin() );
 	}
 	else if( frequency_[0] > 0 )
 		frequency_[0]--;
@@ -144,7 +145,6 @@ bool controls::check_win()
 	const unsigned int x = terrain_.patchbot_->x_;
 	const unsigned int y = terrain_.patchbot_->y_;
 
-
 	if( direction_.empty() )
 		return false;
 
@@ -168,8 +168,6 @@ bool controls::check_win()
 				false : terrain_.at( x + 1, y ).type() == tile_type::server;
 
 		case direction::wait: return false;
-
-		default: throw std::invalid_argument( "ERROR: reading Robot direction" );
 	}
 }
 

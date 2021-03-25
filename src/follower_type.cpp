@@ -48,7 +48,7 @@ void follower_type::follow()
 		return;
 	}
 	action();
-	
+
 	/* hunter moves twice and saves path */
 	if( self_->type() == robot_type::hunter )
 	{
@@ -60,13 +60,13 @@ void follower_type::follow()
 void follower_type::hunt()
 {
 	/* follow Patchbot again if you see him */
-	if(!line_of_sight_blocked() )
+	if( !line_of_sight_blocked() )
 	{
 		state_ = &follower_type::follow;
 		save_path();
 		return;
 	}
-	
+
 	/* hunting specific action */
 	auto follow_track = [&]()
 	{
@@ -82,7 +82,7 @@ void follower_type::hunt()
 		path_pos_++;
 		terrain_.move_robot( self_->x_, self_->y_, current_d_ );
 	};
-	
+
 	if( path_pos_ < path_.size() - 1 )
 	{
 		follow_track();
@@ -138,7 +138,7 @@ bool follower_type::line_of_sight_blocked()
 
 	/* lambda function returns true if AI can't see through that tile */
 	auto blocked_sight = [&]( const unsigned int x, const unsigned int y )
-	{	
+	{
 		if( x >= terrain_.width() || y >= terrain_.height() )
 			return true;
 
@@ -158,7 +158,7 @@ bool follower_type::line_of_sight_blocked()
 	const int dy = -abs( y1 - y0 );
 
 	/* slope on axis */
-	const int	sx = ( x0 < x1 ) ? 1 : -1; 
+	const int	sx = ( x0 < x1 ) ? 1 : -1;
 	const int	sy = ( y0 < y1 ) ? 1 : -1;
 
 	int err = dx + dy; /* error value */
@@ -168,21 +168,21 @@ bool follower_type::line_of_sight_blocked()
 		const int e2 = 2 * err;
 
 		if( e2 > dy )
-		{
+		{ /* one step on x-axis */
 			err += dy;
 			x0 += sx;
 		}
 
 		if( e2 < dx )
-		{
+		{ /* one step on y-axis */
 			err += dx;
 			y0 += sy;
 		}
-		
+
 		if( blocked_sight( x0, y0 ) )
 			return true;
 	}
-	
+
 	return false;
 }
 
@@ -209,14 +209,14 @@ void follower_type::save_path()
 
 	while( searching_pb )
 	{
-		const direction &current = terrain_.dijkstra_at( current_x, current_y );
+		const direction current = terrain_.dijkstra_at( current_x, current_y );
 
 		path_.push_back( current );
 		update_coordinates( current_x, current_y, current );
 
-		/* stop if patchbot reached  */
-		if(  current_x == terrain_.patchbot_->x_ && current_y == terrain_.patchbot_->y_
-			|| terrain_.wall( current_x, current_y, self_->type() ) ) /* to prevent deadlocks */
+		/* stop if patchbot reached or path is blocked */
+		if( current_x == terrain_.patchbot_->x_ && current_y == terrain_.patchbot_->y_
+			|| terrain_.wall( current_x, current_y, self_->type() ) )
 			searching_pb = false;
 	}
 }

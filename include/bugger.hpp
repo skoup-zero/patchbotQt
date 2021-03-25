@@ -9,10 +9,10 @@ namespace patchbot
 	{
 		/* function represents state */
 		void ( bugger_ai:: *state_ )( ) = &bugger_ai::follow_wall;
-		
+
 		/* coordinates of first FOUND wall to follow */
 		unsigned int x_start_, y_start_;
-		
+
 		/* states */
 		///	@brief		Follow a wall on left.
 		void follow_wall();
@@ -21,13 +21,13 @@ namespace patchbot
 		void find_wall();
 		///	@brief		Wait if Robot is blocking your way.
 		void wait();
-		
 
-		
+
+
 		///	@brief		Change Buggers moving direction.
 		void turn_clockwise();
 		void turn_counterclockwise();
-		
+
 		///	@brief		Move in current_d_ direction.
 		void move() const;
 

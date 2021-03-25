@@ -20,7 +20,7 @@ namespace patchbot
 		std::vector<tile *> open_doors_;
 		std::vector<tile *> graves_;
 		bool patchbot_corrupted_ = false;
-		
+
 		terrain( std::vector<tile> &&tiles, std::vector<std::shared_ptr<robot>> &&robots_,
 			std::shared_ptr<robot> patchbot, unsigned int width, unsigned int height );
 
@@ -75,9 +75,12 @@ namespace patchbot
 		///				other robots can't interact with it anymore.
 		///	@param		x, y as robot coordinates.
 		void kill_robot( unsigned int x, unsigned int y );
-		
+
+		///	@brief		Follower type robots corrupt patchbot.
+		///	@param		x, y coordinates of attacking robot.
+		///	@param		d direction attacking robot is heading.
 		void corrupt_patchbot( unsigned int x, unsigned int y, direction d );
-		
+
 		///	@brief		Checks if tile at robot is dangerous.
 		///	@param		x, y robot coordinates.
 		///	@return		true if it kills robot.
@@ -114,7 +117,7 @@ namespace patchbot
 		///	@param		d direction to look.
 		///	@return		true if robot is on next tile.
 		bool robot_next_tile( unsigned int x, unsigned int y, direction d );
-		
+
 		///	@brief		Updates all open doors.
 		void update_doors();
 
@@ -125,10 +128,10 @@ namespace patchbot
 		///	@param		x, y as coordinates.
 		///	@return		direction at dijkstra position.
 		direction dijkstra_at( unsigned int x, unsigned int y ) const;
-		
+
 		/// SETTER
 		void load_dijkstra_path();
-		
+
 		/// GETTER 
 		unsigned int width() const noexcept;
 		unsigned int height() const noexcept;
