@@ -15,6 +15,6 @@ class patchbot_exception: public std::exception
 
 public:
 
-	explicit patchbot_exception( const patchbot_enum_exception patchbot_exception );
+	explicit patchbot_exception( patchbot_enum_exception patchbot_exception );
 	virtual const char *what() const noexcept;
 };

@@ -9,7 +9,7 @@ robot::robot( robot_type type )
 
 void robot::update_obstructed()
 {
-	obstructed_ = ( obstructed_ ) ? false : true;
+	obstructed_ = !obstructed_;
 }
 
 

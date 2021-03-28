@@ -106,7 +106,7 @@ void render_engine::render_map( QPixmap &pixmap, unsigned int screen_width, unsi
 }
 
 /// SETTER
-void render_engine::set_game_is_on( const bool status )
+void render_engine::set_game_is_on( bool status )
 {
 	game_is_on_ = status;
 }
