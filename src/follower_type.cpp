@@ -161,21 +161,21 @@ bool follower_type::line_of_sight_blocked()
 	const int	sx = ( x0 < x1 ) ? 1 : -1;
 	const int	sy = ( y0 < y1 ) ? 1 : -1;
 
-	int err = dx + dy; /* error value */
+	int error1 = dx + dy; /* error value */
 
 	while( !( x0 == x1 && y0 == y1 ) ) /* until patchbot is reached */
 	{
-		const int e2 = 2 * err;
+		const int error2 = 2 * error1;
 
-		if( e2 > dy )
+		if( error2 > dy )
 		{ /* one step on x-axis */
-			err += dy;
+			error1 += dy;
 			x0 += sx;
 		}
 
-		if( e2 < dx )
+		if( error2 < dx )
 		{ /* one step on y-axis */
-			err += dx;
+			error1 += dx;
 			y0 += sy;
 		}
 

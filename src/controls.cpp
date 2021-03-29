@@ -14,7 +14,6 @@ controls &controls::operator=( const controls &other )
 {
 	direction_ = other.direction_;
 	frequency_ = other.frequency_;
-	open_doors_ = other.open_doors_;
 	until_wall_ = other.until_wall_;
 
 	return *this;
@@ -93,13 +92,13 @@ void controls::update_instruction()
 
 	if( frequency_[0] == 1 || frequency_[0] == 0 && ( patchbot_reached_wall || push_blocked_ ) )
 	{
-		push_blocked_ = false;
-		until_wall_ = false;
-
 		frequency_.erase( frequency_.begin() );
 
-		if( direction_.size() > 1 )
+		if( !( direction_.size() == 1 && until_wall_ ) ) /* Server counts as wall, so keep last direction for win check  */
 			direction_.erase( direction_.begin() );
+
+		push_blocked_ = false;
+		until_wall_ = false;
 	}
 	else if( frequency_[0] > 0 )
 		frequency_[0]--;
